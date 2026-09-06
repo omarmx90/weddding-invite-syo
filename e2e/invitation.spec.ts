@@ -72,13 +72,61 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(reception.getByRole("heading", { name: "Recepción" })).toBeVisible();
   });
 
-  test("la sección Nuestro equipo existe", async ({ page }) => {
+  test("la sección Nuestro equipo muestra la fotografía familiar", async ({
+    page,
+  }) => {
     await openInvitation(page);
     const team = page.getByTestId("nuestro-equipo");
     await team.scrollIntoViewIfNeeded();
+
     await expect(
       team.getByRole("heading", { name: "Nuestro equipo" }),
     ).toBeVisible();
+
+    const photo = team.getByRole("img", {
+      name: /Silvia, Omar y su hijo/i,
+    });
+    await expect(photo).toBeVisible();
+    await expect(photo).toHaveAttribute("alt", /Silvia, Omar y su hijo/);
+  });
+
+  test("capturas de Nuestro equipo para inspección visual", async ({ page }) => {
+    test.setTimeout(90_000);
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+    const viewports = [
+      { name: "360x800", width: 360, height: 800 },
+      { name: "390x844", width: 390, height: 844 },
+      { name: "430x932", width: 430, height: 932 },
+      { name: "1440x900", width: 1440, height: 900 },
+    ] as const;
+
+    for (const viewport of viewports) {
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
+      });
+      await openInvitation(page);
+
+      const team = page.getByTestId("nuestro-equipo");
+      await team.scrollIntoViewIfNeeded();
+
+      const photo = team.getByRole("img", {
+        name: /Silvia, Omar y su hijo/i,
+      });
+      await expect(photo).toBeVisible();
+      await expect
+        .poll(
+          async () =>
+            photo.evaluate((img: HTMLImageElement) => img.naturalWidth),
+          { timeout: 30_000 },
+        )
+        .toBeGreaterThan(0);
+
+      await team.screenshot({
+        path: path.join(OUTPUT_DIR, `nuestro-equipo-${viewport.name}.png`),
+      });
+    }
   });
 
   test("el flujo completo de secciones está presente", async ({ page }) => {

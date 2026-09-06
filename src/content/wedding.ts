@@ -94,7 +94,15 @@ export const wedding: WeddingContent = {
       { name: "Nuestro hijo" },
     ],
     photoPlaceholderLabel: "Pronto una foto de nuestro equipo",
-    // photo: { src, alt, objectPosition } — cuando exista fotografía real
+    photo: {
+      // Derivado web del original (nuestro-equipo.jpg se conserva intacto).
+      src: "/images/family/nuestro-equipo-display.jpg",
+      alt: "Silvia, Omar y su hijo juntos en una terraza durante una sesión familiar",
+      width: 2400,
+      height: 1600,
+      // Ligero sesgo hacia los rostros; el marco 3:2 coincide con la foto.
+      objectPosition: "50% 42%",
+    },
   },
   links: {},
 };

@@ -8,15 +8,16 @@ type OurTeamSectionProps = {
 };
 
 /**
- * Sección familiar con guiño futbolero sutil.
- * Lista para fotografía real vía content.photo + objectPosition.
+ * Sección familiar con fotografía real en composición editorial.
+ * Prioriza no cortar a ninguna de las tres personas (foto horizontal 3:2).
  */
 export function OurTeamSection({
   content,
   tone = "surface",
 }: OurTeamSectionProps) {
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
-  const hasPhoto = Boolean(content.photo?.src);
+  const photo = content.photo;
+  const hasPhoto = Boolean(photo?.src);
 
   return (
     <section
@@ -25,7 +26,7 @@ export function OurTeamSection({
       aria-labelledby="nuestro-equipo-title"
       data-testid="nuestro-equipo"
     >
-      <Reveal className="mx-auto w-full max-w-[var(--content-max)] text-center">
+      <Reveal className="mx-auto w-full max-w-[min(100%,42rem)] text-center">
         <hr className="invite-rule mx-auto" aria-hidden="true" />
 
         <p className="mt-10 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.32em] text-ink-subtle">
@@ -41,7 +42,7 @@ export function OurTeamSection({
 
         {/* Guiño: línea de campo + tres posiciones */}
         <div
-          className="mx-auto mt-10 flex w-full max-w-[14rem] flex-col items-center gap-5"
+          className="mx-auto mt-9 flex w-full max-w-[13rem] flex-col items-center gap-4"
           aria-hidden="true"
         >
           <div className="h-px w-full bg-sand/80" />
@@ -49,7 +50,7 @@ export function OurTeamSection({
             {content.members.map((member) => (
               <span
                 key={member.name}
-                className="block size-2 rounded-full bg-taupe/80"
+                className="block size-1.5 rounded-full bg-taupe/85"
                 title={member.name}
               />
             ))}
@@ -57,49 +58,57 @@ export function OurTeamSection({
           <div className="h-px w-full bg-sand/80" />
         </div>
 
-        <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+        <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
           {content.members.map((member) => (
             <li
               key={member.name}
-              className="font-display text-[1.125rem] tracking-wide text-ink"
+              className="font-display text-[1.05rem] tracking-wide text-ink"
             >
               {member.name}
             </li>
           ))}
         </ul>
 
-        <p className="mx-auto mt-8 max-w-[22rem] font-sans text-[1.0625rem] leading-relaxed text-ink-muted text-pretty">
+        {/*
+          Contenedor 3:2 alineado a la foto real (7008×4672).
+          Evita crop vertical agresivo que cortaría a Silvia u Omar.
+        */}
+        <figure
+          className="relative mx-auto mt-10 w-full overflow-hidden bg-beige/50 ring-1 ring-sand/50"
+          data-testid="nuestro-equipo-photo"
+        >
+          <div className="relative aspect-[3/2] w-full">
+            {hasPhoto && photo ? (
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                fill
+                sizes="(max-width: 430px) 92vw, (max-width: 768px) 88vw, 672px"
+                className="object-cover"
+                style={{
+                  objectPosition: photo.objectPosition ?? "50% 42%",
+                }}
+              />
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
+                <div
+                  className="relative size-14 rounded-full border border-sand/90"
+                  aria-hidden="true"
+                >
+                  <span className="absolute inset-x-2 top-1/2 h-px -translate-y-1/2 bg-sand/80" />
+                  <span className="absolute inset-y-2 left-1/2 w-px -translate-x-1/2 bg-sand/80" />
+                </div>
+                <p className="font-sans text-[0.75rem] tracking-[0.18em] text-ink-subtle uppercase text-balance">
+                  {content.photoPlaceholderLabel}
+                </p>
+              </div>
+            )}
+          </div>
+        </figure>
+
+        <p className="mx-auto mt-9 max-w-[22rem] font-sans text-[1.0625rem] leading-relaxed text-ink-muted text-pretty">
           {content.line}
         </p>
-
-        <div className="relative mx-auto mt-12 aspect-[4/5] w-full max-w-[20rem] overflow-hidden bg-beige/70 sm:aspect-[3/4]">
-          {hasPhoto && content.photo ? (
-            <Image
-              src={content.photo.src}
-              alt={content.photo.alt}
-              fill
-              sizes="(max-width: 430px) 85vw, 320px"
-              className="object-cover"
-              style={{
-                objectPosition: content.photo.objectPosition ?? "50% 50%",
-              }}
-            />
-          ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
-              {/* Motivo circular abstracto (balón muy sutil) */}
-              <div
-                className="relative size-14 rounded-full border border-sand/90"
-                aria-hidden="true"
-              >
-                <span className="absolute inset-x-2 top-1/2 h-px -translate-y-1/2 bg-sand/80" />
-                <span className="absolute inset-y-2 left-1/2 w-px -translate-x-1/2 bg-sand/80" />
-              </div>
-              <p className="font-sans text-[0.75rem] tracking-[0.18em] text-ink-subtle uppercase text-balance">
-                {content.photoPlaceholderLabel}
-              </p>
-            </div>
-          )}
-        </div>
       </Reveal>
     </section>
   );
