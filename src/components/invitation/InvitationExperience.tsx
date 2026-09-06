@@ -6,6 +6,7 @@ import type { WeddingContent } from "@/content/types";
 import { HeroOpening } from "@/components/invitation/HeroOpening";
 import { IntroSection } from "@/components/invitation/IntroSection";
 import { EventSection } from "@/components/invitation/EventSection";
+import { OurTeamSection } from "@/components/invitation/OurTeamSection";
 
 type InvitationExperienceProps = {
   content: WeddingContent;
@@ -63,6 +64,7 @@ export function InvitationExperience({ content }: InvitationExperienceProps) {
               event={content.event.reception}
               tone="canvas"
             />
+            <OurTeamSection content={content.familyTeam} tone="surface" />
           </motion.main>
         )}
       </AnimatePresence>

@@ -1,5 +1,11 @@
 import type { WeddingContent } from "./types";
-import { formatLongDateEsMx, PRODUCT_LOCALE, PRODUCT_TIMEZONE } from "@/lib/locale";
+import {
+  formatEditorialDateEsMx,
+  PRODUCT_LOCALE,
+  PRODUCT_TIMEZONE,
+} from "@/lib/locale";
+
+const ceremonyDate = formatEditorialDateEsMx("2026-10-16");
 
 /**
  * Fuente de verdad de la narrativa y la logística de la boda.
@@ -41,15 +47,15 @@ export const wedding: WeddingContent = {
   event: {
     ceremony: {
       title: "Ceremonia religiosa",
-      dateLabel: formatLongDateEsMx("2026-10-16"),
+      date: ceremonyDate,
       timeLabel: "Hora",
-      time: "Por confirmar",
+      time: "5:00 p. m.",
       venueLabel: "Iglesia",
       venue: "Por confirmar",
       addressLabel: "Dirección",
       address: "Por confirmar",
-      ctaLabel: "Ver ubicación",
-      mapsUrl: "",
+      ctaLabel: "Cómo llegar",
+      mapsUrl: "https://share.google/cyuLdnExWdwHQkBQg",
     },
     reception: {
       title: "Recepción",
@@ -62,6 +68,33 @@ export const wedding: WeddingContent = {
       ctaLabel: "Ver ubicación",
       mapsUrl: "",
     },
+  },
+  schedule: {
+    title: "Itinerario del día",
+    /**
+     * Solo entradas confirmadas.
+     * Extender más adelante con preparación, traslado, cena, etc.
+     */
+    items: [
+      {
+        id: "ceremony",
+        title: "Ceremonia religiosa",
+        time: "5:00 p. m.",
+        eventKey: "ceremony",
+      },
+    ],
+  },
+  familyTeam: {
+    title: "Nuestro equipo",
+    eyebrow: "Familia",
+    line: "Los mejores partidos se juegan juntos.",
+    members: [
+      { name: "Silvia" },
+      { name: "Omar" },
+      { name: "Nuestro hijo" },
+    ],
+    photoPlaceholderLabel: "Pronto una foto de nuestro equipo",
+    // photo: { src, alt, objectPosition } — cuando exista fotografía real
   },
   links: {},
 };

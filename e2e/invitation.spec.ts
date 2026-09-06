@@ -1,8 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
+import { wedding } from "../src/content/wedding";
 
 const OUTPUT_DIR = path.join(process.cwd(), "e2e", "output");
+const CEREMONY_MAPS_URL = wedding.event.ceremony.mapsUrl;
 
 async function openInvitation(page: Page) {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -44,14 +46,23 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(page.getByTestId("hero-opening")).toHaveCount(0);
   });
 
-  test("la sección de ceremonia es visible", async ({ page }) => {
+  test("la ceremonia muestra fecha, hora y cómo llegar", async ({ page }) => {
     await openInvitation(page);
     const ceremony = page.getByTestId("ceremony");
     await ceremony.scrollIntoViewIfNeeded();
+
     await expect(
       ceremony.getByRole("heading", { name: "Ceremonia religiosa" }),
     ).toBeVisible();
-    await expect(ceremony.getByText("Viernes 16 de octubre de 2026")).toBeVisible();
+    await expect(ceremony.getByText("Viernes", { exact: true })).toBeVisible();
+    await expect(ceremony.getByText("16 de octubre de 2026")).toBeVisible();
+    await expect(ceremony.getByTestId("ceremony-time")).toHaveText("5:00 p. m.");
+
+    const mapsCta = ceremony.getByTestId("ceremony-maps-cta");
+    await expect(mapsCta).toHaveText(/Cómo llegar/i);
+    await expect(mapsCta).toHaveAttribute("href", CEREMONY_MAPS_URL);
+    await expect(mapsCta).toHaveAttribute("target", "_blank");
+    await expect(mapsCta).toHaveAttribute("rel", /noopener/);
   });
 
   test("la sección de recepción es visible", async ({ page }) => {
@@ -61,9 +72,27 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(reception.getByRole("heading", { name: "Recepción" })).toBeVisible();
   });
 
+  test("la sección Nuestro equipo existe", async ({ page }) => {
+    await openInvitation(page);
+    const team = page.getByTestId("nuestro-equipo");
+    await team.scrollIntoViewIfNeeded();
+    await expect(
+      team.getByRole("heading", { name: "Nuestro equipo" }),
+    ).toBeVisible();
+  });
+
+  test("el flujo completo de secciones está presente", async ({ page }) => {
+    await openInvitation(page);
+    await expect(page.getByTestId("intro-section")).toBeVisible();
+    await expect(page.getByTestId("ceremony")).toBeVisible();
+    await expect(page.getByTestId("reception")).toBeVisible();
+    await expect(page.getByTestId("nuestro-equipo")).toBeVisible();
+  });
+
   test("no hay overflow horizontal a 360px", async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await openInvitation(page);
+    await page.getByTestId("nuestro-equipo").scrollIntoViewIfNeeded();
 
     const hasOverflow = await page.evaluate(() => {
       const doc = document.documentElement;
@@ -80,6 +109,8 @@ test.describe("Invitación de boda — Chromium", () => {
       { name: "360x800", width: 360, height: 800 },
       { name: "390x844", width: 390, height: 844 },
       { name: "430x932", width: 430, height: 932 },
+      { name: "768x1024", width: 768, height: 1024 },
+      { name: "1440x900", width: 1440, height: 900 },
     ] as const;
 
     for (const viewport of viewports) {
@@ -98,7 +129,7 @@ test.describe("Invitación de boda — Chromium", () => {
 
       await page.getByTestId("hero-cta").click();
       await expect(page.getByTestId("invitation-content")).toBeVisible();
-      await expect(page.getByTestId("ceremony").getByRole("heading")).toBeVisible();
+      await expect(page.getByTestId("nuestro-equipo")).toBeVisible();
       await page.screenshot({
         path: path.join(OUTPUT_DIR, `invitation-${viewport.name}.png`),
         fullPage: true,

@@ -10,12 +10,20 @@ export type WeddingMediaAsset = {
   /** Hint opcional para next/image con assets raster */
   width?: number;
   height?: number;
+  /** CSS object-position para el crop (p. ej. "50% 28%") */
+  objectPosition?: string;
+};
+
+/** Fecha editorial en bloques (invitación impresa). */
+export type EditorialDate = {
+  weekday: string;
+  dayMonthYear: string;
 };
 
 export type EventLocation = {
   title: string;
-  /** Línea de fecha larga bajo el título (opcional) */
-  dateLabel?: string;
+  /** Fecha en jerarquía editorial; omitir si aún no aplica */
+  date?: EditorialDate;
   timeLabel: string;
   time: string;
   venueLabel: string;
@@ -23,8 +31,55 @@ export type EventLocation = {
   addressLabel: string;
   address: string;
   ctaLabel: string;
-  /** Si está vacío, el CTA se muestra pero no navega (placeholder) */
+  /** Si está vacío, el CTA se muestra pero no navega (pendiente) */
   mapsUrl: string;
+};
+
+/**
+ * Ítems futuros del itinerario del día.
+ * Solo incluir entradas con información confirmada.
+ */
+export type ScheduleItemId =
+  | "preparation"
+  | "ceremony"
+  | "transfer"
+  | "reception"
+  | "dinner"
+  | "special"
+  | (string & {});
+
+export type ScheduleItem = {
+  id: ScheduleItemId;
+  title: string;
+  /** Hora en español de México cuando esté confirmada */
+  time?: string;
+  description?: string;
+  eventKey?: "ceremony" | "reception";
+};
+
+export type DaySchedule = {
+  title: string;
+  items: ScheduleItem[];
+};
+
+export type FamilyMember = {
+  name: string;
+  /** Etiqueta breve opcional */
+  label?: string;
+};
+
+export type FamilyTeamContent = {
+  title: string;
+  eyebrow: string;
+  /** Línea emocional principal */
+  line: string;
+  members: FamilyMember[];
+  /**
+   * Fotografía familiar futura.
+   * Mientras no exista, la UI muestra un marco preparado.
+   */
+  photo?: WeddingMediaAsset;
+  photoPlaceholderLabel: string;
 };
 
 export type WeddingCopy = {
@@ -63,6 +118,9 @@ export type WeddingContent = {
     ceremony: EventLocation;
     reception: EventLocation;
   };
+  /** Estructura lista para el itinerario completo (sin inventar eventos). */
+  schedule: DaySchedule;
+  familyTeam: FamilyTeamContent;
   links: {
     /** Atajos futuros de WhatsApp / contacto */
     whatsapp?: string;
