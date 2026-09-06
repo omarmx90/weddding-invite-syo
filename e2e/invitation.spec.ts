@@ -40,6 +40,26 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(page.getByText("16 · 10 · 2026")).toBeVisible();
   });
 
+  test("el hero muestra la fotografía real con alt correcto", async ({ page }) => {
+    await page.goto("/");
+    const photo = page.getByTestId("hero-photo");
+    await expect(photo).toBeVisible();
+    await expect(photo).toHaveAttribute(
+      "alt",
+      "Silvia y Omar frente a una iglesia durante una sesión de pareja",
+    );
+    await expect(photo).toHaveAttribute("src", /portada-display/);
+    await expect
+      .poll(
+        async () => photo.evaluate((img: HTMLImageElement) => img.naturalWidth),
+        { timeout: 30_000 },
+      )
+      .toBeGreaterThan(0);
+
+    await expect(page.getByTestId("hero-opening").getByText("Querétaro, México")).toBeVisible();
+    await expect(page.getByTestId("hero-cta")).toBeVisible();
+  });
+
   test("el CTA revela la experiencia de invitación", async ({ page }) => {
     await openInvitation(page);
     await expect(page.getByTestId("intro-section")).toBeVisible();
@@ -150,7 +170,51 @@ test.describe("Invitación de boda — Chromium", () => {
     expect(hasOverflow).toBe(false);
   });
 
+  test("capturas del hero editorial para inspección visual", async ({ page }) => {
+    test.setTimeout(90_000);
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+    const viewports = [
+      { name: "360x800", width: 360, height: 800 },
+      { name: "390x844", width: 390, height: 844 },
+      { name: "430x932", width: 430, height: 932 },
+      { name: "1440x900", width: 1440, height: 900 },
+    ] as const;
+
+    for (const viewport of viewports) {
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
+      });
+
+      await page.goto("/");
+      await expect(page.getByRole("heading", { name: "Silvia & Omar" })).toBeVisible();
+      await expect(page.getByText("16 · 10 · 2026")).toBeVisible();
+      await expect(page.getByTestId("hero-cta")).toBeVisible();
+
+      const photo = page.getByTestId("hero-photo");
+      await expect
+        .poll(
+          async () => photo.evaluate((img: HTMLImageElement) => img.naturalWidth),
+          { timeout: 30_000 },
+        )
+        .toBeGreaterThan(0);
+
+      const hasOverflow = await page.evaluate(() => {
+        const doc = document.documentElement;
+        return doc.scrollWidth > doc.clientWidth + 1;
+      });
+      expect(hasOverflow).toBe(false);
+
+      await page.screenshot({
+        path: path.join(OUTPUT_DIR, `hero-${viewport.name}.png`),
+        fullPage: false,
+      });
+    }
+  });
+
   test("capturas móviles para inspección visual", async ({ page }) => {
+    test.setTimeout(90_000);
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
     const viewports = [

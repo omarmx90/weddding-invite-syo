@@ -85,6 +85,8 @@ export type FamilyTeamContent = {
 export type WeddingCopy = {
   tagline: string;
   heroCta: string;
+  heroEyebrow: string;
+  locationLabel: string;
   introEyebrow: string;
   introTitle: string;
   introBody: string;
@@ -112,7 +114,12 @@ export type WeddingContent = {
     description: string;
   };
   media: {
-    hero: WeddingMediaAsset;
+    hero: WeddingMediaAsset & {
+      /** object-position para viewports estrechos */
+      objectPositionMobile?: string;
+      /** object-position para desktop */
+      objectPositionDesktop?: string;
+    };
   };
   event: {
     ceremony: EventLocation;

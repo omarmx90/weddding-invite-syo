@@ -26,6 +26,8 @@ export const wedding: WeddingContent = {
   copy: {
     tagline: "Nos casamos",
     heroCta: "Ver invitación",
+    heroEyebrow: "Nuestra boda",
+    locationLabel: "Querétaro, México",
     introEyebrow: "Nuestra boda",
     introTitle: "Con alegría queremos compartir este día con ustedes",
     introBody:
@@ -38,10 +40,14 @@ export const wedding: WeddingContent = {
   },
   media: {
     hero: {
-      src: "/images/placeholders/hero.svg",
-      alt: "Fondo provisional en tonos arena — reemplazar con fotografía de Silvia y Omar",
-      width: 1080,
-      height: 1920,
+      // Derivado web; portada.jpg original se conserva intacto.
+      src: "/images/hero/portada-display.jpg",
+      alt: "Silvia y Omar frente a una iglesia durante una sesión de pareja",
+      width: 1600,
+      height: 2400,
+      objectPosition: "58% 52%",
+      objectPositionMobile: "54% 42%",
+      objectPositionDesktop: "62% 46%",
     },
   },
   event: {
