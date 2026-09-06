@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+/*
+  Paleta neutra cálida de la invitación.
+  Editar tokens aquí — los componentes usan alias del theme de Tailwind.
+*/
+:root {
+  --warm-white: #fcfaf7;
+  --beige: #ede3d5;
+  --sand: #d6c2a6;
+  --taupe: #a99076;
+  --ink: #4b443d;
+  --ink-muted: #7a7268;
+  --ink-subtle: #9c9388;
+
+  --canvas: var(--warm-white);
+  --surface: var(--beige);
+  --accent: var(--taupe);
+  --rule: color-mix(in srgb, var(--sand) 70%, var(--beige));
+
+  --hero-fg: var(--warm-white);
+  --hero-veil: rgba(75, 68, 61, 0.38);
+  --hero-veil-deep: rgba(75, 68, 61, 0.55);
+
+  --section-y: clamp(4.5rem, 12vw, 7.5rem);
+  --content-max: 28rem;
+}
+
+@theme inline {
+  --color-warm-white: var(--warm-white);
+  --color-beige: var(--beige);
+  --color-sand: var(--sand);
+  --color-taupe: var(--taupe);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-accent: var(--accent);
+  --color-rule: var(--rule);
+  --color-hero-fg: var(--hero-fg);
+  --color-background: var(--canvas);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-source-sans);
+  --font-display: var(--font-cormorant);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), "Times New Roman", serif;
+}
+
+.font-sans {
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.hero-overlay {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ink) 46%, transparent) 0%,
+      color-mix(in srgb, var(--ink) 34%, transparent) 40%,
+      color-mix(in srgb, var(--ink) 62%, transparent) 100%
+    );
+}
+
+.section-pad {
+  padding-inline: max(1.25rem, env(safe-area-inset-left))
+    max(1.25rem, env(safe-area-inset-right));
+  padding-block: var(--section-y);
+}
+
+.invite-rule {
+  width: 2.5rem;
+  height: 1px;
+  background: var(--sand);
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

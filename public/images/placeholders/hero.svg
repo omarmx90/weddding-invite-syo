@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920" role="img" aria-label="Fondo provisional en tonos arena para la portada de la invitación">
+  <title>MARCADOR DE POSICIÓN — Reemplazar con fotografía de la pareja</title>
+  <defs>
+    <linearGradient id="wash" x1="0%" y1="0%" x2="40%" y2="100%">
+      <stop offset="0%" stop-color="#BFA88C"/>
+      <stop offset="40%" stop-color="#A99076"/>
+      <stop offset="100%" stop-color="#6F6256"/>
+    </linearGradient>
+    <radialGradient id="bloom" cx="50%" cy="34%" r="62%">
+      <stop offset="0%" stop-color="#EDE3D5" stop-opacity="0.35"/>
+      <stop offset="50%" stop-color="#A99076" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#4B443D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="edge" cx="50%" cy="50%" r="70%">
+      <stop offset="35%" stop-color="#4B443D" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#4B443D" stop-opacity="0.45"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#wash)"/>
+  <ellipse cx="540" cy="560" rx="460" ry="380" fill="url(#bloom)"/>
+  <ellipse cx="140" cy="1520" rx="380" ry="280" fill="#4B443D" opacity="0.2"/>
+  <ellipse cx="960" cy="1640" rx="420" ry="300" fill="#4B443D" opacity="0.28"/>
+  <rect width="1080" height="1920" fill="url(#edge)"/>
+  <text x="540" y="1840" text-anchor="middle" fill="#FCFAF7" fill-opacity="0.4" font-family="Georgia, serif" font-size="20" letter-spacing="5">MARCADOR · FOTO</text>
+</svg>
