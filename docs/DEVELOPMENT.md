@@ -146,3 +146,21 @@ Ajuste del SO “Reducir movimiento” → la apertura y los revelados deben seg
 - Dependencias mínimas
 - Copy orientado a invitados en **español de México**
 - Identificadores técnicos (componentes, types, hooks) en inglés
+
+## Vercel Toolbar en producción
+
+La app **no** incluye `@vercel/toolbar`. Si el toolbar aparece en
+https://silvia-y-omar.com, es una configuración del dashboard de Vercel (o de la
+extensión del navegador), no del código.
+
+Para ocultarlo en producción:
+
+1. Abre el [dashboard de Vercel](https://vercel.com/dashboard) y selecciona el proyecto.
+2. Ve a **Settings → General**.
+3. Busca **Vercel Toolbar**.
+4. En el entorno **Production**, elige **Off**.
+5. Opcional a nivel de team: **Team Settings → General → Vercel Toolbar → Production → Off**.
+6. Redeploy si el cambio no se refleja de inmediato.
+7. Verifica en una ventana de incógnito (sin estar logueado en Vercel / sin extensión).
+
+Mantén Preview en **On** o **Default** si quieres el toolbar solo en previews.

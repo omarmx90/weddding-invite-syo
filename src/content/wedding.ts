@@ -26,9 +26,9 @@ export const wedding: WeddingContent = {
       "Será un honor tenerlos presentes en la ceremonia y en la celebración. A continuación encontrarán los detalles para acompañarnos.",
   },
   meta: {
-    title: "Silvia & Omar — 16 de octubre de 2026",
+    title: "Silvia & Omar | Nos casamos",
     description:
-      "Invitación digital a la boda de Silvia y Omar. Viernes 16 de octubre de 2026.",
+      "Una invitación especial para celebrar nuestra boda el 16 de octubre de 2026.",
   },
   media: {
     hero: {

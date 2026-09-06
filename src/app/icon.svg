@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Silvia y Omar">
+  <rect width="32" height="32" fill="#EDE3D5"/>
+  <text
+    x="16"
+    y="21"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="11"
+    font-weight="600"
+    fill="#4B443D"
+    letter-spacing="-0.5"
+  >S&amp;O</text>
+</svg>
