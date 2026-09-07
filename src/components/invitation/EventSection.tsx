@@ -1,4 +1,5 @@
-import type { EventLocation } from "@/content/types";
+import Image from "next/image";
+import type { EventLocation, WeddingMediaAsset } from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
 import {
   BotanicalSprig,
@@ -9,6 +10,8 @@ type EventSectionProps = {
   event: EventLocation;
   sectionId: string;
   tone?: "canvas" | "surface";
+  /** Foto editorial debajo del CTA Cómo llegar */
+  detail?: WeddingMediaAsset;
 };
 
 function DetailRow({ label, value }: { label: string; value: string }) {
@@ -28,6 +31,7 @@ export function EventSection({
   event,
   sectionId,
   tone = "canvas",
+  detail,
 }: EventSectionProps) {
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
   const hasMaps = Boolean(event.mapsUrl.trim());
@@ -121,6 +125,37 @@ export function EventSection({
           </div>
         ) : null}
       </Reveal>
+
+      {detail ? (
+        <figure
+          className={`relative mx-auto mt-14 w-full overflow-hidden bg-beige/40 md:mt-16 ${
+            detail.height && detail.width && detail.height > detail.width
+              ? "max-w-[min(100%,26rem)]"
+              : "max-w-[min(100%,40rem)]"
+          }`}
+          data-testid={`${sectionId}-detail-photo`}
+        >
+          <div
+            className={`relative w-full ${
+              detail.height && detail.width && detail.height > detail.width
+                ? "aspect-[2/3]"
+                : "aspect-[3/2]"
+            }`}
+          >
+            <Image
+              src={detail.src}
+              alt={detail.alt}
+              fill
+              sizes="(max-width: 768px) 100vw, 640px"
+              className="object-cover"
+              style={{
+                objectPosition: detail.objectPosition ?? "50% 45%",
+              }}
+              loading="lazy"
+            />
+          </div>
+        </figure>
+      ) : null}
     </section>
   );
 }

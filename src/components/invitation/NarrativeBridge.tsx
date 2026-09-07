@@ -1,3 +1,5 @@
+import Image from "next/image";
+import type { WeddingMediaAsset } from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
 import { OrnamentalDivider } from "@/components/invitation/ornaments";
 
@@ -5,6 +7,8 @@ type NarrativeBridgeProps = {
   text: string;
   tone?: "canvas" | "surface";
   testId?: string;
+  /** Foto editorial bajo el texto de transición */
+  media?: WeddingMediaAsset;
 };
 
 /**
@@ -15,6 +19,7 @@ export function NarrativeBridge({
   text,
   tone = "canvas",
   testId = "celebration-transition",
+  media,
 }: NarrativeBridgeProps) {
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
 
@@ -30,6 +35,27 @@ export function NarrativeBridge({
           {text}
         </p>
       </Reveal>
+
+      {media ? (
+        <figure
+          className="relative mx-auto mt-12 w-full max-w-[min(100%,40rem)] overflow-hidden bg-beige/40 md:mt-14"
+          data-testid={`${testId}-photo`}
+        >
+          <div className="relative aspect-[3/2] w-full">
+            <Image
+              src={media.src}
+              alt={media.alt}
+              fill
+              sizes="(max-width: 768px) 100vw, 640px"
+              className="object-cover"
+              style={{
+                objectPosition: media.objectPosition ?? "50% 55%",
+              }}
+              loading="lazy"
+            />
+          </div>
+        </figure>
+      ) : null}
     </section>
   );
 }

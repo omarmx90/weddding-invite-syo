@@ -254,6 +254,18 @@ export type WeddingContent = {
       /** object-position para desktop */
       objectPositionDesktop?: string;
     };
+    /** Detalle editorial bajo Guardar la fecha (Nuestro día) */
+    dayDetail?: WeddingMediaAsset;
+    /** Detalle bajo Cómo llegar (Ceremonia católica) */
+    ceremonyDetail?: WeddingMediaAsset;
+    /** Foto en el puente narrativo hacia la celebración */
+    celebrationBridge?: WeddingMediaAsset;
+    /** Detalle en Celebración íntima */
+    receptionDetail?: WeddingMediaAsset;
+    /** Detalle en Itinerario del día */
+    scheduleDetail?: WeddingMediaAsset;
+    /** Par editorial en Con la bendición de Dios */
+    faithDetails?: WeddingMediaAsset[];
   };
   event: {
     ceremony: EventLocation;

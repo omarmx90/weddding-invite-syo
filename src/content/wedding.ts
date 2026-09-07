@@ -52,6 +52,64 @@ export const wedding: WeddingContent = {
       objectPositionMobile: "54% 42%",
       objectPositionDesktop: "62% 46%",
     },
+    dayDetail: {
+      // Derivado de Previas -57.jpg (manos); original intacto en gallery/originals.
+      src: "/images/gallery/features/feature-hands-detail.jpg",
+      alt: "Manos de Silvia y Omar entrelazadas, con anillo y reloj a la vista",
+      width: 1800,
+      height: 1200,
+      objectPosition: "50% 48%",
+    },
+    ceremonyDetail: {
+      // Derivado de Previas -81.jpg; original intacto en gallery/originals.
+      src: "/images/gallery/features/feature-ceremony-couple.jpg",
+      alt: "Silvia y Omar sonriendo frente a la iglesia en un día soleado",
+      width: 1800,
+      height: 1200,
+      objectPosition: "50% 42%",
+    },
+    celebrationBridge: {
+      // Derivado de Previas -21.jpg (familia); original intacto en gallery/originals.
+      src: "/images/gallery/features/feature-celebration-family.jpg",
+      alt: "Silvia, Omar y Mauro sentados juntos en el césped, sonriendo a cámara",
+      width: 1800,
+      height: 1224,
+      objectPosition: "50% 55%",
+    },
+    receptionDetail: {
+      // Derivado de Previas -9.jpg; original intacto en gallery/originals.
+      src: "/images/gallery/features/feature-reception-family.jpg",
+      alt: "Silvia, Omar y Mauro de pie en una terraza con el acueducto de Querétaro al fondo",
+      width: 933,
+      height: 1400,
+      objectPosition: "50% 40%",
+    },
+    scheduleDetail: {
+      // Derivado de Previas -16.jpg; original intacto en gallery/originals.
+      src: "/images/gallery/features/feature-schedule-terrace.jpg",
+      alt: "Silvia, Omar y Mauro en la terraza, compartiendo un momento junto a la barandilla",
+      width: 1800,
+      height: 1200,
+      objectPosition: "50% 45%",
+    },
+    faithDetails: [
+      {
+        // Derivado de Previas -42.jpg; original intacto en gallery/originals.
+        src: "/images/gallery/features/feature-faith-silvia-gaze.jpg",
+        alt: "Silvia mira a Omar con una sonrisa afectuosa, en un instante íntimo al aire libre",
+        width: 1600,
+        height: 1067,
+        objectPosition: "42% 40%",
+      },
+      {
+        // Derivado de Previas -46.jpg; original intacto en gallery/originals.
+        src: "/images/gallery/features/feature-faith-omar-gaze.jpg",
+        alt: "Omar mira a Silvia con ternura, en un instante íntimo al aire libre",
+        width: 1600,
+        height: 1067,
+        objectPosition: "58% 38%",
+      },
+    ],
   },
   event: {
     ceremony: {

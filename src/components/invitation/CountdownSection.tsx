@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { CountdownContent } from "@/content/types";
+import Image from "next/image";
+import type { CountdownContent, WeddingContent } from "@/content/types";
 import type { EditorialChapter } from "@/content/editorial-types";
 import {
   getCountdownParts,
@@ -11,7 +12,6 @@ import {
 import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
 import { SaveTheDate } from "@/components/invitation/SaveTheDate";
-import type { WeddingContent } from "@/content/types";
 
 type CountdownSectionProps = {
   content: CountdownContent;
@@ -38,6 +38,7 @@ export function CountdownSection({
 }: CountdownSectionProps) {
   const [parts, setParts] = useState<CountdownParts | null>(null);
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
+  const dayDetail = wedding.media.dayDetail;
 
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | undefined;
@@ -156,6 +157,27 @@ export function CountdownSection({
 
         <SaveTheDate content={wedding} />
       </Reveal>
+
+      {dayDetail ? (
+        <figure
+          className="relative mx-auto mt-14 w-full max-w-[min(100%,40rem)] overflow-hidden bg-beige/40 md:mt-16"
+          data-testid="day-detail-photo"
+        >
+          <div className="relative aspect-[3/2] w-full">
+            <Image
+              src={dayDetail.src}
+              alt={dayDetail.alt}
+              fill
+              sizes="(max-width: 768px) 100vw, 640px"
+              className="object-cover"
+              style={{
+                objectPosition: dayDetail.objectPosition ?? "50% 48%",
+              }}
+              loading="lazy"
+            />
+          </div>
+        </figure>
+      ) : null}
     </section>
   );
 }

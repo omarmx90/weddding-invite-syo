@@ -1,4 +1,5 @@
-import type { FaithContent } from "@/content/types";
+import Image from "next/image";
+import type { FaithContent, WeddingMediaAsset } from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
 import {
   BotanicalSprig,
@@ -10,16 +11,22 @@ import {
 type FaithSectionProps = {
   content: FaithContent;
   tone?: "canvas" | "surface";
+  details?: WeddingMediaAsset[];
 };
 
 /**
  * Sección de fe — momento íntimo de papelería católica editorial.
  * La tipografía y el versículo lideran; los símbolos son grabado fino.
  */
-export function FaithSection({ content, tone = "surface" }: FaithSectionProps) {
+export function FaithSection({
+  content,
+  tone = "surface",
+  details = [],
+}: FaithSectionProps) {
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
   const guadalupe = content.patrons[0];
   const jude = content.patrons[1];
+  const photoPair = details.filter(Boolean).slice(0, 2);
 
   return (
     <section
@@ -84,6 +91,37 @@ export function FaithSection({ content, tone = "surface" }: FaithSectionProps) {
           {content.patronsPrayer}
         </p>
       </Reveal>
+
+      {photoPair.length > 0 ? (
+        <div
+          className="mx-auto mt-14 grid w-full max-w-[min(100%,42rem)] gap-3 md:mt-16 md:grid-cols-2 md:gap-4"
+          data-testid="faith-detail-photos"
+        >
+          {photoPair.map((photo, index) => (
+            <figure
+              key={photo.src}
+              className="relative overflow-hidden bg-beige/40"
+            >
+              <div className="relative aspect-[3/2] w-full">
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 336px"
+                  className="object-cover"
+                  style={{
+                    objectPosition: photo.objectPosition ?? "50% 40%",
+                  }}
+                  loading="lazy"
+                />
+              </div>
+              <figcaption className="sr-only">
+                {index === 0 ? "Mirada de Silvia" : "Mirada de Omar"}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

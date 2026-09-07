@@ -1,12 +1,16 @@
-import type { DaySchedule, ScheduleItemId } from "@/content/types";
+import Image from "next/image";
+import type {
+  DaySchedule,
+  ScheduleItemId,
+  WeddingMediaAsset,
+} from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
-import {
-  LatinCross,
-} from "@/components/invitation/ornaments";
+import { LatinCross } from "@/components/invitation/ornaments";
 
 type DayScheduleSectionProps = {
   schedule: DaySchedule;
   tone?: "canvas" | "surface";
+  detail?: WeddingMediaAsset;
 };
 
 function ScheduleMarker({ id }: { id: ScheduleItemId }) {
@@ -34,6 +38,7 @@ function ScheduleMarker({ id }: { id: ScheduleItemId }) {
 export function DayScheduleSection({
   schedule,
   tone = "surface",
+  detail,
 }: DayScheduleSectionProps) {
   if (schedule.items.length === 0) return null;
 
@@ -108,6 +113,27 @@ export function DayScheduleSection({
           })}
         </ol>
       </Reveal>
+
+      {detail ? (
+        <figure
+          className="relative mx-auto mt-14 w-full max-w-[min(100%,40rem)] overflow-hidden bg-beige/40 md:mt-16"
+          data-testid="schedule-detail-photo"
+        >
+          <div className="relative aspect-[3/2] w-full">
+            <Image
+              src={detail.src}
+              alt={detail.alt}
+              fill
+              sizes="(max-width: 768px) 100vw, 640px"
+              className="object-cover"
+              style={{
+                objectPosition: detail.objectPosition ?? "50% 45%",
+              }}
+              loading="lazy"
+            />
+          </div>
+        </figure>
+      ) : null}
     </section>
   );
 }

@@ -11,6 +11,13 @@ Derivados web (~2000 px lado largo) en `features/`:
 | `feature-church-kiss.jpg` | Previas -78.jpg | Cinematic #1 — pareja + fe |
 | `feature-family-walkaway.jpg` | Previas -25.jpg | Cinematic #2 — familia al santuario |
 | `feature-couple-laugh.jpg` | Previas -36.jpg | Cinematic #3 — cierre emocional |
+| `feature-hands-detail.jpg` | Previas -57.jpg | Nuestro día — debajo de Guardar la fecha |
+| `feature-ceremony-couple.jpg` | Previas -81.jpg | Ceremonia — debajo de Cómo llegar |
+| `feature-celebration-family.jpg` | Previas -21.jpg | Puente hacia celebración íntima |
+| `feature-reception-family.jpg` | Previas -9.jpg | Celebración íntima |
+| `feature-schedule-terrace.jpg` | Previas -16.jpg | Itinerario del día |
+| `feature-faith-silvia-gaze.jpg` | Previas -42.jpg | Fe — díptico (Silvia) |
+| `feature-faith-omar-gaze.jpg` | Previas -46.jpg | Fe — díptico (Omar) |
 
 ### Reel
 

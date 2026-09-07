@@ -117,23 +117,28 @@ export function InvitationExperience({
               sectionId="ceremony"
               event={content.event.ceremony}
               tone={guest ? "canvas" : "surface"}
+              detail={content.media.ceremonyDetail}
             />
             <NarrativeBridge
               text={content.copy.celebrationTransition}
               tone={guest ? "surface" : "canvas"}
+              media={content.media.celebrationBridge}
             />
             <EventSection
               sectionId="reception"
               event={content.event.reception}
               tone={guest ? "canvas" : "surface"}
+              detail={content.media.receptionDetail}
             />
             <DayScheduleSection
               schedule={content.schedule}
               tone={guest ? "surface" : "canvas"}
+              detail={content.media.scheduleDetail}
             />
             <FaithSection
               content={content.faith}
               tone={guest ? "canvas" : "surface"}
+              details={content.media.faithDetails}
             />
             {cineCouple ? <CinematicMoment moment={cineCouple} /> : null}
             <OurTeamSection
