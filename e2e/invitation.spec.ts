@@ -261,6 +261,100 @@ test.describe("Invitación de boda — Chromium", () => {
     }
   });
 
+  test("el cinematic familiar aparece una sola vez después de Con cariño", async ({
+    page,
+  }) => {
+    await openInvitation(page);
+
+    const family = page.getByTestId("cinematic-cine-family");
+    await expect(family).toHaveCount(1);
+
+    const order = await page.evaluate(() => {
+      const intro = document.querySelector('[data-testid="intro-section"]');
+      const cine = document.querySelector('[data-testid="cinematic-cine-family"]');
+      const ceremony = document.querySelector('[data-testid="ceremony"]');
+      const team = document.querySelector('[data-testid="nuestro-equipo"]');
+      const gallery = document.querySelector('[data-testid="nuestros-momentos"]');
+      if (!intro || !cine || !ceremony || !team || !gallery) return null;
+      const position = intro.compareDocumentPosition(cine);
+      const beforeCeremony = cine.compareDocumentPosition(ceremony);
+      const teamBeforeGallery = team.compareDocumentPosition(gallery);
+      return {
+        familyAfterIntro: (position & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+        ceremonyAfterFamily:
+          (beforeCeremony & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+        galleryAfterTeam:
+          (teamBeforeGallery & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+        walkawayCount: document.querySelectorAll(
+          'img[src*="feature-family-walkaway"]',
+        ).length,
+      };
+    });
+
+    expect(order).not.toBeNull();
+    expect(order?.familyAfterIntro).toBe(true);
+    expect(order?.ceremonyAfterFamily).toBe(true);
+    expect(order?.galleryAfterTeam).toBe(true);
+    expect(order?.walkawayCount).toBe(1);
+  });
+
+  test("capturas del cinematic familiar en la apertura narrativa", async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+    const viewports = [
+      { name: "390x844", width: 390, height: 844 },
+      { name: "430x932", width: 430, height: 932 },
+      { name: "1440x900", width: 1440, height: 900 },
+    ] as const;
+
+    for (const viewport of viewports) {
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
+      });
+      await openInvitation(page);
+
+      const intro = page.getByTestId("intro-section");
+      await intro.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: path.join(
+          OUTPUT_DIR,
+          `family-move-intro-${viewport.name}.png`,
+        ),
+      });
+
+      const family = page.getByTestId("cinematic-cine-family");
+      await family.scrollIntoViewIfNeeded();
+      await expect
+        .poll(
+          async () =>
+            family.locator("img").first().evaluate(
+              (el: HTMLImageElement) => el.naturalWidth,
+            ),
+          { timeout: 30_000 },
+        )
+        .toBeGreaterThan(0);
+      await page.screenshot({
+        path: path.join(
+          OUTPUT_DIR,
+          `family-move-photo-${viewport.name}.png`,
+        ),
+      });
+
+      const team = page.getByTestId("nuestro-equipo");
+      await team.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: path.join(
+          OUTPUT_DIR,
+          `family-move-team-to-gallery-${viewport.name}.png`,
+        ),
+      });
+    }
+  });
+
   test("capturas del riel de galería para inspección visual", async ({ page }) => {
     test.setTimeout(120_000);
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });

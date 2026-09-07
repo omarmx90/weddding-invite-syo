@@ -112,6 +112,7 @@ export function InvitationExperience({
               <PersonalizedWelcome guest={guest} tone="surface" />
             ) : null}
             <IntroSection content={content} />
+            {cineFamily ? <CinematicMoment moment={cineFamily} /> : null}
             <EventSection
               sectionId="ceremony"
               event={content.event.ceremony}
@@ -144,7 +145,6 @@ export function InvitationExperience({
               content={content.familiesBlessing}
               tone={guest ? "canvas" : "surface"}
             />
-            {cineFamily ? <CinematicMoment moment={cineFamily} /> : null}
             {showGallery ? (
               <MomentsGallerySection
                 content={content.gallery}
