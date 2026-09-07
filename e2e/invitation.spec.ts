@@ -181,11 +181,95 @@ test.describe("Invitación de boda — Chromium", () => {
       team.getByText("Tres corazones. Tres equipos. Una sola familia."),
     ).toBeVisible();
 
-    const photo = team.getByRole("img", {
-      name: /Silvia, Omar y Mauro/i,
-    });
-    await expect(photo).toBeVisible();
-    await expect(photo).toHaveAttribute("alt", /Silvia, Omar y Mauro/);
+    const gallery = page.getByTestId("football-gallery");
+    await expect(gallery).toBeVisible();
+    expect(wedding.familyTeam.footballGallery.items.length).toBeGreaterThanOrEqual(
+      10,
+    );
+    expect(wedding.familyTeam.footballGallery.items.length).toBeLessThanOrEqual(
+      20,
+    );
+
+    const first = page.getByTestId("football-photo-fb-01");
+    await expect(first).toBeVisible();
+    await expect(first.locator("img")).toHaveAttribute(
+      "alt",
+      /Silvia, Mauro y Omar/i,
+    );
+  });
+
+  test("galería futbolera abre lightbox con navegación y Escape", async ({
+    page,
+  }) => {
+    await openInvitation(page);
+    const team = page.getByTestId("nuestro-equipo");
+    await team.scrollIntoViewIfNeeded();
+
+    await page.getByTestId("football-photo-fb-01").click();
+    const lightbox = page.getByTestId("football-lightbox");
+    await expect(lightbox).toBeVisible();
+    await expect(page.getByTestId("football-lightbox-counter")).toHaveText(
+      `1 / ${wedding.familyTeam.footballGallery.items.length}`,
+    );
+
+    await page.getByTestId("football-lightbox-next").click();
+    await expect(page.getByTestId("football-lightbox-counter")).toHaveText(
+      `2 / ${wedding.familyTeam.footballGallery.items.length}`,
+    );
+
+    await page.getByTestId("football-lightbox-prev").click();
+    await expect(page.getByTestId("football-lightbox-counter")).toHaveText(
+      `1 / ${wedding.familyTeam.footballGallery.items.length}`,
+    );
+
+    await page.keyboard.press("Escape");
+    await expect(lightbox).toHaveCount(0);
+  });
+
+  test("capturas de la galería futbolera y lightbox", async ({ page }) => {
+    test.setTimeout(120_000);
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+    const viewports = [
+      { name: "390x844", width: 390, height: 844 },
+      { name: "1440x900", width: 1440, height: 900 },
+    ] as const;
+
+    for (const viewport of viewports) {
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
+      });
+      await openInvitation(page);
+
+      const team = page.getByTestId("nuestro-equipo");
+      await team.scrollIntoViewIfNeeded();
+      await team.screenshot({
+        path: path.join(OUTPUT_DIR, `football-section-${viewport.name}.png`),
+      });
+
+      const gallery = page.getByTestId("football-gallery");
+      await gallery.scrollIntoViewIfNeeded();
+      await gallery.screenshot({
+        path: path.join(OUTPUT_DIR, `football-grid-${viewport.name}.png`),
+      });
+
+      await page.getByTestId("football-photo-fb-01").click();
+      await expect(page.getByTestId("football-lightbox")).toBeVisible();
+      await page.screenshot({
+        path: path.join(OUTPUT_DIR, `football-lightbox-${viewport.name}.png`),
+      });
+      await page.getByTestId("football-lightbox-close").click();
+
+      const moments = page.getByTestId("nuestros-momentos");
+      await moments.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: path.join(
+          OUTPUT_DIR,
+          `football-to-moments-${viewport.name}.png`,
+        ),
+      });
+    }
   });
 
   test("la galería Nuestros momentos está activa con fotografías reales", async ({
@@ -422,9 +506,7 @@ test.describe("Invitación de boda — Chromium", () => {
       const team = page.getByTestId("nuestro-equipo");
       await team.scrollIntoViewIfNeeded();
 
-      const photo = team.getByRole("img", {
-        name: /Silvia, Omar y Mauro/i,
-      });
+      const photo = team.getByTestId("football-photo-fb-01").locator("img");
       await expect(photo).toBeVisible();
       await expect
         .poll(

@@ -85,6 +85,21 @@ export type FamilyMember = {
   team?: string;
 };
 
+export type GalleryOrientation = "portrait" | "landscape";
+
+/** Ítem de la galería futbolera familiar (derivados web). */
+export type FootballGalleryItem = {
+  id: string;
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  objectPosition?: string;
+  orientation: GalleryOrientation;
+  /** Ritmo del collage editorial */
+  span?: "hero" | "wide" | "tall" | "default";
+};
+
 export type FamilyTeamContent = {
   title: string;
   eyebrow: string;
@@ -96,14 +111,16 @@ export type FamilyTeamContent = {
   rivalryTitle?: string;
   members: FamilyMember[];
   /**
-   * Fotografía familiar futura.
-   * Mientras no exista, la UI muestra un marco preparado.
+   * Fotografía protagonista de la sección (playeras).
    */
   photo?: WeddingMediaAsset;
   photoPlaceholderLabel: string;
+  /** Galería editorial “Fútbol en familia” */
+  footballGallery: {
+    title: string;
+    items: FootballGalleryItem[];
+  };
 };
-
-export type GalleryOrientation = "portrait" | "landscape";
 
 export type GalleryFrame = "featured" | "portrait" | "landscape" | "square";
 

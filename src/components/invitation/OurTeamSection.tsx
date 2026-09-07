@@ -1,8 +1,13 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import type { FamilyTeamContent } from "@/content/types";
 import type { EditorialChapter } from "@/content/editorial-types";
 import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
+import { FootballLightbox } from "@/components/invitation/FootballLightbox";
+import { OrnamentalDivider } from "@/components/invitation/ornaments";
 
 type OurTeamSectionProps = {
   content: FamilyTeamContent;
@@ -10,30 +15,47 @@ type OurTeamSectionProps = {
   tone?: "canvas" | "surface";
 };
 
+function spanClass(span?: string) {
+  switch (span) {
+    case "hero":
+      return "football-grid-item football-grid-item--hero";
+    case "wide":
+      return "football-grid-item football-grid-item--wide";
+    case "tall":
+      return "football-grid-item football-grid-item--tall";
+    default:
+      return "football-grid-item";
+  }
+}
+
 /**
- * Sección familiar editorial con guiño futbolero tipográfico.
+ * Nuestro equipo — tipografía + collage futbolero editorial + lightbox.
  */
 export function OurTeamSection({
   content,
   chapter,
   tone = "surface",
 }: OurTeamSectionProps) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
-  const photo = content.photo;
-  const hasPhoto = Boolean(photo?.src);
   const rivalryOrder = ["Silvia", "Omar", "Mauro"] as const;
   const rivalryMembers = rivalryOrder
-    .map((name) => content.members.find((member) => member.name === name && member.team))
-    .filter((member): member is NonNullable<typeof member> => Boolean(member));
+    .map((name) =>
+      content.members.find((member) => member.name === name && member.team),
+    )
+    .filter(
+      (member): member is NonNullable<typeof member> => Boolean(member),
+    );
+  const items = content.footballGallery.items;
 
   return (
     <section
       id="nuestro-equipo"
-      className={`${background} section-pad text-ink`}
+      className={`${background} football-pitch-section relative section-pad text-ink`}
       aria-labelledby="nuestro-equipo-title"
       data-testid="nuestro-equipo"
     >
-      <Reveal className="mx-auto w-full max-w-[min(100%,42rem)] text-center">
+      <Reveal className="relative z-[1] mx-auto w-full max-w-[min(100%,42rem)] text-center">
         {chapter ? <ChapterMark chapter={chapter} className="mb-8" /> : null}
         <hr className="invite-rule mx-auto" aria-hidden="true" />
 
@@ -48,50 +70,7 @@ export function OurTeamSection({
           {content.title}
         </h2>
 
-        <div
-          className="mx-auto mt-9 flex w-full max-w-[13rem] flex-col items-center gap-4"
-          aria-hidden="true"
-        >
-          <div className="h-px w-full bg-sand/80" />
-          <div className="flex w-full items-center justify-between px-2">
-            {content.members.map((member) => (
-              <span
-                key={member.name}
-                className="block size-1.5 rounded-full bg-taupe/85"
-                title={member.name}
-              />
-            ))}
-          </div>
-          <div className="h-px w-full bg-sand/80" />
-        </div>
-
-        <figure
-          className="relative mx-auto mt-10 w-full overflow-hidden bg-beige/50"
-          data-testid="nuestro-equipo-photo"
-        >
-          <div className="relative aspect-[3/2] w-full">
-            {hasPhoto && photo ? (
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                fill
-                sizes="(max-width: 430px) 92vw, (max-width: 768px) 88vw, 672px"
-                className="object-cover"
-                style={{
-                  objectPosition: photo.objectPosition ?? "50% 42%",
-                }}
-              />
-            ) : (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
-                <p className="font-sans text-[0.75rem] tracking-[0.18em] text-ink-subtle uppercase text-balance">
-                  {content.photoPlaceholderLabel}
-                </p>
-              </div>
-            )}
-          </div>
-        </figure>
-
-        <p className="mx-auto mt-9 max-w-[22rem] font-display text-[clamp(1.15rem,4.5vw,1.4rem)] leading-snug text-ink text-pretty">
+        <p className="mx-auto mt-8 max-w-[22rem] font-display text-[clamp(1.15rem,4.5vw,1.4rem)] leading-snug text-ink text-pretty">
           {content.line}
         </p>
         {content.lineSecondary ? (
@@ -102,7 +81,7 @@ export function OurTeamSection({
 
         {rivalryMembers.length > 0 ? (
           <div
-            className="mx-auto mt-14 max-w-[20rem]"
+            className="mx-auto mt-12 max-w-[20rem]"
             data-testid="nuestro-equipo-rivalry"
           >
             {content.rivalryTitle ? (
@@ -111,7 +90,7 @@ export function OurTeamSection({
               </p>
             ) : null}
 
-            <ul className="mt-10 flex flex-col gap-8">
+            <ul className="mt-10 flex flex-col gap-7">
               {rivalryMembers.map((member) => (
                 <li
                   key={`${member.name}-${member.team}`}
@@ -130,6 +109,59 @@ export function OurTeamSection({
           </div>
         ) : null}
       </Reveal>
+
+      {items.length > 0 ? (
+        <div className="relative z-[1] mx-auto mt-14 w-full max-w-[min(100%,52rem)] px-[max(1.15rem,env(safe-area-inset-left))] pr-[max(1.15rem,env(safe-area-inset-right))]">
+          <p className="text-center font-sans text-[0.6875rem] font-medium uppercase tracking-[0.32em] text-ink-subtle">
+            {content.footballGallery.title}
+          </p>
+
+          <ul
+            className="football-grid mt-8 list-none p-0"
+            data-testid="football-gallery"
+          >
+            {items.map((item, index) => (
+              <li key={item.id} className={spanClass(item.span)}>
+                <button
+                  type="button"
+                  className="football-grid-button group relative block h-full w-full overflow-hidden bg-beige/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
+                  onClick={() => setOpenIndex(index)}
+                  aria-label={`Ver fotografía ${index + 1} de ${items.length}: ${item.alt}`}
+                  data-testid={`football-photo-${item.id}`}
+                >
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    fill
+                    sizes={
+                      item.span === "hero"
+                        ? "(max-width: 768px) 92vw, 832px"
+                        : "(max-width: 768px) 46vw, 400px"
+                    }
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                    style={{
+                      objectPosition: item.objectPosition ?? "50% 40%",
+                    }}
+                    loading="lazy"
+                  />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      <div className="relative z-[1] mx-auto mt-16 max-w-[18rem]">
+        <OrnamentalDivider className="text-taupe/60" motif="monogram" />
+      </div>
+
+      <FootballLightbox
+        items={items}
+        openIndex={openIndex}
+        galleryTitle={content.footballGallery.title}
+        onClose={() => setOpenIndex(null)}
+        onChangeIndex={setOpenIndex}
+      />
     </section>
   );
 }

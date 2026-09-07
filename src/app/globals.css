@@ -408,3 +408,92 @@ body {
     scroll-snap-type: x proximity;
   }
 }
+
+/* Nuestro equipo — guiño sutil de cancha + collage editorial */
+.football-pitch-section::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 8% 6%;
+  border: 1px solid color-mix(in srgb, var(--sand) 42%, transparent);
+  border-radius: 2px;
+  opacity: 0.45;
+}
+
+.football-pitch-section::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  bottom: 18%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: color-mix(in srgb, var(--sand) 38%, transparent);
+  opacity: 0.55;
+}
+
+.football-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.football-grid-item {
+  min-height: 0;
+}
+
+.football-grid-button {
+  aspect-ratio: 4 / 5;
+  min-height: 11rem;
+}
+
+.football-grid-item--hero {
+  grid-column: 1 / -1;
+}
+
+.football-grid-item--hero .football-grid-button {
+  aspect-ratio: 3 / 2;
+  min-height: 14rem;
+}
+
+.football-grid-item--wide {
+  grid-column: 1 / -1;
+}
+
+.football-grid-item--wide .football-grid-button {
+  aspect-ratio: 16 / 10;
+  min-height: 12rem;
+}
+
+.football-grid-item--tall .football-grid-button {
+  aspect-ratio: 3 / 4;
+}
+
+@media (min-width: 768px) {
+  .football-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+
+  .football-grid-item {
+    grid-column: span 3;
+  }
+
+  .football-grid-item--hero {
+    grid-column: 1 / -1;
+  }
+
+  .football-grid-item--wide {
+    grid-column: span 4;
+  }
+
+  .football-grid-item--tall {
+    grid-column: span 2;
+  }
+
+  .football-grid-item--hero .football-grid-button {
+    min-height: 22rem;
+  }
+}
+
