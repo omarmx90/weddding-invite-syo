@@ -383,14 +383,14 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(page.getByText(/Dress code/i)).toHaveCount(0);
   });
 
-  test("RSVP queda preparado sin CTA falso", async ({ page }) => {
-    expect(wedding.rsvp.enabled).toBe(false);
+  test("RSVP en home general no muestra formulario", async ({ page }) => {
+    expect(wedding.rsvp.enabled).toBe(true);
     expect(wedding.rsvp.deadlineIso).toBe("2026-10-10");
     expect(wedding.rsvp.timezone).toBe("America/Mexico_City");
 
     await openInvitation(page);
-    await expect(page.getByRole("button", { name: /Confirmar asistencia/i })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: /Confirmar asistencia/i })).toHaveCount(0);
+    await expect(page.getByTestId("rsvp-section")).toHaveCount(0);
+    await expect(page.getByTestId("rsvp-submit")).toHaveCount(0);
   });
 
   test("no hay overflow horizontal a 360px", async ({ page }) => {

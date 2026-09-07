@@ -142,11 +142,11 @@ export const wedding: WeddingContent = {
    * enabled: false evita CTAs falsos. Deadline real: 10 de octubre de 2026.
    */
   rsvp: {
-    enabled: false,
+    enabled: true,
     deadlineIso: "2026-10-10",
     timezone: PRODUCT_TIMEZONE,
     ctaLabel: "Confirmar asistencia",
-    note: "La confirmación de asistencia se implementará en una fase posterior (sin CTAs hasta entonces).",
+    note: "Confirmación en ligas privadas /i/[slug] con hash del secreto en Supabase.",
   },
   familyTeam: {
     title: "Nuestro equipo",

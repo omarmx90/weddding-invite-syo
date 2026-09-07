@@ -8,6 +8,18 @@ import { wedding } from "../src/content/wedding";
 async function openPersonalizedInvitation(page: Page, slug: string) {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(`/i/${slug}`);
+  await expect(page.getByTestId("invitation-access-denied")).toBeVisible();
+}
+
+async function openPersonalizedWithMemoryToken(page: Page, slug: string) {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const tokenResponse = await page.request.get(
+    `/api/test/rsvp-reset?slug=${encodeURIComponent(slug)}`,
+  );
+  expect(tokenResponse.ok()).toBeTruthy();
+  const body = (await tokenResponse.json()) as { token?: string };
+  expect(body.token).toBeTruthy();
+  await page.goto(`/i/${slug}?t=${encodeURIComponent(body.token!)}`);
   await expect(page.getByTestId("hero-opening")).toBeVisible();
   await page.getByTestId("hero-cta").click();
   await expect(page.getByTestId("invitation-content")).toBeVisible();
@@ -15,6 +27,8 @@ async function openPersonalizedInvitation(page: Page, slug: string) {
 }
 
 test.describe("Invitaciones personalizadas — piloto", () => {
+  test.describe.configure({ mode: "serial" });
+
   test.skip(
     ({ browserName }) => browserName !== "chromium",
     "Cobertura prioritaria en Chromium",
@@ -22,6 +36,7 @@ test.describe("Invitaciones personalizadas — piloto", () => {
 
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.request.post("/api/test/rsvp-reset", { data: {} });
   });
 
   test("helper singular/plural de lugares", () => {
@@ -30,31 +45,40 @@ test.describe("Invitaciones personalizadas — piloto", () => {
     expect(formatReservedSeats(3)).toBe("3 lugares");
   });
 
-  test("/i/granados-montero muestra familia y 2 lugares", async ({ page }) => {
+  test("sin token no revela datos de familia", async ({ page }) => {
     await openPersonalizedInvitation(page, "granados-montero");
+    await expect(page.getByText("Familia Granados Montero")).toHaveCount(0);
+    await expect(page.getByTestId("rsvp-submit")).toHaveCount(0);
+  });
+
+  test("/i/granados-montero con token muestra familia y 2 lugares", async ({
+    page,
+  }) => {
+    await openPersonalizedWithMemoryToken(page, "granados-montero");
     await expect(page.getByTestId("personalized-guest-name")).toHaveText(
       "Familia Granados Montero",
     );
     await expect(page.getByTestId("personalized-seats")).toHaveText("2 lugares");
-    await expect(page.getByTestId("rsvp-coming-soon")).toBeVisible();
+    await expect(page.getByTestId("rsvp-section")).toBeVisible();
     await expect(page.getByTestId("rsvp-deadline")).toContainText(
       "10 de octubre de 2026",
     );
-    await expect(
-      page.getByRole("button", { name: /Confirmar asistencia/i }),
-    ).toHaveCount(0);
   });
 
-  test("/i/montero-aguilar muestra familia y 3 lugares", async ({ page }) => {
-    await openPersonalizedInvitation(page, "montero-aguilar");
+  test("/i/montero-aguilar con token muestra familia y 3 lugares", async ({
+    page,
+  }) => {
+    await openPersonalizedWithMemoryToken(page, "montero-aguilar");
     await expect(page.getByTestId("personalized-guest-name")).toHaveText(
       "Familia Montero Aguilar",
     );
     await expect(page.getByTestId("personalized-seats")).toHaveText("3 lugares");
   });
 
-  test("/i/nava-munoz muestra familia y 3 lugares", async ({ page }) => {
-    await openPersonalizedInvitation(page, "nava-munoz");
+  test("/i/nava-munoz con token muestra familia y 3 lugares", async ({
+    page,
+  }) => {
+    await openPersonalizedWithMemoryToken(page, "nava-munoz");
     await expect(page.getByTestId("personalized-guest-name")).toHaveText(
       "Familia Nava Muñoz",
     );
@@ -89,15 +113,14 @@ test.describe("Invitaciones personalizadas — piloto", () => {
     await page.getByTestId("hero-cta").click();
     await expect(page.getByTestId("invitation-content")).toBeVisible();
     await expect(page.getByTestId("personalized-welcome")).toHaveCount(0);
-    await expect(page.getByTestId("rsvp-coming-soon")).toHaveCount(0);
+    await expect(page.getByTestId("rsvp-section")).toHaveCount(0);
   });
 
-  test("no hay overflow horizontal en ruta personalizada a 360px", async ({
+  test("no hay overflow horizontal en ruta denegada a 360px", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await openPersonalizedInvitation(page, "granados-montero");
-    await page.getByTestId("rsvp-coming-soon").scrollIntoViewIfNeeded();
 
     const result = await page.evaluate(() => {
       const doc = document.documentElement;
@@ -135,7 +158,7 @@ test.describe("Invitaciones personalizadas — piloto", () => {
 
     for (const viewport of viewports) {
       await page.setViewportSize(viewport);
-      await openPersonalizedInvitation(page, "granados-montero");
+      await openPersonalizedWithMemoryToken(page, "granados-montero");
       await page.getByTestId("personalized-welcome").scrollIntoViewIfNeeded();
       await page.screenshot({
         path: path.join(outputDir, `personalized-${viewport.name}.png`),

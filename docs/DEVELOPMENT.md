@@ -25,7 +25,14 @@ Opcional (validación futura en iOS Safari):
 npx playwright install webkit
 ```
 
-No se requiere `.env` para los slices actuales de la invitación.
+No se requiere `.env` para ver la invitación general. Para RSVP local:
+
+```bash
+cp .env.example .env.local
+# Sin Supabase → store memory automático en `next dev`
+```
+
+Guía completa: `docs/RSVP.md`.
 
 ## Scripts
 
@@ -67,16 +74,14 @@ Horas, sedes, direcciones y URLs de mapa de ceremonia/recepción se editan solo 
 3. Decláralos en `wedding.gallery.items` con `featured: true` y `objectPosition`.
 4. Ver mapping y curaduría en `public/images/gallery/README.md`.
 
-### RSVP (fase futura)
+### RSVP (piloto activo)
 
 En `wedding.rsvp`:
 
 - `deadlineIso: "2026-10-10"` (America/Mexico_City)
-- `enabled: false` — **no** renderizar CTAs de confirmación reales hasta implementar persistencia
+- `enabled: true` — formulario real en `/i/[slug]?t=…`
 
-En rutas `/i/[slug]` se muestra un bloque editorial “Próximamente” con la fecha límite (sin botón falso).
-
-Cuando se active: formulario real + backend; nunca un botón decorativo que no haga nada.
+Ver `docs/RSVP.md` para schema, seguridad y variables.
 
 ### Invitaciones personalizadas (piloto)
 

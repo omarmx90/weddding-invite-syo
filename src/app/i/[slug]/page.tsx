@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { InvitationAccessDenied } from "@/components/invitation/InvitationAccessDenied";
 import { InvitationExperience } from "@/components/invitation/InvitationExperience";
-import {
-  getEnabledGuestInvitations,
-  getGuestBySlug,
-} from "@/content/guests";
+import { getEnabledGuestInvitations } from "@/content/guests";
 import { wedding } from "@/content/wedding";
+import { isRsvpDeadlinePassed } from "@/lib/rsvp/deadline";
+import {
+  resolveInvitationAccess,
+  toGuestInvitation,
+} from "@/lib/rsvp/invitations";
+import { isRsvpPersistenceReady } from "@/lib/rsvp/repository";
 
 type PersonalizedInvitationPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ t?: string | string[] }>;
 };
+
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return getEnabledGuestInvitations().map((guest) => ({
@@ -17,49 +24,39 @@ export function generateStaticParams() {
   }));
 }
 
+const privateRobots: Metadata["robots"] = {
+  index: false,
+  follow: false,
+  googleBot: {
+    index: false,
+    follow: false,
+    noimageindex: true,
+  },
+};
+
 /**
- * Metadata de privacidad:
- * - robots: noindex, nofollow (los slugs no deben indexarse)
- * - sin Open Graph personalizado (no exponer nombres de familias)
- * - sin canonical a /i/[slug] (evita legitimar URLs privadas en buscadores)
- *   La home `/` conserva su canonical público.
+ * Metadata de privacidad — sin nombres de familia, sin canonical a /i/[slug].
  */
 export async function generateMetadata({
   params,
 }: PersonalizedInvitationPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const guest = getGuestBySlug(slug);
+  const { invitation } = await resolveInvitationAccess(slug, undefined);
 
-  if (!guest) {
+  if (!invitation) {
     return {
       title: "Invitación no encontrada",
-      robots: {
-        index: false,
-        follow: false,
-        googleBot: {
-          index: false,
-          follow: false,
-        },
-      },
+      robots: privateRobots,
     };
   }
 
   return {
     title: "Invitación",
     description: wedding.meta.description,
-    robots: {
-      index: false,
-      follow: false,
-      googleBot: {
-        index: false,
-        follow: false,
-        noimageindex: true,
-      },
-    },
+    robots: privateRobots,
     openGraph: {
       title: wedding.meta.title,
       description: wedding.meta.description,
-      // URL genérica del sitio — no la ruta personalizada
       url: "/",
     },
   };
@@ -67,13 +64,44 @@ export async function generateMetadata({
 
 export default async function PersonalizedInvitationPage({
   params,
+  searchParams,
 }: PersonalizedInvitationPageProps) {
   const { slug } = await params;
-  const guest = getGuestBySlug(slug);
+  const query = await searchParams;
+  const rawToken = query.t;
+  const accessToken = Array.isArray(rawToken) ? rawToken[0] : rawToken;
 
-  if (!guest) {
+  const { invitation, tokenValid, rsvp } = await resolveInvitationAccess(
+    slug,
+    accessToken,
+  );
+
+  if (!invitation) {
     notFound();
   }
 
-  return <InvitationExperience content={wedding} guest={guest} />;
+  // Sin token válido: no revelar familia, lugares ni RSVP.
+  if (!tokenValid) {
+    return <InvitationAccessDenied />;
+  }
+
+  const guest = toGuestInvitation(invitation);
+
+  return (
+    <InvitationExperience
+      content={wedding}
+      guest={guest}
+      rsvpContext={{
+        accessToken,
+        existingRsvp: rsvp
+          ? {
+              attending: rsvp.attending,
+              confirmedSeats: rsvp.confirmedSeats,
+            }
+          : null,
+        persistenceReady: isRsvpPersistenceReady(),
+        deadlinePassed: isRsvpDeadlinePassed(),
+      }}
+    />
+  );
 }

@@ -80,16 +80,15 @@ Regla: no usar `"use client"` salvo que haga falta API del navegador, estado loc
 - **Después:** Invitados y RSVPs en Supabase; la narrativa estática puede seguir en git.
 - **Imágenes:** Archivos en `public/images/…` referenciados desde el contenido. Sustituir el placeholder sin tocar React.
 
-### Integración futura con Supabase
+### Persistencia / RSVP (piloto seguro)
 
-Cuando haga falta:
+Ver `docs/RSVP.md`.
 
-1. Agregar `@supabase/supabase-js` (y helper server) con env vars en Vercel.
-2. Tablas tentativas: `invitations` (slug, greeting, seats, status), `rsvps` (invitation_id, responses).
-3. Server Components cargan la invitación por `slug` en `/i/[slug]`.
-4. El RSVP client publica vía Route Handlers con validación; nunca exponer service keys.
-
-No introducir Supabase hasta que RSVP/persistencia de invitados esté en alcance.
+- Store: Supabase (Production) o memory (local / Preview / e2e).
+- DB guarda `access_token_hash` (SHA-256), nunca el token en claro.
+- Writes: server action + verificación de hash (slug insuficiente).
+- Service role solo en servidor; RLS sin policies públicas.
+- Sin token válido: no se revelan familia / lugares / RSVP.
 
 ### Routing personalizado futuro
 

@@ -17,12 +17,23 @@ import { FaithSection } from "@/components/invitation/FaithSection";
 import { OurTeamSection } from "@/components/invitation/OurTeamSection";
 import { MomentsGallerySection } from "@/components/invitation/MomentsGallerySection";
 import { DressGuidanceSection } from "@/components/invitation/DressGuidanceSection";
-import { RsvpComingSoonSection } from "@/components/invitation/RsvpComingSoonSection";
+import { RsvpSection } from "@/components/invitation/RsvpSection";
 import { CinematicMoment } from "@/components/invitation/CinematicMoment";
+
+type RsvpContext = {
+  accessToken?: string;
+  existingRsvp?: {
+    attending: boolean;
+    confirmedSeats: number;
+  } | null;
+  persistenceReady: boolean;
+  deadlinePassed: boolean;
+};
 
 type InvitationExperienceProps = {
   content: WeddingContent;
   guest?: GuestInvitation;
+  rsvpContext?: RsvpContext;
 };
 
 type Phase = "opening" | "invitation";
@@ -30,6 +41,7 @@ type Phase = "opening" | "invitation";
 export function InvitationExperience({
   content,
   guest,
+  rsvpContext,
 }: InvitationExperienceProps) {
   const [phase, setPhase] = useState<Phase>("opening");
   const reduceMotion = useReducedMotion();
@@ -130,11 +142,15 @@ export function InvitationExperience({
               chapter={content.editorial.chapters.celebrate}
               tone={guest ? "surface" : "canvas"}
             />
-            {guest ? (
-              <RsvpComingSoonSection
-                deadlineIso={
-                  guest.rsvpDeadlineIso ?? content.rsvp.deadlineIso
-                }
+            {guest && rsvpContext ? (
+              <RsvpSection
+                slug={guest.slug}
+                maxSeats={guest.maxSeats ?? guest.seats}
+                deadlineIso={guest.rsvpDeadlineIso ?? content.rsvp.deadlineIso}
+                accessToken={rsvpContext.accessToken}
+                existingRsvp={rsvpContext.existingRsvp}
+                persistenceReady={rsvpContext.persistenceReady}
+                deadlinePassed={rsvpContext.deadlinePassed}
                 tone="canvas"
               />
             ) : null}
