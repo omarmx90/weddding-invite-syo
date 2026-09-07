@@ -58,7 +58,14 @@ Sin tokens ni URLs con `?t=` en auditoría.
 
 1. Aplicar `supabase/admin.sql` en el SQL Editor del proyecto.
 2. Auth → providers → Email (magic link) ON.
-3. Redirect URLs: `https://silvia-y-omar.com/admin/auth/callback` (+ localhost si aplica).
+3. **URL Configuration** → [Auth URL config](https://supabase.com/dashboard/project/ohylccqzlauahkhnifqy/auth/url-configuration)
+   - **Site URL:** `https://silvia-y-omar.com` (NUNCA `http://localhost:3000`)
+   - **Redirect URLs** (exactas, sin wildcards amplios):
+     - `https://silvia-y-omar.com/admin/auth/callback`
+     - (opcional local) `http://127.0.0.1:3000/admin/auth/callback`
+
+Si el magic link falla con `localhost:3000/?error=…`, el Site URL de Supabase
+sigue apuntando a localhost: corrígelo y solicita un enlace **nuevo**.
 4. Vercel Production env: allowlist, anon key, encryption key, `RSVP_STORE=supabase`.
 5. **No** poner service role ni encryption key en `NEXT_PUBLIC_*`.
 6. Backfill de secretos del piloto (opcional):

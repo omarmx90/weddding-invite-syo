@@ -1,11 +1,28 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAuthServerClient } from "@/lib/admin/session";
 import { isEmailAllowlisted } from "@/lib/admin/allowlist";
+import { site } from "@/content/site";
+import { isVercelProduction } from "@/lib/supabase/server";
 
+/**
+ * Callback PKCE: Supabase redirige con ?code=…
+ * Intercambio: exchangeCodeForSession(code).
+ */
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  const authError = requestUrl.searchParams.get("error");
   const next = "/admin";
+
+  const origin = isVercelProduction()
+    ? (process.env.INVITE_SITE_URL?.trim() || site.url).replace(/\/$/, "")
+    : requestUrl.origin;
+
+  if (authError) {
+    return NextResponse.redirect(
+      new URL(`/admin/login?error=${encodeURIComponent(authError)}`, origin),
+    );
+  }
 
   if (code) {
     const supabase = await createSupabaseAuthServerClient();
@@ -13,16 +30,14 @@ export async function GET(request: Request) {
     if (!error) {
       const { data } = await supabase.auth.getUser();
       if (data.user?.email && isEmailAllowlisted(data.user.email)) {
-        return NextResponse.redirect(new URL(next, requestUrl.origin));
+        return NextResponse.redirect(new URL(next, origin));
       }
       await supabase.auth.signOut();
       return NextResponse.redirect(
-        new URL("/admin/login?error=unauthorized", requestUrl.origin),
+        new URL("/admin/login?error=unauthorized", origin),
       );
     }
   }
 
-  return NextResponse.redirect(
-    new URL("/admin/login?error=auth", requestUrl.origin),
-  );
+  return NextResponse.redirect(new URL("/admin/login?error=auth", origin));
 }

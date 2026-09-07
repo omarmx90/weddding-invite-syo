@@ -7,9 +7,12 @@ import { createSupabaseAuthBrowserClient } from "@/lib/supabase/auth-browser";
 export function AdminLoginForm({
   authConfigured,
   e2eHint,
+  emailRedirectTo,
 }: {
   authConfigured: boolean;
   e2eHint: boolean;
+  /** Calculado en servidor — Production nunca usa localhost */
+  emailRedirectTo: string;
 }) {
   const searchParams = useSearchParams();
   const errorCode = searchParams.get("error");
@@ -25,6 +28,9 @@ export function AdminLoginForm({
     }
     if (errorCode === "auth") {
       return "No se pudo completar el acceso. Intenta de nuevo.";
+    }
+    if (errorCode === "access_denied" || errorCode === "otp_expired") {
+      return "El enlace expiró o ya fue usado. Solicita uno nuevo.";
     }
     return null;
   }, [errorCode]);
@@ -43,20 +49,33 @@ export function AdminLoginForm({
       return;
     }
 
+    if (/localhost|127\.0\.0\.1/i.test(emailRedirectTo) && !e2eHint) {
+      // Defensa: en builds de Production el servidor no debe haber enviado localhost.
+      const host = typeof window !== "undefined" ? window.location.hostname : "";
+      if (host === "silvia-y-omar.com" || host.endsWith(".vercel.app")) {
+        setStatus("error");
+        setMessage(
+          "Configuración de acceso incompleta. Revisa el dominio de autenticación.",
+        );
+        return;
+      }
+    }
+
     setStatus("sending");
     try {
       const supabase = createSupabaseAuthBrowserClient();
-      const redirectTo = `${window.location.origin}/admin/auth/callback`;
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
-          emailRedirectTo: redirectTo,
+          emailRedirectTo,
           shouldCreateUser: true,
         },
       });
       if (error) {
         setStatus("error");
-        setMessage("No pudimos enviar el enlace. Revisa el correo e intenta otra vez.");
+        setMessage(
+          "No pudimos enviar el enlace. Revisa el correo e intenta otra vez.",
+        );
         return;
       }
       setStatus("sent");
@@ -107,6 +126,10 @@ export function AdminLoginForm({
           {status === "sending" ? "Enviando…" : "Enviar enlace"}
         </button>
       </form>
+
+      <p className="sr-only" data-testid="admin-email-redirect-to">
+        {emailRedirectTo}
+      </p>
 
       {errorText ? (
         <p className="mt-6 font-sans text-[0.9375rem] text-ink-muted" role="alert">

@@ -7,6 +7,11 @@ import {
   encryptInviteToken,
   decryptInviteToken,
 } from "../src/lib/admin/encryption";
+import {
+  assertProductionAdminRedirectSafe,
+  resolveAdminAuthEmailRedirectTo,
+} from "../src/lib/admin/auth-redirect";
+import { isAdminE2EAuthEnabled } from "../src/lib/admin/e2e-auth-shared";
 import { generateInviteToken, hashInviteToken } from "../src/lib/rsvp/token";
 
 async function resetStores(page: Page) {
@@ -67,6 +72,17 @@ test.describe("Admin guest manager — Chromium", () => {
     await expect(page.getByTestId("admin-dashboard")).toBeVisible();
     await expect(page.getByTestId("stat-families")).toContainText("3");
     await expect(page.getByTestId("stat-pending-families")).toContainText("3");
+  });
+
+  test("login e2e expone redirect de callback local, no dominio ajeno", async ({
+    page,
+  }) => {
+    await page.goto("/admin/login");
+    const redirectTo = await page
+      .getByTestId("admin-email-redirect-to")
+      .innerText();
+    expect(redirectTo).toContain("/admin/auth/callback");
+    expect(redirectTo).toMatch(/127\.0\.0\.1:3000|localhost:3000/);
   });
 
   test("crear invitación genera slug único y URL privada una vez", async ({
@@ -249,6 +265,51 @@ test.describe("Admin unit helpers — Chromium", () => {
     ({ browserName }) => browserName !== "chromium",
     "Helpers en proceso Chromium",
   );
+
+  test("Production auth redirect usa dominio canónico y nunca localhost", () => {
+    const previousEnv = process.env.VERCEL_ENV;
+    const previousInvite = process.env.INVITE_SITE_URL;
+    try {
+      process.env.VERCEL_ENV = "production";
+      process.env.INVITE_SITE_URL = "https://silvia-y-omar.com";
+      const redirectTo = resolveAdminAuthEmailRedirectTo({
+        requestOrigin: "http://localhost:3000",
+      });
+      expect(redirectTo).toBe(
+        "https://silvia-y-omar.com/admin/auth/callback",
+      );
+      expect(redirectTo).not.toMatch(/localhost|127\.0\.0\.1/i);
+      expect(() => assertProductionAdminRedirectSafe(redirectTo)).not.toThrow();
+    } finally {
+      if (previousEnv === undefined) delete process.env.VERCEL_ENV;
+      else process.env.VERCEL_ENV = previousEnv;
+      if (previousInvite === undefined) delete process.env.INVITE_SITE_URL;
+      else process.env.INVITE_SITE_URL = previousInvite;
+    }
+  });
+
+  test("test mode imposible en Production", () => {
+    const previousEnv = process.env.VERCEL_ENV;
+    const previousMode = process.env.ADMIN_AUTH_MODE;
+    const previousSecret = process.env.ADMIN_E2E_SECRET;
+    const previousStore = process.env.RSVP_STORE;
+    try {
+      process.env.VERCEL_ENV = "production";
+      process.env.ADMIN_AUTH_MODE = "test";
+      process.env.ADMIN_E2E_SECRET = "should-not-enable";
+      process.env.RSVP_STORE = "memory";
+      expect(isAdminE2EAuthEnabled()).toBe(false);
+    } finally {
+      if (previousEnv === undefined) delete process.env.VERCEL_ENV;
+      else process.env.VERCEL_ENV = previousEnv;
+      if (previousMode === undefined) delete process.env.ADMIN_AUTH_MODE;
+      else process.env.ADMIN_AUTH_MODE = previousMode;
+      if (previousSecret === undefined) delete process.env.ADMIN_E2E_SECRET;
+      else process.env.ADMIN_E2E_SECRET = previousSecret;
+      if (previousStore === undefined) delete process.env.RSVP_STORE;
+      else process.env.RSVP_STORE = previousStore;
+    }
+  });
 
   test("slugify y cifrado roundtrip", () => {
     expect(slugifyFamilyName("Familia Pérez López")).toBe("perez-lopez");
