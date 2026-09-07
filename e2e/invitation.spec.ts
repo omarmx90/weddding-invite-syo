@@ -430,10 +430,21 @@ test.describe("Invitación de boda — Chromium", () => {
       });
       await openInvitation(page);
 
+      await page.getByTestId("countdown-section").scrollIntoViewIfNeeded();
+      await page.getByTestId("save-the-date").screenshot({
+        path: path.join(OUTPUT_DIR, `polish-save-date-${viewport.name}.png`),
+      });
+
       const ceremony = page.getByTestId("ceremony");
       await ceremony.scrollIntoViewIfNeeded();
       await ceremony.screenshot({
         path: path.join(OUTPUT_DIR, `catholic-ceremony-${viewport.name}.png`),
+      });
+
+      const schedule = page.getByTestId("day-schedule");
+      await schedule.scrollIntoViewIfNeeded();
+      await schedule.screenshot({
+        path: path.join(OUTPUT_DIR, `polish-schedule-${viewport.name}.png`),
       });
 
       const faith = page.getByTestId("faith-section");

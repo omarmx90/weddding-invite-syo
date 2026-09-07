@@ -2,6 +2,7 @@ import type { DressGuidanceContent } from "@/content/types";
 import type { EditorialChapter } from "@/content/editorial-types";
 import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
+import { BotanicalSprig } from "@/components/invitation/ornaments";
 
 type DressGuidanceSectionProps = {
   content: DressGuidanceContent;
@@ -28,7 +29,7 @@ export function DressGuidanceSection({
     >
       <Reveal className="mx-auto w-full max-w-[var(--content-max)] text-center">
         {chapter ? <ChapterMark chapter={chapter} className="mb-8" /> : null}
-        <hr className="invite-rule mx-auto" aria-hidden="true" />
+        <BotanicalSprig className="mx-auto h-5 w-16 text-taupe/55" />
 
         <p className="mt-10 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.34em] text-ink-subtle">
           {content.eyebrow}

@@ -139,6 +139,22 @@ export const wedding: WeddingContent = {
     patronsPrayer:
       "Que su intercesión acompañe nuestro matrimonio, nuestro hogar y nuestra familia.",
   },
+  /**
+   * Preparado para futuros nombres reales.
+   * enabled: false — no inventar placeholders.
+   */
+  familiesBlessing: {
+    enabled: false,
+    title: "Con la bendición de nuestras familias",
+    brideParents: {
+      label: "Padres de Silvia",
+      names: [],
+    },
+    groomParents: {
+      label: "Padres de Omar",
+      names: [],
+    },
+  },
   dress: {
     eyebrow: "Para celebrar juntos",
     title: "Un toque especial",

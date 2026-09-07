@@ -20,6 +20,7 @@ import { DressGuidanceSection } from "@/components/invitation/DressGuidanceSecti
 import { RsvpSection } from "@/components/invitation/RsvpSection";
 import { CinematicMoment } from "@/components/invitation/CinematicMoment";
 import { EditorialClosing } from "@/components/invitation/EditorialClosing";
+import { FamiliesBlessingSection } from "@/components/invitation/FamiliesBlessingSection";
 
 type RsvpContext = {
   accessToken?: string;
@@ -105,6 +106,7 @@ export function InvitationExperience({
               accessibleSummary={countdownAccessibleSummary}
               chapter={content.editorial.chapters.day}
               tone="canvas"
+              wedding={content}
             />
             {guest ? (
               <PersonalizedWelcome guest={guest} tone="surface" />
@@ -138,6 +140,10 @@ export function InvitationExperience({
               chapter={content.editorial.chapters.family}
               tone={guest ? "surface" : "canvas"}
             />
+            <FamiliesBlessingSection
+              content={content.familiesBlessing}
+              tone={guest ? "canvas" : "surface"}
+            />
             {cineFamily ? <CinematicMoment moment={cineFamily} /> : null}
             {showGallery ? (
               <MomentsGallerySection
@@ -152,10 +158,6 @@ export function InvitationExperience({
               tone={guest ? "surface" : "canvas"}
             />
             {cineClosing ? <CinematicMoment moment={cineClosing} /> : null}
-            <EditorialClosing
-              content={content}
-              tone={guest ? "surface" : "canvas"}
-            />
             {guest && rsvpContext ? (
               <RsvpSection
                 slug={guest.slug}
@@ -168,6 +170,10 @@ export function InvitationExperience({
                 tone="canvas"
               />
             ) : null}
+            <EditorialClosing
+              content={content}
+              tone={guest ? "surface" : "canvas"}
+            />
           </motion.main>
         )}
       </AnimatePresence>

@@ -4,6 +4,10 @@ import {
   personalizationCopy,
 } from "@/content/guests";
 import { Reveal } from "@/components/invitation/Reveal";
+import {
+  BotanicalSprig,
+  OrnamentalDivider,
+} from "@/components/invitation/ornaments";
 
 type PersonalizedWelcomeProps = {
   guest: GuestInvitation;
@@ -19,7 +23,7 @@ function splitFamilyName(displayName: string): { prefix: string; rest: string } 
 }
 
 /**
- * Saludo editorial — el nombre de familia como pieza tipográfica.
+ * Pase personalizado — pieza tipográfica de papelería, no ticket.
  */
 export function PersonalizedWelcome({
   guest,
@@ -35,8 +39,8 @@ export function PersonalizedWelcome({
       aria-labelledby="personalized-welcome-title"
       data-testid="personalized-welcome"
     >
-      <Reveal className="mx-auto w-full max-w-[var(--content-max)] text-center">
-        <hr className="invite-rule mx-auto" aria-hidden="true" />
+      <Reveal className="mx-auto w-full max-w-[min(100%,22rem)] text-center">
+        <OrnamentalDivider className="text-taupe/65" motif="monogram" />
 
         <p className="mt-10 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.34em] text-ink-subtle">
           {personalizationCopy.eyebrow}
@@ -52,7 +56,6 @@ export function PersonalizedWelcome({
               <span className="block text-[0.75rem] font-sans font-medium uppercase tracking-[0.36em] text-ink-subtle">
                 {prefix}
               </span>
-              {/* Espacio en el árbol de texto: el nombre accesible sigue siendo "Familia …" */}
               {" "}
               <span className="mt-3 block text-[clamp(2rem,8.5vw,2.85rem)] leading-[0.95] font-medium tracking-[-0.02em] uppercase text-balance">
                 {rest}
@@ -65,7 +68,9 @@ export function PersonalizedWelcome({
           )}
         </h2>
 
-        <div className="mx-auto mt-10 max-w-[16rem]">
+        <BotanicalSprig className="mx-auto mt-9 h-4 w-14 text-taupe/50" />
+
+        <div className="mx-auto mt-9 max-w-[16rem]">
           <p className="font-sans text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-ink-subtle">
             {personalizationCopy.reservedPreface}
           </p>

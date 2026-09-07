@@ -1,13 +1,35 @@
-import type { DaySchedule } from "@/content/types";
+import type { DaySchedule, ScheduleItemId } from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
+import {
+  LatinCross,
+} from "@/components/invitation/ornaments";
 
 type DayScheduleSectionProps = {
   schedule: DaySchedule;
   tone?: "canvas" | "surface";
 };
 
+function ScheduleMarker({ id }: { id: ScheduleItemId }) {
+  if (id === "ceremony") {
+    return <LatinCross className="h-4 w-3 text-taupe/75" />;
+  }
+  if (id === "reception") {
+    return (
+      <span className="inline-block size-1.5 rotate-45 border border-taupe/70" />
+    );
+  }
+  if (id === "closing") {
+    return (
+      <span className="font-display text-[0.5rem] leading-none tracking-[0.08em] text-taupe/80">
+        S&amp;O
+      </span>
+    );
+  }
+  return <span className="size-2 shrink-0 rounded-full bg-taupe/80" />;
+}
+
 /**
- * Línea temporal editorial del día — horas claras, sin cards.
+ * Línea temporal editorial del día — escaneable, con marcas ornamentales.
  */
 export function DayScheduleSection({
   schedule,
@@ -40,17 +62,22 @@ export function DayScheduleSection({
           </h2>
         </div>
 
-        <ol className="schedule-timeline mx-auto mt-12 max-w-[22rem] list-none p-0">
+        <ol className="mx-auto mt-12 max-w-[22rem] list-none p-0">
           {schedule.items.map((item, index) => {
             const isLast = index === schedule.items.length - 1;
             return (
               <li
                 key={item.id}
-                className="schedule-timeline-item relative grid grid-cols-[1.15rem_1fr] gap-x-4 pb-10 last:pb-0"
+                className="relative grid grid-cols-[1.35rem_1fr] gap-x-4 pb-10 last:pb-0"
                 data-testid={`schedule-item-${item.id}`}
               >
-                <div className="relative flex flex-col items-center" aria-hidden="true">
-                  <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-taupe/85 ring-4 ring-beige/80" />
+                <div
+                  className="relative flex flex-col items-center"
+                  aria-hidden="true"
+                >
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+                    <ScheduleMarker id={item.id} />
+                  </span>
                   {!isLast ? (
                     <span className="mt-2 w-px flex-1 bg-sand/90" />
                   ) : null}

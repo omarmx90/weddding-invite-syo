@@ -159,6 +159,20 @@ export type FaithContent = {
   patrons: string[];
 };
 
+/** Bendición de familias — desactivada hasta tener nombres reales. */
+export type FamiliesBlessingContent = {
+  enabled: boolean;
+  title: string;
+  brideParents: {
+    label: string;
+    names: string[];
+  };
+  groomParents: {
+    label: string;
+    names: string[];
+  };
+};
+
 export type DressGuidanceContent = {
   eyebrow: string;
   title: string;
@@ -232,6 +246,11 @@ export type WeddingContent = {
   schedule: DaySchedule;
   countdown: CountdownContent;
   faith: FaithContent;
+  /**
+   * Padres / familias — opcional.
+   * No publicar con nombres vacíos o placeholders.
+   */
+  familiesBlessing: FamiliesBlessingContent;
   dress: DressGuidanceContent;
   /** Confirmación futura — no renderizar CTA mientras enabled sea false */
   rsvp: RsvpContent;

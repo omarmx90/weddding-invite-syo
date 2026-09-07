@@ -1,6 +1,9 @@
 import type { WeddingContent } from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
-import { OrnamentalDivider } from "@/components/invitation/ornaments";
+import {
+  BotanicalSprig,
+  OrnamentalDivider,
+} from "@/components/invitation/ornaments";
 
 type EditorialClosingProps = {
   content: WeddingContent;
@@ -8,8 +11,7 @@ type EditorialClosingProps = {
 };
 
 /**
- * Cierre ornamental discreto — monograma + fecha.
- * Sin cruz aquí: ya aparece en Ceremonia y Fe.
+ * Cierre editorial mínimo — monograma, fecha y lugar.
  */
 export function EditorialClosing({
   content,
@@ -25,8 +27,12 @@ export function EditorialClosing({
     >
       <Reveal className="mx-auto flex w-full max-w-[18rem] flex-col items-center text-center">
         <OrnamentalDivider className="text-taupe/65" motif="monogram" />
+        <BotanicalSprig className="mt-6 h-4 w-14 text-taupe/50" />
         <p className="mt-7 font-display text-[clamp(1.15rem,4.2vw,1.35rem)] tracking-[0.22em] text-ink">
           <time dateTime={content.date.iso}>{content.date.display}</time>
+        </p>
+        <p className="mt-3 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-ink-subtle">
+          {content.copy.locationLabel}
         </p>
       </Reveal>
     </section>

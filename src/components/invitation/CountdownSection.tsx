@@ -10,12 +10,16 @@ import {
 } from "@/lib/countdown";
 import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
+import { SaveTheDate } from "@/components/invitation/SaveTheDate";
+import type { WeddingContent } from "@/content/types";
 
 type CountdownSectionProps = {
   content: CountdownContent;
   accessibleSummary: string;
   chapter?: EditorialChapter;
   tone?: "canvas" | "surface";
+  /** Contenido completo para Guardar la fecha */
+  wedding: WeddingContent;
 };
 
 function msUntilNextMinuteBoundary(nowMs: number): number {
@@ -30,6 +34,7 @@ export function CountdownSection({
   accessibleSummary,
   chapter,
   tone = "canvas",
+  wedding,
 }: CountdownSectionProps) {
   const [parts, setParts] = useState<CountdownParts | null>(null);
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
@@ -148,6 +153,8 @@ export function CountdownSection({
             </p>
           </div>
         )}
+
+        <SaveTheDate content={wedding} />
       </Reveal>
     </section>
   );

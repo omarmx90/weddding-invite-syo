@@ -24,7 +24,7 @@ export function FaithSection({ content, tone = "surface" }: FaithSectionProps) {
   return (
     <section
       id="nuestra-fe"
-      className={`${background} section-pad text-ink`}
+      className={`${background} section-pad pb-16 text-ink md:pb-20`}
       aria-labelledby="faith-title"
       data-testid="faith-section"
     >
