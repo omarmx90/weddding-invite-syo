@@ -2,11 +2,13 @@
 
 import { useCallback, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import type { GuestInvitation } from "@/content/guest-types";
 import type { WeddingContent } from "@/content/types";
 import { isGallerySectionVisible } from "@/content/wedding";
 import { formatLongDateEsMx } from "@/lib/locale";
 import { HeroOpening } from "@/components/invitation/HeroOpening";
 import { CountdownSection } from "@/components/invitation/CountdownSection";
+import { PersonalizedWelcome } from "@/components/invitation/PersonalizedWelcome";
 import { IntroSection } from "@/components/invitation/IntroSection";
 import { EventSection } from "@/components/invitation/EventSection";
 import { NarrativeBridge } from "@/components/invitation/NarrativeBridge";
@@ -15,17 +17,24 @@ import { FaithSection } from "@/components/invitation/FaithSection";
 import { OurTeamSection } from "@/components/invitation/OurTeamSection";
 import { MomentsGallerySection } from "@/components/invitation/MomentsGallerySection";
 import { DressGuidanceSection } from "@/components/invitation/DressGuidanceSection";
+import { RsvpComingSoonSection } from "@/components/invitation/RsvpComingSoonSection";
 
 type InvitationExperienceProps = {
   content: WeddingContent;
+  /** Presente solo en `/i/[slug]` */
+  guest?: GuestInvitation;
 };
 
 type Phase = "opening" | "invitation";
 
-export function InvitationExperience({ content }: InvitationExperienceProps) {
+export function InvitationExperience({
+  content,
+  guest,
+}: InvitationExperienceProps) {
   const [phase, setPhase] = useState<Phase>("opening");
   const reduceMotion = useReducedMotion();
   const showGallery = isGallerySectionVisible(content.gallery);
+  const isPersonalized = Boolean(guest);
 
   const countdownAccessibleSummary = `Cuenta regresiva para la ceremonia del ${formatLongDateEsMx(content.countdown.targetIsoDate)} a las ${content.event.ceremony.time}, hora de la Ciudad de México.`;
 
@@ -34,7 +43,11 @@ export function InvitationExperience({ content }: InvitationExperienceProps) {
   }, []);
 
   return (
-    <div className="relative min-h-dvh bg-canvas" data-testid="invitation-root">
+    <div
+      className="relative min-h-dvh bg-canvas"
+      data-testid="invitation-root"
+      data-invitation-mode={isPersonalized ? "personalized" : "general"}
+    >
       <AnimatePresence mode="wait">
         {phase === "opening" ? (
           <motion.div
@@ -70,28 +83,54 @@ export function InvitationExperience({ content }: InvitationExperienceProps) {
               accessibleSummary={countdownAccessibleSummary}
               tone="canvas"
             />
+            {guest ? (
+              <PersonalizedWelcome guest={guest} tone="surface" />
+            ) : null}
             <IntroSection content={content} />
             <EventSection
               sectionId="ceremony"
               event={content.event.ceremony}
-              tone="surface"
+              tone={guest ? "canvas" : "surface"}
             />
             <NarrativeBridge
               text={content.copy.celebrationTransition}
-              tone="canvas"
+              tone={guest ? "surface" : "canvas"}
             />
             <EventSection
               sectionId="reception"
               event={content.event.reception}
-              tone="surface"
+              tone={guest ? "canvas" : "surface"}
             />
-            <DayScheduleSection schedule={content.schedule} tone="canvas" />
-            <FaithSection content={content.faith} tone="surface" />
-            <OurTeamSection content={content.familyTeam} tone="canvas" />
+            <DayScheduleSection
+              schedule={content.schedule}
+              tone={guest ? "surface" : "canvas"}
+            />
+            <FaithSection
+              content={content.faith}
+              tone={guest ? "canvas" : "surface"}
+            />
+            <OurTeamSection
+              content={content.familyTeam}
+              tone={guest ? "surface" : "canvas"}
+            />
             {showGallery ? (
-              <MomentsGallerySection content={content.gallery} tone="surface" />
+              <MomentsGallerySection
+                content={content.gallery}
+                tone={guest ? "canvas" : "surface"}
+              />
             ) : null}
-            <DressGuidanceSection content={content.dress} tone="canvas" />
+            <DressGuidanceSection
+              content={content.dress}
+              tone={guest ? "surface" : "canvas"}
+            />
+            {guest ? (
+              <RsvpComingSoonSection
+                deadlineIso={
+                  guest.rsvpDeadlineIso ?? content.rsvp.deadlineIso
+                }
+                tone="canvas"
+              />
+            ) : null}
           </motion.main>
         )}
       </AnimatePresence>

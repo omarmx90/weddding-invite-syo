@@ -51,12 +51,12 @@ e2e/                          Specs de Playwright + salida visual
 
 | Ruta | Estado | Rol |
 | --- | --- | --- |
-| `/` | **Ahora** | Experiencia de invitación (hero + secciones) |
-| `/i/[slug]` | **Futuro** | Invitación personalizada por familia/invitado |
+| `/` | **Ahora** | Experiencia de invitación general |
+| `/i/[slug]` | **Ahora (piloto)** | Invitación personalizada por familia (`src/content/guests.ts`) |
 | `/admin/*` | **Futuro** | Panel RSVP (con autenticación) |
 | API routes | **Futuro** | Mutaciones RSVP cuando exista Supabase |
 
-Las URLs personalizadas son un tema de routing, no otra app. El shell de invitación aceptará un `InvitationContext` opcional (slug, lugares, saludo) resuelto en el servidor.
+Las URLs personalizadas reutilizan `InvitationExperience` con un `guest` opcional resuelto en el servidor. Metadata: `noindex, nofollow`; sin canonical público a `/i/[slug]` y sin Open Graph con nombres de familias.
 
 ### Server vs Client Components
 

@@ -72,9 +72,18 @@ Horas, sedes, direcciones y URLs de mapa de ceremonia/recepción se editan solo 
 En `wedding.rsvp`:
 
 - `deadlineIso: "2026-10-10"` (America/Mexico_City)
-- `enabled: false` — **no** renderizar CTAs hasta implementar persistencia real
+- `enabled: false` — **no** renderizar CTAs de confirmación reales hasta implementar persistencia
+
+En rutas `/i/[slug]` se muestra un bloque editorial “Próximamente” con la fecha límite (sin botón falso).
 
 Cuando se active: formulario real + backend; nunca un botón decorativo que no haga nada.
+
+### Invitaciones personalizadas (piloto)
+
+- Datos: `src/content/guests.ts` + `src/content/guest-types.ts`
+- Rutas: `/i/granados-montero`, `/i/montero-aguilar`, `/i/nava-munoz`
+- SEO: `robots: noindex, nofollow`; sin canonical a la URL privada
+- Migración Supabase: documentada en comentarios de `guests.ts`
 
 ## Locale es-MX
 
