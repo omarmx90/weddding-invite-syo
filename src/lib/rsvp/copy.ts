@@ -7,7 +7,8 @@ export const rsvpCopy = {
   question: "¿Nos acompañan?",
   yes: "Sí, ahí estaremos",
   no: "No podremos acompañarlos",
-  seatsQuestion: "¿Cuántos nos acompañarán?",
+  // Más natural y breve en mobile que "¿Cuántos nos acompañarán?"
+  seatsQuestion: "¿Cuántos asistirán?",
   submit: "Enviar confirmación",
   update: "Actualizar confirmación",
   confirmedTitle: "Asistencia confirmada",
@@ -18,6 +19,10 @@ export const rsvpCopy = {
     "Gracias por confirmar. Nos dará mucha alegría compartir este día con ustedes.",
   successNo:
     "Gracias por avisarnos. Los tendremos presentes en este día tan especial.",
+  seeYouLine: "Nos vemos el 16 de octubre",
+  ceremonyMapsLabel: "Cómo llegar a la ceremonia",
+  celebrationMapsLabel: "Cómo llegar a la celebración",
+  confirmedStatusSr: "Confirmación guardada",
   deadlineLabel: "Confirma antes del",
   deadlinePassedTitle: "El periodo de confirmación ha terminado",
   deadlinePassedBody:
@@ -30,10 +35,11 @@ export const rsvpCopy = {
     "Estamos preparando la confirmación en línea. Vuelve a intentar más tarde.",
   persistError:
     "No pudimos guardar tu confirmación en este momento. Intenta nuevamente en unos minutos.",
-  loading: "Guardando tu confirmación…",
+  loading: "Confirmando…",
   validationAttend: "Elige una opción para continuar.",
   optionalMessageLabel: "Mensaje (opcional)",
   optionalMessagePlaceholder: "Una nota breve, si lo deseas",
+  declinedSummary: "No podrán acompañarnos",
 } as const;
 
 export function formatRsvpDeadlineCopy(

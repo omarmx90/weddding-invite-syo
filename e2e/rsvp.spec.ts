@@ -206,6 +206,83 @@ test.describe("RSVP piloto — Chromium", () => {
       expect(box!.height).toBeGreaterThanOrEqual(44);
     }
   });
+
+  test("mensaje opcional no es requerido para confirmar", async ({ page }) => {
+    const token = await fetchMemoryToken(page, "granados-montero");
+    await openPersonalizedWithToken(page, "granados-montero", token);
+    await expect(page.getByTestId("rsvp-message")).toBeVisible();
+    await expect(page.getByTestId("rsvp-message")).toHaveAttribute(
+      "placeholder",
+      /nota breve/i,
+    );
+    await page.getByTestId("rsvp-attend-yes").click();
+    await page.getByTestId("rsvp-seat-2").click();
+    await page.getByTestId("rsvp-submit").click();
+    await expect(page.getByTestId("rsvp-confirmed")).toBeVisible();
+    await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
+      "2 de 2 lugares",
+    );
+  });
+
+  test("submit deshabilitado durante pending evita double submit", async ({
+    page,
+  }) => {
+    const token = await fetchMemoryToken(page, "montero-aguilar");
+    await openPersonalizedWithToken(page, "montero-aguilar", token);
+    await page.getByTestId("rsvp-attend-yes").click();
+    await page.getByTestId("rsvp-seat-1").click();
+
+    const submit = page.getByTestId("rsvp-submit");
+    await submit.dblclick();
+    await expect(page.getByTestId("rsvp-confirmed")).toBeVisible();
+    await expect(page.getByTestId("rsvp-submit")).toHaveCount(0);
+    await expect(page.getByTestId("rsvp-success-mark")).toBeVisible();
+    await expect(page.getByTestId("rsvp-success-message")).toContainText(
+      "Gracias por confirmar",
+    );
+    await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
+      "1 de 3 lugares",
+    );
+    await expect(page.getByTestId("rsvp-see-you")).toHaveText(
+      "Nos vemos el 16 de octubre",
+    );
+    await expect(page.getByTestId("rsvp-ceremony-maps")).toBeVisible();
+    await expect(page.getByTestId("rsvp-celebration-maps")).toHaveCount(0);
+  });
+
+  test("actualizar confirmación permanece accesible y secundario", async ({
+    page,
+  }) => {
+    const token = await fetchMemoryToken(page, "nava-munoz");
+    await openPersonalizedWithToken(page, "nava-munoz", token);
+    await page.getByTestId("rsvp-attend-no").click();
+    await page.getByTestId("rsvp-submit").click();
+    await expect(page.getByTestId("rsvp-confirmed")).toBeVisible();
+    await expect(page.getByTestId("rsvp-edit")).toBeVisible();
+    await page.getByTestId("rsvp-edit").click();
+    await expect(page.getByTestId("rsvp-form")).toBeVisible();
+    await expect(page.getByTestId("rsvp-attend-no")).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
+  test("mobile 390 no genera overflow horizontal en RSVP", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const token = await fetchMemoryToken(page, "granados-montero");
+    await openPersonalizedWithToken(page, "granados-montero", token);
+    await page.getByTestId("rsvp-attend-yes").click();
+    const overflow = await page.evaluate(() => {
+      const doc = document.documentElement;
+      return {
+        scrollWidth: doc.scrollWidth,
+        clientWidth: doc.clientWidth,
+      };
+    });
+    expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
+  });
 });
 
 test.describe("RSVP seguridad estática — Chromium", () => {
