@@ -40,8 +40,10 @@ Solo dos familias (vía `next/font`):
 
 | Rol | Familia | Uso |
 | --- | --- | --- |
-| Display | **Cormorant Garamond** | Nombres de la pareja, títulos de sección, líneas de fecha |
-| Sans | **Source Sans 3** | Cuerpo, etiquetas, botones, logística |
+| Display | **Bodoni Moda** | Nombres, títulos, countdown, fechas |
+| Sans | **Manrope** | Cuerpo, etiquetas, botones, logística |
+
+Ver decisión completa en `docs/TYPOGRAPHY.md`.
 
 Reglas:
 

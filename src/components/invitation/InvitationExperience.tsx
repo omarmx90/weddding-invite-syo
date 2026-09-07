@@ -18,10 +18,10 @@ import { OurTeamSection } from "@/components/invitation/OurTeamSection";
 import { MomentsGallerySection } from "@/components/invitation/MomentsGallerySection";
 import { DressGuidanceSection } from "@/components/invitation/DressGuidanceSection";
 import { RsvpComingSoonSection } from "@/components/invitation/RsvpComingSoonSection";
+import { CinematicMoment } from "@/components/invitation/CinematicMoment";
 
 type InvitationExperienceProps = {
   content: WeddingContent;
-  /** Presente solo en `/i/[slug]` */
   guest?: GuestInvitation;
 };
 
@@ -35,6 +35,7 @@ export function InvitationExperience({
   const reduceMotion = useReducedMotion();
   const showGallery = isGallerySectionVisible(content.gallery);
   const isPersonalized = Boolean(guest);
+  const [cineCouple, cineFamily] = content.editorial.cinematic;
 
   const countdownAccessibleSummary = `Cuenta regresiva para la ceremonia del ${formatLongDateEsMx(content.countdown.targetIsoDate)} a las ${content.event.ceremony.time}, hora de la Ciudad de México.`;
 
@@ -81,6 +82,7 @@ export function InvitationExperience({
             <CountdownSection
               content={content.countdown}
               accessibleSummary={countdownAccessibleSummary}
+              chapter={content.editorial.chapters.day}
               tone="canvas"
             />
             {guest ? (
@@ -109,18 +111,23 @@ export function InvitationExperience({
               content={content.faith}
               tone={guest ? "canvas" : "surface"}
             />
+            {cineCouple ? <CinematicMoment moment={cineCouple} /> : null}
             <OurTeamSection
               content={content.familyTeam}
+              chapter={content.editorial.chapters.family}
               tone={guest ? "surface" : "canvas"}
             />
+            {cineFamily ? <CinematicMoment moment={cineFamily} /> : null}
             {showGallery ? (
               <MomentsGallerySection
                 content={content.gallery}
+                chapter={content.editorial.chapters.moments}
                 tone={guest ? "canvas" : "surface"}
               />
             ) : null}
             <DressGuidanceSection
               content={content.dress}
+              chapter={content.editorial.chapters.celebrate}
               tone={guest ? "surface" : "canvas"}
             />
             {guest ? (

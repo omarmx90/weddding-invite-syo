@@ -1,3 +1,5 @@
+import type { EditorialSystem } from "./editorial-types";
+
 /**
  * Contratos de contenido de la invitación.
  * Los componentes de UI consumen estos tipos; no inventan campos de boda ad hoc.
@@ -233,6 +235,8 @@ export type WeddingContent = {
    * Escalable a ~100 fotos; el riel solo consume `featured`.
    */
   gallery: GalleryContent;
+  /** Capítulos y momentos visuales (polish tipográfico) */
+  editorial: EditorialSystem;
   links: {
     /** Atajos futuros de WhatsApp / contacto */
     whatsapp?: string;

@@ -364,6 +364,34 @@ export const wedding: WeddingContent = {
       },
     ],
   },
+  editorial: {
+    chapters: {
+      day: { number: "01", label: "Nuestro gran día" },
+      family: { number: "02", label: "Nuestra familia" },
+      moments: { number: "03", label: "Recuerdos" },
+      celebrate: { number: "04", label: "Para celebrar juntos" },
+    },
+    cinematic: [
+      {
+        id: "cine-couple",
+        src: "/images/gallery/momento-01.jpg",
+        alt: "Silvia y Omar sonriendo juntos frente a una fachada de tonos cálidos",
+        title: "Silvia & Omar",
+        objectPosition: "50% 38%",
+        width: 1600,
+        height: 1067,
+      },
+      {
+        id: "cine-family",
+        src: "/images/gallery/momento-07.jpg",
+        alt: "Silvia, Omar y Mauro sonriendo en una terraza con el acueducto de fondo",
+        title: "Silvia, Omar y Mauro",
+        objectPosition: "50% 32%",
+        width: 1600,
+        height: 1067,
+      },
+    ],
+  },
   links: {},
 };
 

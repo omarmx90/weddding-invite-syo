@@ -1,20 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Source_Sans_3 } from "next/font/google";
+import { Bodoni_Moda, Manrope } from "next/font/google";
 import { site } from "@/content/site";
 import { wedding } from "@/content/wedding";
 import "./globals.css";
 
-const sourceSans = Source_Sans_3({
-  variable: "--font-source-sans",
+/**
+ * Tipografía editorial ganadora (polish 2026):
+ * Bodoni Moda (display) + Manrope (soporte).
+ * Ver docs/TYPOGRAPHY.md — comparación vs DM Serif+Inter y Playfair+Source Sans.
+ */
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
+  weight: ["400", "500", "600"],
 });
 
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
+const bodoni = Bodoni_Moda({
+  variable: "--font-bodoni",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
   display: "swap",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -81,7 +87,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang={wedding.locale}
-      className={`${sourceSans.variable} ${cormorant.variable} h-full bg-canvas antialiased`}
+      className={`${manrope.variable} ${bodoni.variable} h-full bg-canvas antialiased`}
     >
       <body className="min-h-full bg-canvas font-sans text-ink antialiased">
         {children}

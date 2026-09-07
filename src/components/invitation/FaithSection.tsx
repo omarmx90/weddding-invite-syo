@@ -17,7 +17,7 @@ function MinimalCross({ className }: { className?: string }) {
       <path
         d="M12 2V30M5 11H19"
         stroke="currentColor"
-        strokeWidth="1.15"
+        strokeWidth="1.05"
         strokeLinecap="round"
       />
     </svg>
@@ -25,7 +25,7 @@ function MinimalCross({ className }: { className?: string }) {
 }
 
 /**
- * Sección de fe — tipográfica, breve y respetuosa.
+ * Sección de fe — aireada, tipográfica, marca editorial pequeña.
  */
 export function FaithSection({ content, tone = "surface" }: FaithSectionProps) {
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
@@ -40,25 +40,25 @@ export function FaithSection({ content, tone = "surface" }: FaithSectionProps) {
       <Reveal className="mx-auto w-full max-w-[var(--content-max)] text-center">
         <hr className="invite-rule mx-auto" aria-hidden="true" />
 
-        <MinimalCross className="mx-auto mt-10 h-8 w-6 text-taupe/70" />
+        <MinimalCross className="mx-auto mt-14 h-7 w-5 text-taupe/65" />
 
         <h2
           id="faith-title"
-          className="font-display mt-6 text-[clamp(1.85rem,7vw,2.5rem)] leading-snug font-medium tracking-[-0.01em] text-balance"
+          className="font-display mt-8 text-[clamp(1.95rem,7.5vw,2.65rem)] leading-[1.05] font-medium tracking-[-0.02em] text-balance"
         >
           {content.title}
         </h2>
 
-        <p className="mx-auto mt-7 max-w-[22rem] font-sans text-[1.0625rem] leading-[1.75] text-ink-muted text-pretty">
+        <p className="mx-auto mt-8 max-w-[21rem] font-sans text-[1.0625rem] leading-[1.8] text-ink-muted text-pretty">
           {content.body}
         </p>
 
         {content.patrons.length > 0 ? (
-          <p className="mx-auto mt-10 max-w-[20rem] font-sans text-[0.6875rem] font-medium uppercase tracking-[0.22em] text-ink-subtle text-balance">
+          <p className="mx-auto mt-12 max-w-[20rem] font-sans text-[0.6875rem] font-medium uppercase tracking-[0.24em] text-ink-subtle text-balance">
             {content.patrons.map((patron, index) => (
               <span key={patron}>
                 {index > 0 ? (
-                  <span className="mx-2 text-sand" aria-hidden="true">
+                  <span className="mx-2.5 text-sand" aria-hidden="true">
                     ·
                   </span>
                 ) : null}

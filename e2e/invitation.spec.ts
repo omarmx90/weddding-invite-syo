@@ -426,6 +426,48 @@ test.describe("Invitación de boda — Chromium", () => {
     expect(result.railCanScroll).toBe(true);
   });
 
+  test("capturas del polish editorial para inspección visual", async ({ page }) => {
+    test.setTimeout(120_000);
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+    const viewports = [
+      { name: "360x800", width: 360, height: 800 },
+      { name: "390x844", width: 390, height: 844 },
+      { name: "430x932", width: 430, height: 932 },
+      { name: "768x1024", width: 768, height: 1024 },
+      { name: "1440x900", width: 1440, height: 900 },
+    ] as const;
+
+    for (const viewport of viewports) {
+      await page.setViewportSize(viewport);
+      await openInvitation(page);
+
+      await page.getByTestId("countdown-section").scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: path.join(OUTPUT_DIR, `polish-countdown-${viewport.name}.png`),
+        fullPage: false,
+      });
+
+      await page.getByTestId("ceremony").scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: path.join(OUTPUT_DIR, `polish-ceremony-${viewport.name}.png`),
+        fullPage: false,
+      });
+
+      await page.getByTestId("nuestro-equipo").scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: path.join(OUTPUT_DIR, `polish-equipo-${viewport.name}.png`),
+        fullPage: false,
+      });
+
+      await page.getByTestId("nuestros-momentos").scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: path.join(OUTPUT_DIR, `polish-gallery-${viewport.name}.png`),
+        fullPage: false,
+      });
+    }
+  });
+
   test("capturas del hero editorial para inspección visual", async ({ page }) => {
     test.setTimeout(90_000);
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });

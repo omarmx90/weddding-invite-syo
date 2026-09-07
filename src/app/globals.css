@@ -22,7 +22,7 @@
   --hero-veil: rgba(75, 68, 61, 0.38);
   --hero-veil-deep: rgba(75, 68, 61, 0.55);
 
-  --section-y: clamp(4.75rem, 12.5vw, 7.75rem);
+  --section-y: clamp(5rem, 13vw, 8.25rem);
   --content-max: 28rem;
 }
 
@@ -41,8 +41,8 @@
   --color-hero-fg: var(--hero-fg);
   --color-background: var(--canvas);
   --color-foreground: var(--ink);
-  --font-sans: var(--font-source-sans);
-  --font-display: var(--font-cormorant);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-bodoni);
 }
 
 html {
@@ -63,10 +63,83 @@ body {
 
 .font-display {
   font-family: var(--font-display), "Times New Roman", serif;
+  font-optical-sizing: auto;
 }
 
 .font-sans {
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.chapter-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  text-align: left;
+}
+
+.chapter-mark--center {
+  align-items: center;
+  text-align: center;
+}
+
+.chapter-number {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-subtle);
+}
+
+.chapter-label {
+  font-family: var(--font-display), "Times New Roman", serif;
+  font-size: clamp(1.05rem, 3.8vw, 1.25rem);
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.hero-name {
+  font-size: clamp(3.15rem, 15vw, 6.25rem);
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+}
+
+.hero-ampersand {
+  font-size: clamp(1.65rem, 7vw, 2.75rem);
+  line-height: 1;
+  font-weight: 400;
+  color: var(--taupe);
+  margin-block: 0.15em;
+  padding-left: 0.08em;
+}
+
+.countdown-value {
+  font-size: clamp(2.85rem, 14vw, 4.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-label {
+  margin-top: 0.85rem;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--ink-subtle);
+}
+
+.cinematic-veil {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--warm-white) 18%, transparent) 0%,
+      transparent 28%,
+      color-mix(in srgb, var(--ink) 42%, transparent) 100%
+    );
 }
 
 .hero-overlay {
@@ -249,15 +322,23 @@ body {
 }
 
 .gallery-rail-slide--featured {
-  width: min(86vw, 26rem);
+  width: min(88vw, 28rem);
 }
 
 .gallery-rail-slide--featured .gallery-slide-figure > div {
   aspect-ratio: 5 / 4;
 }
 
+.gallery-rail-slide--lead {
+  width: min(92vw, 30rem);
+}
+
+.gallery-rail-slide--lead .gallery-slide-figure > div {
+  aspect-ratio: 4 / 5;
+}
+
 .gallery-rail-slide--landscape {
-  width: min(78vw, 22rem);
+  width: min(74vw, 21rem);
 }
 
 .gallery-rail-slide--landscape .gallery-slide-figure > div {
@@ -265,7 +346,7 @@ body {
 }
 
 .gallery-rail-slide--portrait {
-  width: min(68vw, 18rem);
+  width: min(64vw, 17rem);
 }
 
 .gallery-rail-slide--portrait .gallery-slide-figure > div {
@@ -273,7 +354,7 @@ body {
 }
 
 .gallery-rail-slide--square {
-  width: min(62vw, 16rem);
+  width: min(58vw, 15rem);
 }
 
 .gallery-rail-slide--square .gallery-slide-figure > div {
@@ -282,25 +363,29 @@ body {
 
 @media (min-width: 768px) {
   .gallery-rail-track {
-    gap: 1.15rem;
+    gap: 1.35rem;
     padding-inline: max(2rem, calc((100vw - 52rem) / 2 + 1.25rem))
       max(2.5rem, calc((100vw - 52rem) / 2 + 1.5rem));
   }
 
+  .gallery-rail-slide--lead {
+    width: min(46vw, 30rem);
+  }
+
   .gallery-rail-slide--featured {
-    width: min(42vw, 28rem);
+    width: min(40vw, 27rem);
   }
 
   .gallery-rail-slide--landscape {
-    width: min(36vw, 24rem);
+    width: min(34vw, 23rem);
   }
 
   .gallery-rail-slide--portrait {
-    width: min(28vw, 20rem);
+    width: min(26vw, 19rem);
   }
 
   .gallery-rail-slide--square {
-    width: min(24vw, 17rem);
+    width: min(22vw, 16rem);
   }
 }
 

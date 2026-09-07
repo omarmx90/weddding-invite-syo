@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from "react";
 import type { CountdownContent } from "@/content/types";
+import type { EditorialChapter } from "@/content/editorial-types";
 import {
   getCountdownParts,
   padCountdownValue,
   type CountdownParts,
 } from "@/lib/countdown";
 import { Reveal } from "@/components/invitation/Reveal";
+import { ChapterMark } from "@/components/invitation/ChapterMark";
 
 type CountdownSectionProps = {
   content: CountdownContent;
   accessibleSummary: string;
+  chapter?: EditorialChapter;
   tone?: "canvas" | "surface";
 };
 
@@ -20,12 +23,12 @@ function msUntilNextMinuteBoundary(nowMs: number): number {
 }
 
 /**
- * Cuenta regresiva editorial — actualiza al límite del minuto (sin polling por segundo).
- * Los números visuales son decorativos; la fecha/hora se anuncia una sola vez.
+ * Cuenta regresiva editorial — tipografía Didone grande, labels mínimos.
  */
 export function CountdownSection({
   content,
   accessibleSummary,
+  chapter,
   tone = "canvas",
 }: CountdownSectionProps) {
   const [parts, setParts] = useState<CountdownParts | null>(null);
@@ -93,6 +96,7 @@ export function CountdownSection({
       data-timezone={content.timezone}
     >
       <Reveal className="mx-auto w-full max-w-[var(--content-max)] text-center">
+        {chapter ? <ChapterMark chapter={chapter} className="mb-8" /> : null}
         <hr className="invite-rule mx-auto" aria-hidden="true" />
 
         <p className="sr-only" id="countdown-title">
@@ -101,42 +105,37 @@ export function CountdownSection({
 
         {display.arrived ? (
           <p
-            className="font-display mt-10 text-[clamp(1.65rem,6.5vw,2.15rem)] leading-snug text-ink text-balance"
+            className="font-display mt-10 text-[clamp(1.75rem,7vw,2.35rem)] leading-snug text-ink text-balance"
             data-testid="countdown-arrived"
           >
             {content.arrivedMessage}
           </p>
         ) : (
           <div data-testid="countdown-active">
-            <p className="mt-10 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.34em] text-ink-subtle">
+            <p className="mt-10 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.36em] text-ink-subtle">
               {content.preface}
             </p>
 
             <div
-              className="mt-8 grid grid-cols-3 gap-2 sm:gap-6"
+              className="mt-9 grid grid-cols-3 gap-1 sm:gap-5"
               aria-hidden="true"
               data-testid="countdown-units"
             >
-              {units.map((unit, index) => (
+              {units.map((unit) => (
                 <div key={unit.key} className="flex flex-col items-center">
                   <p
-                    className="font-display text-[clamp(2.35rem,12vw,3.75rem)] leading-none tracking-[-0.03em] text-ink tabular-nums"
+                    className="font-display countdown-value text-ink"
                     data-testid={`countdown-${unit.key}`}
                   >
                     {unit.value}
                   </p>
-                  <p className="mt-3 font-sans text-[0.625rem] font-medium uppercase tracking-[0.28em] text-ink-subtle sm:text-[0.6875rem] sm:tracking-[0.32em]">
-                    {unit.label}
-                  </p>
-                  {index < units.length - 1 ? (
-                    <span className="sr-only">·</span>
-                  ) : null}
+                  <p className="countdown-label">{unit.label}</p>
                 </div>
               ))}
             </div>
 
             <div
-              className="mx-auto mt-8 flex w-full max-w-[16rem] items-center gap-3"
+              className="mx-auto mt-9 flex w-full max-w-[14rem] items-center gap-3"
               aria-hidden="true"
             >
               <span className="h-px flex-1 bg-sand" />
@@ -144,7 +143,7 @@ export function CountdownSection({
               <span className="h-px flex-1 bg-sand" />
             </div>
 
-            <p className="mt-6 font-display text-[clamp(1.05rem,4vw,1.25rem)] leading-snug text-ink-muted text-balance">
+            <p className="mt-6 font-display text-[clamp(1.1rem,4.2vw,1.3rem)] leading-snug tracking-[0.02em] text-ink-muted text-balance">
               {content.suffix}
             </p>
           </div>
