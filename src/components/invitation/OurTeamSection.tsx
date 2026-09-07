@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import type { FamilyTeamContent } from "@/content/types";
+import type { FamilyTeamContent, FootballGalleryItem } from "@/content/types";
 import type { EditorialChapter } from "@/content/editorial-types";
 import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
@@ -15,21 +15,21 @@ type OurTeamSectionProps = {
   tone?: "canvas" | "surface";
 };
 
-function spanClass(span?: string) {
-  switch (span) {
-    case "hero":
-      return "football-grid-item football-grid-item--hero";
-    case "wide":
-      return "football-grid-item football-grid-item--wide";
-    case "tall":
-      return "football-grid-item football-grid-item--tall";
-    default:
-      return "football-grid-item";
+function slideClass(item: FootballGalleryItem, index: number) {
+  if (index === 0 || item.span === "hero") {
+    return "gallery-rail-slide gallery-rail-slide--lead";
   }
+  if (item.span === "tall" || item.orientation === "portrait") {
+    return "gallery-rail-slide gallery-rail-slide--portrait";
+  }
+  if (item.span === "wide") {
+    return "gallery-rail-slide gallery-rail-slide--featured";
+  }
+  return "gallery-rail-slide gallery-rail-slide--landscape";
 }
 
 /**
- * Nuestro equipo — tipografía + collage futbolero editorial + lightbox.
+ * Nuestro equipo — tipografía + riel fotográfico (como Nuestros momentos) + lightbox.
  */
 export function OurTeamSection({
   content,
@@ -51,11 +51,11 @@ export function OurTeamSection({
   return (
     <section
       id="nuestro-equipo"
-      className={`${background} football-pitch-section relative section-pad text-ink`}
+      className={`${background} football-pitch-section relative section-pad-y text-ink`}
       aria-labelledby="nuestro-equipo-title"
       data-testid="nuestro-equipo"
     >
-      <Reveal className="relative z-[1] mx-auto w-full max-w-[min(100%,42rem)] text-center">
+      <Reveal className="relative z-[1] mx-auto w-full max-w-[min(100%,42rem)] pl-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))] text-center">
         {chapter ? <ChapterMark chapter={chapter} className="mb-8" /> : null}
         <hr className="invite-rule mx-auto" aria-hidden="true" />
 
@@ -111,47 +111,64 @@ export function OurTeamSection({
       </Reveal>
 
       {items.length > 0 ? (
-        <div className="relative z-[1] mx-auto mt-14 w-full max-w-[min(100%,52rem)] px-[max(1.15rem,env(safe-area-inset-left))] pr-[max(1.15rem,env(safe-area-inset-right))]">
-          <p className="text-center font-sans text-[0.6875rem] font-medium uppercase tracking-[0.32em] text-ink-subtle">
+        <div className="relative z-[1] mt-14 w-full">
+          <p className="px-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))] text-center font-sans text-[0.6875rem] font-medium uppercase tracking-[0.32em] text-ink-subtle">
             {content.footballGallery.title}
           </p>
+          <p className="mt-3 px-[max(1.25rem,env(safe-area-inset-left))] text-center font-sans text-[0.6875rem] tracking-[0.2em] text-ink-subtle uppercase md:hidden">
+            Desliza para ver más
+          </p>
 
-          <ul
-            className="football-grid mt-8 list-none p-0"
+          <div
+            className="gallery-rail mt-8 min-w-0 w-full"
             data-testid="football-gallery"
+            tabIndex={0}
+            role="region"
+            aria-label={`${content.footballGallery.title}: álbum familiar. Desplaza horizontalmente para ver más. Toca una foto para ampliarla.`}
           >
-            {items.map((item, index) => (
-              <li key={item.id} className={spanClass(item.span)}>
-                <button
-                  type="button"
-                  className="football-grid-button group relative block h-full w-full overflow-hidden bg-beige/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
-                  onClick={() => setOpenIndex(index)}
-                  aria-label={`Ver fotografía ${index + 1} de ${items.length}: ${item.alt}`}
-                  data-testid={`football-photo-${item.id}`}
-                >
-                  <Image
-                    src={item.src}
-                    alt={item.alt}
-                    fill
-                    sizes={
-                      item.span === "hero"
-                        ? "(max-width: 768px) 92vw, 832px"
-                        : "(max-width: 768px) 46vw, 400px"
-                    }
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                    style={{
-                      objectPosition: item.objectPosition ?? "50% 40%",
-                    }}
-                    loading="lazy"
-                  />
-                </button>
-              </li>
-            ))}
-          </ul>
+            <ul className="gallery-rail-track">
+              {items.map((item, index) => {
+                const number = String(index + 1).padStart(2, "0");
+                return (
+                  <li key={item.id} className={slideClass(item, index)}>
+                    <figure className="gallery-slide-figure">
+                      <div className="relative h-full w-full overflow-hidden bg-beige/40">
+                        <button
+                          type="button"
+                          className="group absolute inset-0 block h-full w-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
+                          onClick={() => setOpenIndex(index)}
+                          aria-label={`Ver fotografía ${index + 1} de ${items.length}: ${item.alt}`}
+                          data-testid={`football-photo-${item.id}`}
+                        >
+                          <Image
+                            src={item.src}
+                            alt={item.alt}
+                            fill
+                            sizes="(max-width: 430px) 88vw, (max-width: 768px) 72vw, 500px"
+                            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                            style={{
+                              objectPosition: item.objectPosition ?? "50% 40%",
+                            }}
+                            loading="lazy"
+                          />
+                        </button>
+                      </div>
+                      <figcaption className="mt-3 flex items-baseline justify-between gap-3 px-0.5">
+                        <span className="font-sans text-[0.625rem] font-medium tracking-[0.24em] text-ink-subtle tabular-nums">
+                          {number}
+                        </span>
+                        <span className="sr-only">{item.alt}</span>
+                      </figcaption>
+                    </figure>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       ) : null}
 
-      <div className="relative z-[1] mx-auto mt-16 max-w-[18rem]">
+      <div className="relative z-[1] mx-auto mt-16 max-w-[18rem] px-[max(1.25rem,env(safe-area-inset-left))]">
         <OrnamentalDivider className="text-taupe/60" motif="monogram" />
       </div>
 

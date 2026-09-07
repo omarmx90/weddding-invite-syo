@@ -199,6 +199,7 @@ test.describe("Invitación de boda — Chromium", () => {
 
     const gallery = page.getByTestId("football-gallery");
     await expect(gallery).toBeVisible();
+    await expect(gallery).toHaveAttribute("role", "region");
     expect(wedding.familyTeam.footballGallery.items.length).toBeGreaterThanOrEqual(
       10,
     );
@@ -267,7 +268,16 @@ test.describe("Invitación de boda — Chromium", () => {
       const gallery = page.getByTestId("football-gallery");
       await gallery.scrollIntoViewIfNeeded();
       await gallery.screenshot({
-        path: path.join(OUTPUT_DIR, `football-grid-${viewport.name}.png`),
+        path: path.join(OUTPUT_DIR, `football-rail-${viewport.name}.png`),
+      });
+      await gallery.evaluate((el) => {
+        el.scrollLeft = Math.min(220, el.scrollWidth);
+      });
+      await gallery.screenshot({
+        path: path.join(OUTPUT_DIR, `football-rail-scrolled-${viewport.name}.png`),
+      });
+      await gallery.evaluate((el) => {
+        el.scrollLeft = 0;
       });
 
       await page.getByTestId("football-photo-fb-01").click();
@@ -696,11 +706,16 @@ test.describe("Invitación de boda — Chromium", () => {
     await page.getByTestId("countdown-section").scrollIntoViewIfNeeded();
 
     const rail = page.getByTestId("gallery-rail");
+    const footballRail = page.getByTestId("football-gallery");
     await expect(rail).toBeVisible();
+    await expect(footballRail).toBeVisible();
 
     const result = await page.evaluate(() => {
       const doc = document.documentElement;
       const railEl = document.querySelector("[data-testid='gallery-rail']");
+      const footballEl = document.querySelector(
+        "[data-testid='football-gallery']",
+      );
       const before = window.scrollX;
       window.scrollBy(240, 0);
       const afterWindow = window.scrollX;
@@ -712,12 +727,16 @@ test.describe("Invitación de boda — Chromium", () => {
         railCanScroll: railEl
           ? railEl.scrollWidth > railEl.clientWidth + 8
           : false,
+        footballCanScroll: footballEl
+          ? footballEl.scrollWidth > footballEl.clientWidth + 8
+          : false,
       };
     });
 
     expect(result.docOk).toBe(true);
     expect(result.windowScrollDelta).toBe(0);
     expect(result.railCanScroll).toBe(true);
+    expect(result.footballCanScroll).toBe(true);
   });
 
   test("capturas del polish editorial para inspección visual", async ({ page }) => {
