@@ -5,10 +5,11 @@
 export function getAdminAllowlist(): string[] {
   const raw = process.env.ADMIN_EMAILS?.trim() ?? "";
   if (!raw) return [];
-  return raw
+  const emails = raw
     .split(",")
     .map((email) => normalizeAdminEmail(email))
     .filter(Boolean);
+  return [...new Set(emails)];
 }
 
 export function normalizeAdminEmail(email: string): string {

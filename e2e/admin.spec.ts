@@ -142,6 +142,10 @@ test.describe("Admin guest manager — Chromium", () => {
     await page.getByTestId("admin-guest-search").fill("Granados");
     await page.getByTestId("admin-guest-search").press("Enter");
     await expect(page.getByTestId("admin-guest-granados-montero")).toBeVisible();
+
+    await page.goto("/admin/guests?q=nava-munoz");
+    await expect(page.getByTestId("admin-guest-nava-munoz")).toBeVisible();
+    await expect(page.getByTestId("admin-guest-granados-montero")).toHaveCount(0);
   });
 
   test("editar, no reducir seats bajo confirmados, desactivar", async ({
@@ -176,6 +180,9 @@ test.describe("Admin guest manager — Chromium", () => {
     page.once("dialog", (dialog) => dialog.accept());
     await page.getByTestId("admin-disable").click();
     await expect(page.getByTestId("admin-detail-enabled")).toHaveText("No");
+
+    await page.goto("/admin/guests?status=inactive");
+    await expect(page.getByTestId("admin-guest-montero-aguilar")).toBeVisible();
   });
 
   test("rotación invalida enlace anterior y conserva RSVP", async ({
@@ -291,6 +298,13 @@ test.describe("Admin unit helpers — Chromium", () => {
       );
       expect(redirectTo).not.toMatch(/localhost|127\.0\.0\.1/i);
       expect(() => assertProductionAdminRedirectSafe(redirectTo)).not.toThrow();
+
+      process.env.INVITE_SITE_URL = "https://evil.example.com";
+      expect(() =>
+        resolveAdminAuthEmailRedirectTo({
+          requestOrigin: "http://localhost:3000",
+        }),
+      ).toThrow(/canónico/i);
     } finally {
       if (previousEnv === undefined) delete process.env.VERCEL_ENV;
       else process.env.VERCEL_ENV = previousEnv;

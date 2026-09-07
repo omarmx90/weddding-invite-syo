@@ -23,6 +23,7 @@ export function AdminGuestDetail({ guest }: { guest: GuestDetail }) {
   const router = useRouter();
   const [current, setCurrent] = useState(guest);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const [whatsapp, setWhatsapp] = useState<string | null>(null);
   const [whatsappHref, setWhatsappHref] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
@@ -110,7 +111,7 @@ export function AdminGuestDetail({ guest }: { guest: GuestDetail }) {
       <div className="mt-10 flex flex-col gap-3">
         <ActionButton
           testId="admin-copy-invite"
-          label="Copiar invitación"
+          label={copied ? "Enlace copiado" : "Copiar invitación"}
           disabled={isPending}
           onClick={() =>
             run(async () => {
@@ -118,6 +119,8 @@ export function AdminGuestDetail({ guest }: { guest: GuestDetail }) {
               if (!result.ok) throw new Error(result.message);
               setInviteUrl(result.data.inviteUrl);
               await navigator.clipboard.writeText(result.data.inviteUrl);
+              setCopied(true);
+              window.setTimeout(() => setCopied(false), 2000);
             })
           }
         />

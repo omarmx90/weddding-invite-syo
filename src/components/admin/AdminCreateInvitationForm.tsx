@@ -10,6 +10,7 @@ export function AdminCreateInvitationForm() {
   const [maxSeats, setMaxSeats] = useState(2);
   const [error, setError] = useState<string | null>(null);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function onSubmit(event: React.FormEvent) {
@@ -56,9 +57,11 @@ export function AdminCreateInvitationForm() {
             className="inline-flex min-h-11 items-center justify-center border border-ink bg-ink px-5 py-2.5 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.24em] text-warm-white"
             onClick={async () => {
               await navigator.clipboard.writeText(inviteUrl);
+              setCopied(true);
+              window.setTimeout(() => setCopied(false), 2000);
             }}
           >
-            Copiar enlace
+            {copied ? "Enlace copiado" : "Copiar enlace"}
           </button>
           <button
             type="button"

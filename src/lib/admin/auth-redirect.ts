@@ -13,12 +13,9 @@ export function resolveAdminAuthEmailRedirectTo(options?: {
     const base = (
       process.env.INVITE_SITE_URL?.trim() || site.url
     ).replace(/\/$/, "");
-    if (/localhost|127\.0\.0\.1/i.test(base)) {
-      throw new Error(
-        "INVITE_SITE_URL no puede ser localhost en Production.",
-      );
-    }
-    return `${base}/admin/auth/callback`;
+    const redirectTo = `${base}/admin/auth/callback`;
+    assertProductionAdminRedirectSafe(redirectTo);
+    return redirectTo;
   }
 
   const origin = (options?.requestOrigin || "").replace(/\/$/, "");

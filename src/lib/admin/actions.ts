@@ -8,6 +8,7 @@ import {
   buildWhatsAppMessage,
   buildWhatsAppShareHref,
 } from "@/lib/admin/messages";
+import { guestMatchesAdminQuery } from "@/lib/admin/search";
 import type {
   CreateInvitationInput,
   DashboardStats,
@@ -25,6 +26,19 @@ function fail<T>(message: string): AdminActionResult<T> {
   return { ok: false, message };
 }
 
+function toSafeAdminErrorMessage(error: unknown): string {
+  const message =
+    error instanceof Error ? error.message : "No se pudo completar la acción.";
+  if (
+    /INVITE_TOKEN|SERVICE_ROLE|encryption|ciphertext|token|SECRET|KEY/i.test(
+      message,
+    )
+  ) {
+    return "No se pudo completar la acción.";
+  }
+  return message;
+}
+
 async function withAdmin<T>(
   run: (email: string) => Promise<T>,
 ): Promise<AdminActionResult<T>> {
@@ -36,9 +50,7 @@ async function withAdmin<T>(
     const data = await run(admin.email);
     return { ok: true, data };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "No se pudo completar la acción.";
-    return fail(message);
+    return fail(toSafeAdminErrorMessage(error));
   }
 }
 
@@ -57,20 +69,22 @@ export async function getAdminDashboard(): Promise<
 
 export async function listAdminGuests(filters?: {
   query?: string;
-  status?: GuestRsvpStatus | "all";
+  status?: GuestRsvpStatus | "all" | "inactive";
 }): Promise<AdminActionResult<GuestListItem[]>> {
   return withAdmin(async () => {
     const store = getAdminGuestStore();
     let guests = await store.listGuests();
     const status = filters?.status ?? "all";
-    if (status !== "all") {
-      guests = guests.filter((guest) => guest.status === status);
-    }
-    const query = filters?.query?.trim().toLowerCase();
-    if (query) {
-      guests = guests.filter((guest) =>
-        guest.displayName.toLowerCase().includes(query),
+    if (status === "inactive") {
+      guests = guests.filter((guest) => !guest.enabled);
+    } else if (status !== "all") {
+      guests = guests.filter(
+        (guest) => guest.enabled && guest.status === status,
       );
+    }
+    const query = filters?.query?.trim();
+    if (query) {
+      guests = guests.filter((guest) => guestMatchesAdminQuery(guest, query));
     }
     return guests;
   });

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AdminGuestFilters } from "@/components/admin/AdminGuestFilters";
 import { getAuthorizedAdminSession } from "@/lib/admin/session";
 import { getAdminGuestStore, isAdminPersistenceReady } from "@/lib/admin/repository";
+import { guestMatchesAdminQuery } from "@/lib/admin/search";
 import type { GuestRsvpStatus } from "@/lib/admin/types";
 import { formatAdminDateTime } from "@/lib/admin/format";
 
@@ -31,22 +32,24 @@ export default async function AdminGuestsPage({
   const params = await searchParams;
   const query = params.q?.trim() ?? "";
   const statusParam = params.status;
-  const status: GuestRsvpStatus | "all" =
+  const status: GuestRsvpStatus | "all" | "inactive" =
     statusParam === "confirmed" ||
     statusParam === "declined" ||
-    statusParam === "pending"
+    statusParam === "pending" ||
+    statusParam === "inactive"
       ? statusParam
       : "all";
 
   let guests = await getAdminGuestStore().listGuests();
-  if (status !== "all") {
-    guests = guests.filter((guest) => guest.status === status);
+  if (status === "inactive") {
+    guests = guests.filter((guest) => !guest.enabled);
+  } else if (status !== "all") {
+    guests = guests.filter(
+      (guest) => guest.enabled && guest.status === status,
+    );
   }
   if (query) {
-    const q = query.toLowerCase();
-    guests = guests.filter((guest) =>
-      guest.displayName.toLowerCase().includes(q),
-    );
+    guests = guests.filter((guest) => guestMatchesAdminQuery(guest, query));
   }
 
   return (
@@ -111,7 +114,7 @@ export default async function AdminGuestsPage({
 
       {guests.length === 0 ? (
         <p className="mt-8 font-sans text-ink-muted" data-testid="admin-guests-empty">
-          No hay familias con ese filtro.
+          No encontramos familias con ese filtro.
         </p>
       ) : null}
     </div>

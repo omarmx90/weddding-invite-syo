@@ -58,7 +58,7 @@ Sin tokens ni URLs con `?t=` en auditoría.
 
 1. Aplicar `supabase/admin.sql` en el SQL Editor del proyecto.
 2. Auth → providers → Email (magic link) ON.
-3. **URL Configuration** → [Auth URL config](https://supabase.com/dashboard/project/ohylccqzlauahkhnifqy/auth/url-configuration)
+3. **URL Configuration** → Auth → URL Configuration (Supabase Dashboard)
    - **Site URL:** `https://silvia-y-omar.com` (NUNCA `http://localhost:3000`)
    - **Redirect URLs** (exactas, sin wildcards amplios):
      - `https://silvia-y-omar.com/admin/auth/callback`

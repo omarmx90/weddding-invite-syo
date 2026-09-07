@@ -4,6 +4,7 @@ import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { guestInvitations } from "../src/content/guests";
+import { wedding } from "../src/content/wedding";
 import { resolveRsvpStoreMode } from "../src/lib/rsvp/repository";
 
 async function resetRsvpStore(
@@ -297,7 +298,12 @@ test.describe("RSVP piloto — Chromium", () => {
       "Nos vemos el 16 de octubre",
     );
     await expect(page.getByTestId("rsvp-ceremony-maps")).toBeVisible();
-    await expect(page.getByTestId("rsvp-celebration-maps")).toHaveCount(0);
+    const celebrationMaps = page.getByTestId("rsvp-celebration-maps");
+    await expect(celebrationMaps).toBeVisible();
+    await expect(celebrationMaps).toHaveAttribute(
+      "href",
+      wedding.event.reception.mapsUrl,
+    );
   });
 
   test("actualizar confirmación permanece accesible y secundario", async ({

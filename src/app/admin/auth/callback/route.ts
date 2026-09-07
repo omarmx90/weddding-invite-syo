@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAuthServerClient } from "@/lib/admin/session";
 import { isEmailAllowlisted } from "@/lib/admin/allowlist";
-import { site } from "@/content/site";
+import {
+  assertProductionAdminRedirectSafe,
+  resolveAdminAuthEmailRedirectTo,
+} from "@/lib/admin/auth-redirect";
 import { isVercelProduction } from "@/lib/supabase/server";
 
 /**
@@ -15,8 +18,12 @@ export async function GET(request: Request) {
   const next = "/admin";
 
   const origin = isVercelProduction()
-    ? (process.env.INVITE_SITE_URL?.trim() || site.url).replace(/\/$/, "")
+    ? resolveAdminAuthEmailRedirectTo().replace(/\/admin\/auth\/callback$/, "")
     : requestUrl.origin;
+
+  if (isVercelProduction()) {
+    assertProductionAdminRedirectSafe(`${origin}/admin/auth/callback`);
+  }
 
   if (authError) {
     return NextResponse.redirect(

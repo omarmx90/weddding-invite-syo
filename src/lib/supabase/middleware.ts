@@ -80,6 +80,8 @@ export async function updateAdminSession(request: NextRequest) {
     url.pathname = "/admin/login";
     if (user?.email && !isEmailAllowlisted(user.email)) {
       url.searchParams.set("error", "unauthorized");
+      // Fail closed: no dejar sesión Supabase activa fuera de allowlist.
+      await supabase.auth.signOut();
     }
     return NextResponse.redirect(url);
   }

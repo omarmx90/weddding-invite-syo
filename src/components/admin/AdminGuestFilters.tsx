@@ -31,7 +31,7 @@ export function AdminGuestFilters({
         <input
           type="search"
           value={value}
-          placeholder="Buscar familia"
+          placeholder="Buscar familia o slug"
           data-testid="admin-guest-search"
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={(event) => {
@@ -49,6 +49,7 @@ export function AdminGuestFilters({
             ["pending", "Pendientes"],
             ["confirmed", "Confirmados"],
             ["declined", "No asistirán"],
+            ["inactive", "Inactivos"],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -58,7 +59,7 @@ export function AdminGuestFilters({
             aria-pressed={status === key}
             disabled={isPending}
             onClick={() => push(value, key)}
-            className={`min-h-10 px-3 py-2 font-sans text-[0.7rem] font-medium uppercase tracking-[0.16em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe ${
+            className={`min-h-11 px-3 py-2 font-sans text-[0.7rem] font-medium uppercase tracking-[0.16em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe ${
               status === key
                 ? "border border-ink bg-ink text-warm-white"
                 : "border border-taupe/50 text-ink-muted hover:border-taupe hover:text-ink"
