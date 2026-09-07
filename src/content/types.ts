@@ -64,8 +64,10 @@ export type DaySchedule = {
 
 export type FamilyMember = {
   name: string;
-  /** Etiqueta breve opcional */
+  /** Etiqueta breve opcional (p. ej. rol familiar) */
   label?: string;
+  /** Equipo favorito — guiño familiar, no branding deportivo */
+  team?: string;
 };
 
 export type FamilyTeamContent = {
@@ -73,6 +75,10 @@ export type FamilyTeamContent = {
   eyebrow: string;
   /** Línea emocional principal */
   line: string;
+  /** Segunda línea corta (guiño futbolero, opcional) */
+  lineSecondary?: string;
+  /** Título del guiño de equipos */
+  rivalryTitle?: string;
   members: FamilyMember[];
   /**
    * Fotografía familiar futura.
@@ -80,6 +86,25 @@ export type FamilyTeamContent = {
    */
   photo?: WeddingMediaAsset;
   photoPlaceholderLabel: string;
+};
+
+export type GalleryItem = WeddingMediaAsset & {
+  id: string;
+  /** Solo las marcadas aparecen en el riel inicial */
+  featured: boolean;
+};
+
+export type GalleryContent = {
+  /**
+   * Si es false, la sección no se renderiza (aunque haya ítems de prueba).
+   * Activar cuando existan fotografías reales en `public/images/gallery/`.
+   */
+  enabled: boolean;
+  title: string;
+  eyebrow: string;
+  /** Pista breve de swipe (solo si aporta) */
+  hint?: string;
+  items: GalleryItem[];
 };
 
 export type WeddingCopy = {
@@ -90,6 +115,8 @@ export type WeddingCopy = {
   introEyebrow: string;
   introTitle: string;
   introBody: string;
+  /** Firma familiar bajo el mensaje de bienvenida */
+  familySignature: string;
 };
 
 export type WeddingContent = {
@@ -128,6 +155,11 @@ export type WeddingContent = {
   /** Estructura lista para el itinerario completo (sin inventar eventos). */
   schedule: DaySchedule;
   familyTeam: FamilyTeamContent;
+  /**
+   * Galería editorial ("Nuestros momentos").
+   * Escalable a ~100 fotos; el riel solo consume `featured`.
+   */
+  gallery: GalleryContent;
   links: {
     /** Atajos futuros de WhatsApp / contacto */
     whatsapp?: string;

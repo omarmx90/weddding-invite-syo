@@ -1,4 +1,4 @@
-import type { WeddingContent } from "./types";
+import type { GalleryContent, WeddingContent } from "./types";
 import {
   formatEditorialDateEsMx,
   PRODUCT_LOCALE,
@@ -28,10 +28,11 @@ export const wedding: WeddingContent = {
     heroCta: "Ver invitación",
     heroEyebrow: "Nuestra boda",
     locationLabel: "Querétaro, México",
-    introEyebrow: "Nuestra boda",
-    introTitle: "Con alegría queremos compartir este día con ustedes",
+    introEyebrow: "Con cariño",
+    introTitle: "Nos hace mucha ilusión celebrar este día con ustedes",
     introBody:
-      "Será un honor tenerlos presentes en la ceremonia y en la celebración. A continuación encontrarán los detalles para acompañarnos.",
+      "Cada persona que recibe esta invitación es especial para nosotros. Gracias por acompañar a nuestra familia — Silvia, Omar y Mauro — en un momento que queremos compartir de cerca.",
+    familySignature: "Silvia, Omar y Mauro",
   },
   meta: {
     title: "Silvia & Omar | Nos casamos",
@@ -52,12 +53,12 @@ export const wedding: WeddingContent = {
   },
   event: {
     ceremony: {
-      title: "Ceremonia religiosa",
+      title: "Ceremonia católica",
       date: ceremonyDate,
       timeLabel: "Hora",
       time: "5:00 p. m.",
-      venueLabel: "Iglesia",
-      venue: "Por confirmar",
+      venueLabel: "Parroquia",
+      venue: "Parroquia de Nuestra Señora de la Luz",
       addressLabel: "Dirección",
       address: "Por confirmar",
       ctaLabel: "Cómo llegar",
@@ -77,14 +78,10 @@ export const wedding: WeddingContent = {
   },
   schedule: {
     title: "Itinerario del día",
-    /**
-     * Solo entradas confirmadas.
-     * Extender más adelante con preparación, traslado, cena, etc.
-     */
     items: [
       {
         id: "ceremony",
-        title: "Ceremonia religiosa",
+        title: "Ceremonia católica",
         time: "5:00 p. m.",
         eventKey: "ceremony",
       },
@@ -94,23 +91,47 @@ export const wedding: WeddingContent = {
     title: "Nuestro equipo",
     eyebrow: "Familia",
     line: "Los mejores partidos se juegan juntos.",
+    lineSecondary:
+      "En la cancha no nos ponemos de acuerdo; en la vida, siempre del mismo lado.",
+    rivalryTitle: "Tres corazones. Tres equipos. Una sola familia.",
     members: [
-      { name: "Silvia" },
-      { name: "Omar" },
-      { name: "Nuestro hijo" },
+      { name: "Silvia", team: "Cruz Azul" },
+      { name: "Omar", team: "Chivas" },
+      { name: "Mauro", team: "América" },
     ],
     photoPlaceholderLabel: "Pronto una foto de nuestro equipo",
     photo: {
       // Derivado web del original (nuestro-equipo.jpg se conserva intacto).
       src: "/images/family/nuestro-equipo-display.jpg",
-      alt: "Silvia, Omar y su hijo juntos en una terraza durante una sesión familiar",
+      alt: "Silvia, Omar y Mauro juntos en una terraza durante una sesión familiar",
       width: 2400,
       height: 1600,
-      // Ligero sesgo hacia los rostros; el marco 3:2 coincide con la foto.
       objectPosition: "50% 42%",
     },
   },
+  /**
+   * Galería deshabilitada hasta agregar fotografías reales en
+   * `public/images/gallery/` y marcar `featured: true` en los ítems.
+   * Ver `public/images/gallery/README.md`.
+   */
+  gallery: {
+    enabled: false,
+    title: "Nuestros momentos",
+    eyebrow: "Álbum",
+    hint: "Desliza para ver más",
+    items: [],
+  },
   links: {},
 };
+
+/** Ítems destacados del riel (máx. ~20 en la primera versión). */
+export function getFeaturedGalleryItems(gallery: GalleryContent) {
+  return gallery.items.filter((item) => item.featured);
+}
+
+/** La sección se muestra solo con contenido real habilitado. */
+export function isGallerySectionVisible(gallery: GalleryContent) {
+  return gallery.enabled && getFeaturedGalleryItems(gallery).length > 0;
+}
 
 export type { WeddingContent };

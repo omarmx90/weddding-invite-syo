@@ -56,9 +56,17 @@ Textos y datos de la boda viven en:
 - `src/content/types.ts` — forma
 - `src/lib/locale.ts` — locale `es-MX` y formateo de fechas largas
 
-Sustituye la fotografía del hero dejando el archivo en `public/images/placeholders/` y actualizando `media.hero` en `wedding.ts`.
+Sustituye la fotografía del hero en `public/images/hero/` y actualiza `media.hero` en `wedding.ts`.
 
 Horas, sedes, direcciones y URLs de mapa de ceremonia/recepción se editan solo en `wedding.ts`.
+
+### Galería (“Nuestros momentos”)
+
+1. Agrega derivados web en `public/images/gallery/` (ver README de esa carpeta).
+2. Declara cada foto en `wedding.gallery.items` con `featured: true` para el riel.
+3. Pon `gallery.enabled: true` solo cuando haya al menos una foto real.
+
+La sección no se muestra si está deshabilitada o sin destacadas — evita placeholders vacíos en producción.
 
 ## Locale es-MX
 

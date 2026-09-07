@@ -190,8 +190,53 @@ body {
   border: 0;
 }
 
+/* Riel editorial — scroll-snap nativo, sin JS de carousel */
+.gallery-rail {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: max(1.25rem, env(safe-area-inset-left));
+  outline: none;
+}
+
+.gallery-rail:focus-visible {
+  outline: 2px solid var(--taupe);
+  outline-offset: 4px;
+}
+
+.gallery-rail-track {
+  display: flex;
+  gap: 0.85rem;
+  width: max-content;
+  padding-inline: max(1.25rem, env(safe-area-inset-left))
+    max(1.25rem, env(safe-area-inset-right));
+  padding-block: 0.15rem 0.5rem;
+  list-style: none;
+  margin: 0;
+}
+
+.gallery-rail-slide {
+  flex: 0 0 auto;
+  width: min(78vw, 22rem);
+  aspect-ratio: 4 / 5;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .gallery-rail-slide {
+    width: min(42vw, 26rem);
+    aspect-ratio: 3 / 4;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .gallery-rail {
+    scroll-snap-type: x proximity;
   }
 }

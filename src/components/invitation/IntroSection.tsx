@@ -36,7 +36,7 @@ export function IntroSection({ content }: IntroSectionProps) {
         </p>
         <hr className="invite-rule mx-auto mt-12" aria-hidden="true" />
         <p className="mt-10 font-display text-[1.35rem] text-ink">
-          {content.couple.displayName}
+          {content.copy.familySignature}
         </p>
         <p className="mt-3 font-sans text-sm tracking-[0.22em] text-ink-muted">
           <time dateTime={content.date.iso}>{content.date.display}</time>

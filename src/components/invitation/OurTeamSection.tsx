@@ -8,8 +8,8 @@ type OurTeamSectionProps = {
 };
 
 /**
- * Sección familiar con fotografía real en composición editorial.
- * Prioriza no cortar a ninguna de las tres personas (foto horizontal 3:2).
+ * Sección familiar editorial con guiño futbolero discreto.
+ * Conserva la paleta beige/arena; los equipos son tipografía, no branding.
  */
 export function OurTeamSection({
   content,
@@ -18,6 +18,11 @@ export function OurTeamSection({
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
   const photo = content.photo;
   const hasPhoto = Boolean(photo?.src);
+  const rivalryOrder = ["Mauro", "Omar", "Silvia"] as const;
+  const rivalryMembers = rivalryOrder
+    .map((name) => content.members.find((member) => member.name === name && member.team))
+    .filter((member): member is NonNullable<typeof member> => Boolean(member));
+
 
   return (
     <section
@@ -40,7 +45,6 @@ export function OurTeamSection({
           {content.title}
         </h2>
 
-        {/* Guiño: línea de campo + tres posiciones */}
         <div
           className="mx-auto mt-9 flex w-full max-w-[13rem] flex-col items-center gap-4"
           aria-hidden="true"
@@ -58,21 +62,17 @@ export function OurTeamSection({
           <div className="h-px w-full bg-sand/80" />
         </div>
 
-        <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+        <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           {content.members.map((member) => (
             <li
               key={member.name}
-              className="font-display text-[1.05rem] tracking-wide text-ink"
+              className="font-display text-[1.1rem] tracking-wide text-ink"
             >
               {member.name}
             </li>
           ))}
         </ul>
 
-        {/*
-          Contenedor 3:2 alineado a la foto real (7008×4672).
-          Evita crop vertical agresivo que cortaría a Silvia u Omar.
-        */}
         <figure
           className="relative mx-auto mt-10 w-full overflow-hidden bg-beige/50 ring-1 ring-sand/50"
           data-testid="nuestro-equipo-photo"
@@ -109,6 +109,44 @@ export function OurTeamSection({
         <p className="mx-auto mt-9 max-w-[22rem] font-sans text-[1.0625rem] leading-relaxed text-ink-muted text-pretty">
           {content.line}
         </p>
+        {content.lineSecondary ? (
+          <p className="mx-auto mt-3 max-w-[22rem] font-sans text-[0.9375rem] leading-relaxed text-ink-subtle text-pretty">
+            {content.lineSecondary}
+          </p>
+        ) : null}
+
+        {rivalryMembers.length > 0 ? (
+          <div
+            className="mx-auto mt-12 max-w-[22rem]"
+            data-testid="nuestro-equipo-rivalry"
+          >
+            {content.rivalryTitle ? (
+              <p className="font-display text-[clamp(1.15rem,4.5vw,1.35rem)] leading-snug text-ink text-balance">
+                {content.rivalryTitle}
+              </p>
+            ) : null}
+
+            <ul className="mt-8 flex flex-col gap-5">
+              {rivalryMembers.map((member) => (
+                <li
+                  key={`${member.name}-${member.team}`}
+                  className="flex flex-col items-center gap-1.5"
+                >
+                  <span className="font-display text-[1.2rem] tracking-wide text-ink">
+                    {member.name}
+                  </span>
+                  <span
+                    className="h-px w-6 bg-sand"
+                    aria-hidden="true"
+                  />
+                  <span className="font-sans text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-ink-subtle">
+                    {member.team}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </Reveal>
     </section>
   );

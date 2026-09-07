@@ -66,13 +66,18 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(page.getByTestId("hero-opening")).toHaveCount(0);
   });
 
-  test("la ceremonia muestra fecha, hora y cómo llegar", async ({ page }) => {
+  test("la ceremonia muestra parroquia, fecha, hora y cómo llegar", async ({
+    page,
+  }) => {
     await openInvitation(page);
     const ceremony = page.getByTestId("ceremony");
     await ceremony.scrollIntoViewIfNeeded();
 
     await expect(
-      ceremony.getByRole("heading", { name: "Ceremonia religiosa" }),
+      ceremony.getByRole("heading", { name: "Ceremonia católica" }),
+    ).toBeVisible();
+    await expect(
+      ceremony.getByText("Parroquia de Nuestra Señora de la Luz"),
     ).toBeVisible();
     await expect(ceremony.getByText("Viernes", { exact: true })).toBeVisible();
     await expect(ceremony.getByText("16 de octubre de 2026")).toBeVisible();
@@ -85,6 +90,17 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(mapsCta).toHaveAttribute("rel", /noopener/);
   });
 
+  test("el mensaje familiar de bienvenida es visible", async ({ page }) => {
+    await openInvitation(page);
+    const intro = page.getByTestId("intro-section");
+    await expect(
+      intro.getByRole("heading", {
+        name: /Nos hace mucha ilusión celebrar este día con ustedes/i,
+      }),
+    ).toBeVisible();
+    await expect(intro.getByText("Silvia, Omar y Mauro", { exact: true })).toBeVisible();
+  });
+
   test("la sección de recepción es visible", async ({ page }) => {
     await openInvitation(page);
     const reception = page.getByTestId("reception");
@@ -92,7 +108,7 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(reception.getByRole("heading", { name: "Recepción" })).toBeVisible();
   });
 
-  test("la sección Nuestro equipo muestra la fotografía familiar", async ({
+  test("Nuestro equipo muestra familia, equipos y fotografía", async ({
     page,
   }) => {
     await openInvitation(page);
@@ -102,12 +118,35 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(
       team.getByRole("heading", { name: "Nuestro equipo" }),
     ).toBeVisible();
+    await expect(team.getByText("Mauro", { exact: true }).first()).toBeVisible();
+    await expect(team.getByText("América", { exact: true })).toBeVisible();
+    await expect(team.getByText("Chivas", { exact: true })).toBeVisible();
+    await expect(team.getByText("Cruz Azul", { exact: true })).toBeVisible();
+    await expect(
+      team.getByText("Tres corazones. Tres equipos. Una sola familia."),
+    ).toBeVisible();
 
     const photo = team.getByRole("img", {
-      name: /Silvia, Omar y su hijo/i,
+      name: /Silvia, Omar y Mauro/i,
     });
     await expect(photo).toBeVisible();
-    await expect(photo).toHaveAttribute("alt", /Silvia, Omar y su hijo/);
+    await expect(photo).toHaveAttribute("alt", /Silvia, Omar y Mauro/);
+  });
+
+  test("la galería solo aparece cuando está habilitada con contenido", async ({
+    page,
+  }) => {
+    await openInvitation(page);
+    if (wedding.gallery.enabled && wedding.gallery.items.some((i) => i.featured)) {
+      const gallery = page.getByTestId("nuestros-momentos");
+      await expect(gallery).toBeVisible();
+      const rail = page.getByTestId("gallery-rail");
+      await expect(rail).toBeVisible();
+      await expect(rail).toHaveAttribute("tabindex", "0");
+    } else {
+      await expect(page.getByTestId("nuestros-momentos")).toHaveCount(0);
+      await expect(page.getByTestId("gallery-rail")).toHaveCount(0);
+    }
   });
 
   test("capturas de Nuestro equipo para inspección visual", async ({ page }) => {
@@ -132,7 +171,7 @@ test.describe("Invitación de boda — Chromium", () => {
       await team.scrollIntoViewIfNeeded();
 
       const photo = team.getByRole("img", {
-        name: /Silvia, Omar y su hijo/i,
+        name: /Silvia, Omar y Mauro/i,
       });
       await expect(photo).toBeVisible();
       await expect
