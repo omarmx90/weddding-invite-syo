@@ -25,6 +25,13 @@ export default defineConfig({
     env: {
       ...process.env,
       RSVP_STORE: "memory",
+      ADMIN_AUTH_MODE: "test",
+      ADMIN_E2E_SECRET: "e2e-admin-secret-not-for-production",
+      ADMIN_EMAILS: "admin@syo.test,pair@syo.test",
+      INVITE_SITE_URL: baseURL,
+      // 32 bytes hex — solo e2e local
+      INVITE_TOKEN_ENCRYPTION_KEY:
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
     },
   },
   projects: [
