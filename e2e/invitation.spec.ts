@@ -332,6 +332,33 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(rail).toBeVisible();
     await expect(rail).toHaveAttribute("tabindex", "0");
 
+    const counter = page.getByTestId("gallery-rail-counter");
+    await expect(counter).toBeVisible();
+    await expect(counter).toContainText("01");
+    await expect(counter).toContainText(
+      String(featured.length).padStart(2, "0"),
+    );
+
+    const hint = page.getByTestId("gallery-rail-hint");
+    await expect(hint).toContainText(/Desliza para descubrir/i);
+
+    // Next-photo peek: lead slide narrower than rail viewport
+    const peek = await rail.evaluate((el) => {
+      const slide = el.querySelector("[data-gallery-slide='0']");
+      if (!slide) return null;
+      const slideWidth = (slide as HTMLElement).getBoundingClientRect().width;
+      return {
+        railWidth: el.clientWidth,
+        slideWidth,
+        canScroll: el.scrollWidth > el.clientWidth + 8,
+        peekPx: el.clientWidth - slideWidth,
+      };
+    });
+    expect(peek).not.toBeNull();
+    expect(peek!.canScroll).toBe(true);
+    expect(peek!.slideWidth).toBeLessThan(peek!.railWidth * 0.92);
+    expect(peek!.peekPx).toBeGreaterThan(24);
+
     for (const item of featured) {
       const photo = page.getByTestId(`gallery-photo-${item.id}`);
       await expect(photo).toHaveAttribute("alt", item.alt);
@@ -345,6 +372,71 @@ test.describe("Invitación de boda — Chromium", () => {
         { timeout: 30_000 },
       )
       .toBeGreaterThan(0);
+
+    await rail.evaluate((el) => {
+      el.scrollBy({ left: Math.min(280, el.clientWidth * 0.7) });
+    });
+    await expect
+      .poll(async () => (await counter.innerText()).replace(/\s+/g, " "))
+      .toMatch(/02\s*\/\s*\d{2}/);
+    await expect(hint).not.toContainText(/Desliza para descubrir/i);
+
+    await rail.evaluate((el) => {
+      const slides = el.querySelectorAll<HTMLElement>("[data-gallery-slide]");
+      const lastSlide = slides[slides.length - 1];
+      lastSlide?.scrollIntoView({ inline: "start", block: "nearest" });
+      el.scrollLeft = el.scrollWidth - el.clientWidth;
+    });
+    const last = String(featured.length).padStart(2, "0");
+    await expect
+      .poll(
+        async () => (await counter.innerText()).replace(/\s+/g, " "),
+        { timeout: 8_000 },
+      )
+      .toContain(`${last} / ${last}`);
+    await expect(page.getByTestId("gallery-rail-hint")).toHaveAttribute(
+      "data-at-end",
+      "true",
+    );
+  });
+
+  test("football gallery: discoverability chrome y lightbox tras swipe", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openInvitation(page);
+    const team = page.getByTestId("nuestro-equipo");
+    await team.scrollIntoViewIfNeeded();
+
+    const rail = page.getByTestId("football-gallery");
+    await expect(page.getByTestId("football-gallery-counter")).toContainText(
+      "01",
+    );
+    await expect(page.getByTestId("football-gallery-hint")).toContainText(
+      /Desliza para descubrir/i,
+    );
+
+    await rail.evaluate((el) => {
+      el.scrollBy({ left: 240 });
+    });
+    await expect
+      .poll(async () =>
+        (await page.getByTestId("football-gallery-counter").innerText()).replace(
+          /\s+/g,
+          " ",
+        ),
+      )
+      .toMatch(/0[2-9]\s*\/\s*\d{2}/);
+
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await openInvitation(page);
+    await page.getByTestId("nuestro-equipo").scrollIntoViewIfNeeded();
+    await expect(page.getByTestId("football-gallery-counter")).toBeVisible();
+    await expect(page.getByTestId("football-gallery-hint")).toBeVisible();
+
+    await page.getByTestId("football-photo-fb-01").click();
+    await expect(page.getByTestId("football-lightbox")).toBeVisible();
+    await page.keyboard.press("Escape");
   });
 
   test("capturas de momentos cinematográficos para inspección visual", async ({

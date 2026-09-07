@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import type { FamilyTeamContent, FootballGalleryItem } from "@/content/types";
 import type { EditorialChapter } from "@/content/editorial-types";
@@ -8,6 +8,10 @@ import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
 import { FootballLightbox } from "@/components/invitation/FootballLightbox";
 import { SectionEndMark } from "@/components/invitation/SectionEndMark";
+import {
+  GalleryRail,
+  GalleryRailSlide,
+} from "@/components/invitation/GalleryRail";
 
 type OurTeamSectionProps = {
   content: FamilyTeamContent;
@@ -29,7 +33,7 @@ function slideClass(item: FootballGalleryItem, index: number) {
 }
 
 /**
- * Nuestro equipo — tipografía + riel fotográfico (como Nuestros momentos) + lightbox.
+ * Nuestro equipo — tipografía + riel (mismo lenguaje que Momentos) + lightbox.
  */
 export function OurTeamSection({
   content,
@@ -37,6 +41,7 @@ export function OurTeamSection({
   tone = "surface",
 }: OurTeamSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const pointerRef = useRef({ x: 0, y: 0, moved: false });
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
   const rivalryOrder = ["Silvia", "Omar", "Mauro"] as const;
   const rivalryMembers = rivalryOrder
@@ -115,56 +120,72 @@ export function OurTeamSection({
           <p className="px-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))] text-center font-sans text-[0.6875rem] font-medium uppercase tracking-[0.32em] text-ink-subtle">
             {content.footballGallery.title}
           </p>
-          <p className="mt-3 px-[max(1.25rem,env(safe-area-inset-left))] text-center font-sans text-[0.6875rem] tracking-[0.2em] text-ink-subtle uppercase md:hidden">
-            Desliza para ver más
-          </p>
 
-          <div
-            className="gallery-rail mt-8 min-w-0 w-full"
-            data-testid="football-gallery"
-            tabIndex={0}
-            role="region"
-            aria-label={`${content.footballGallery.title}: álbum familiar. Desplaza horizontalmente para ver más. Toca una foto para ampliarla.`}
+          <GalleryRail
+            className="mt-8"
+            testId="football-gallery"
+            itemCount={items.length}
+            hint="Desliza para descubrir"
+            ariaLabel={`${content.footballGallery.title}: álbum familiar. Desplaza horizontalmente para ver más. Toca una foto para ampliarla.`}
           >
-            <ul className="gallery-rail-track">
-              {items.map((item, index) => {
-                const number = String(index + 1).padStart(2, "0");
-                return (
-                  <li key={item.id} className={slideClass(item, index)}>
-                    <figure className="gallery-slide-figure">
-                      <div className="relative h-full w-full overflow-hidden bg-beige/40">
-                        <button
-                          type="button"
-                          className="group absolute inset-0 block h-full w-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
-                          onClick={() => setOpenIndex(index)}
-                          aria-label={`Ver fotografía ${index + 1} de ${items.length}: ${item.alt}`}
-                          data-testid={`football-photo-${item.id}`}
-                        >
-                          <Image
-                            src={item.src}
-                            alt={item.alt}
-                            fill
-                            sizes="(max-width: 430px) 88vw, (max-width: 768px) 72vw, 500px"
-                            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                            style={{
-                              objectPosition: item.objectPosition ?? "50% 40%",
-                            }}
-                            loading="lazy"
-                          />
-                        </button>
-                      </div>
-                      <figcaption className="mt-3 flex items-baseline justify-between gap-3 px-0.5">
-                        <span className="font-sans text-[0.625rem] font-medium tracking-[0.24em] text-ink-subtle tabular-nums">
-                          {number}
-                        </span>
-                        <span className="sr-only">{item.alt}</span>
-                      </figcaption>
-                    </figure>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+            {items.map((item, index) => {
+              const number = String(index + 1).padStart(2, "0");
+              return (
+                <GalleryRailSlide
+                  key={item.id}
+                  index={index}
+                  className={slideClass(item, index)}
+                >
+                  <figure className="gallery-slide-figure">
+                    <div className="relative h-full w-full overflow-hidden bg-beige/40">
+                      <button
+                        type="button"
+                        className="group absolute inset-0 block h-full w-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
+                        onPointerDown={(event) => {
+                          pointerRef.current = {
+                            x: event.clientX,
+                            y: event.clientY,
+                            moved: false,
+                          };
+                        }}
+                        onPointerMove={(event) => {
+                          const dx = event.clientX - pointerRef.current.x;
+                          const dy = event.clientY - pointerRef.current.y;
+                          if (Math.hypot(dx, dy) > 12) {
+                            pointerRef.current.moved = true;
+                          }
+                        }}
+                        onClick={() => {
+                          if (pointerRef.current.moved) return;
+                          setOpenIndex(index);
+                        }}
+                        aria-label={`Ver fotografía ${index + 1} de ${items.length}: ${item.alt}`}
+                        data-testid={`football-photo-${item.id}`}
+                      >
+                        <Image
+                          src={item.src}
+                          alt={item.alt}
+                          fill
+                          sizes="(max-width: 430px) 82vw, (max-width: 768px) 72vw, 500px"
+                          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                          style={{
+                            objectPosition: item.objectPosition ?? "50% 40%",
+                          }}
+                          loading="lazy"
+                        />
+                      </button>
+                    </div>
+                    <figcaption className="mt-3 flex items-baseline justify-between gap-3 px-0.5">
+                      <span className="font-sans text-[0.625rem] font-medium tracking-[0.24em] text-ink-subtle tabular-nums">
+                        {number}
+                      </span>
+                      <span className="sr-only">{item.alt}</span>
+                    </figcaption>
+                  </figure>
+                </GalleryRailSlide>
+              );
+            })}
+          </GalleryRail>
         </div>
       ) : null}
 

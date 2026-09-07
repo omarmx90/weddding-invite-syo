@@ -5,6 +5,10 @@ import { getFeaturedGalleryItems } from "@/content/wedding";
 import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
 import { SectionEndMark } from "@/components/invitation/SectionEndMark";
+import {
+  GalleryRail,
+  GalleryRailSlide,
+} from "@/components/invitation/GalleryRail";
 
 type MomentsGallerySectionProps = {
   content: GalleryContent;
@@ -29,7 +33,7 @@ function slideClass(item: GalleryItem, index: number) {
 }
 
 /**
- * Álbum editorial — primera foto protagonista, ritmo de ratios.
+ * Álbum editorial — peek + contador + hint de swipe.
  */
 export function MomentsGallerySection({
   content,
@@ -40,6 +44,7 @@ export function MomentsGallerySection({
   if (items.length === 0) return null;
 
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
+  const hint = content.hint?.trim() || "Desliza para descubrir";
 
   return (
     <section
@@ -61,59 +66,56 @@ export function MomentsGallerySection({
           >
             {content.title}
           </h2>
-          {content.hint ? (
-            <p className="mt-4 font-sans text-[0.6875rem] tracking-[0.2em] text-ink-subtle uppercase md:hidden">
-              {content.hint}
-            </p>
-          ) : null}
         </div>
       </Reveal>
 
-      <div
-        className="gallery-rail mt-12 min-w-0 w-full"
-        data-testid="gallery-rail"
-        tabIndex={0}
-        role="region"
-        aria-label={`${content.title}: álbum de fotografías. Desplaza horizontalmente para ver más.`}
+      <GalleryRail
+        className="mt-12"
+        testId="gallery-rail"
+        itemCount={items.length}
+        hint={hint}
+        ariaLabel={`${content.title}: álbum de fotografías. Desplaza horizontalmente para ver más.`}
       >
-        <ul className="gallery-rail-track">
-          {items.map((item, index) => {
-            const number = String(index + 1).padStart(2, "0");
-            return (
-              <li key={item.id} className={slideClass(item, index)}>
-                <figure className="gallery-slide-figure">
-                  <div className="relative h-full w-full overflow-hidden bg-beige/40">
-                    <Image
-                      src={item.src}
-                      alt={item.alt}
-                      fill
-                      sizes="(max-width: 430px) 88vw, (max-width: 768px) 72vw, 500px"
-                      className="object-cover"
-                      style={{
-                        objectPosition: item.objectPosition ?? "50% 40%",
-                      }}
-                      loading="lazy"
-                      data-testid={`gallery-photo-${item.id}`}
-                    />
-                  </div>
-                  <figcaption className="mt-3 flex items-baseline justify-between gap-3 px-0.5">
-                    <span className="font-sans text-[0.625rem] font-medium tracking-[0.24em] text-ink-subtle tabular-nums">
-                      {number}
+        {items.map((item, index) => {
+          const number = String(index + 1).padStart(2, "0");
+          return (
+            <GalleryRailSlide
+              key={item.id}
+              index={index}
+              className={slideClass(item, index)}
+            >
+              <figure className="gallery-slide-figure">
+                <div className="relative h-full w-full overflow-hidden bg-beige/40">
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    fill
+                    sizes="(max-width: 430px) 82vw, (max-width: 768px) 72vw, 500px"
+                    className="object-cover"
+                    style={{
+                      objectPosition: item.objectPosition ?? "50% 40%",
+                    }}
+                    loading="lazy"
+                    data-testid={`gallery-photo-${item.id}`}
+                  />
+                </div>
+                <figcaption className="mt-3 flex items-baseline justify-between gap-3 px-0.5">
+                  <span className="font-sans text-[0.625rem] font-medium tracking-[0.24em] text-ink-subtle tabular-nums">
+                    {number}
+                  </span>
+                  {item.caption ? (
+                    <span className="font-display text-[0.95rem] leading-snug text-ink-muted text-right">
+                      {item.caption}
                     </span>
-                    {item.caption ? (
-                      <span className="font-display text-[0.95rem] leading-snug text-ink-muted text-right">
-                        {item.caption}
-                      </span>
-                    ) : (
-                      <span className="sr-only">{item.alt}</span>
-                    )}
-                  </figcaption>
-                </figure>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+                  ) : (
+                    <span className="sr-only">{item.alt}</span>
+                  )}
+                </figcaption>
+              </figure>
+            </GalleryRailSlide>
+          );
+        })}
+      </GalleryRail>
 
       <SectionEndMark />
     </section>

@@ -419,7 +419,7 @@ export const wedding: WeddingContent = {
     enabled: true,
     title: "Nuestros momentos",
     eyebrow: "Álbum",
-    hint: "Desliza para ver más",
+    hint: "Desliza para descubrir",
     items: [
       {
         id: "momento-01",
