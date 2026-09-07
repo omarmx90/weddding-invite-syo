@@ -1,4 +1,5 @@
 import { Reveal } from "@/components/invitation/Reveal";
+import { OrnamentalDivider } from "@/components/invitation/ornaments";
 
 type NarrativeBridgeProps = {
   text: string;
@@ -8,6 +9,7 @@ type NarrativeBridgeProps = {
 
 /**
  * Puente tipográfico breve entre secciones del día.
+ * Separador S&O en lugar de regla lisa — un solo punto ornamental.
  */
 export function NarrativeBridge({
   text,
@@ -23,7 +25,7 @@ export function NarrativeBridge({
       data-testid={testId}
     >
       <Reveal className="mx-auto w-full max-w-[var(--content-max)] text-center">
-        <hr className="invite-rule mx-auto" aria-hidden="true" />
+        <OrnamentalDivider className="text-taupe/70" motif="monogram" />
         <p className="font-display mt-10 text-[clamp(1.35rem,5.5vw,1.7rem)] leading-snug text-ink text-balance">
           {text}
         </p>

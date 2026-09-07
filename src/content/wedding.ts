@@ -127,8 +127,17 @@ export const wedding: WeddingContent = {
   },
   faith: {
     title: "Con la bendición de Dios",
-    body: "Ponemos este nuevo capítulo de nuestra familia en manos de Dios, acompañados por nuestra fe y por quienes más queremos.",
+    /**
+     * Texto tradicional en español para 1 Cor 13, 7–8.
+     * Se cita el libro/capítulo; no se atribuye una edición comercial.
+     */
+    verse: {
+      text: "Todo lo disculpa, todo lo cree, todo lo espera, todo lo soporta. El amor no pasa nunca.",
+      citation: "1 Corintios 13, 7–8",
+    },
     patrons: ["Nuestra Señora de Guadalupe", "San Judas Tadeo"],
+    patronsPrayer:
+      "Que su intercesión acompañe nuestro matrimonio, nuestro hogar y nuestra familia.",
   },
   dress: {
     eyebrow: "Para celebrar juntos",

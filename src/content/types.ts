@@ -149,7 +149,13 @@ export type CountdownContent = {
 
 export type FaithContent = {
   title: string;
-  body: string;
+  /** Texto bíblico breve; citar solo libro/capítulo, sin marca de traducción. */
+  verse: {
+    text: string;
+    citation: string;
+  };
+  /** Oración / intención bajo los patronos */
+  patronsPrayer: string;
   patrons: string[];
 };
 

@@ -1,5 +1,6 @@
 import type { EventLocation } from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
+import { LatinCross } from "@/components/invitation/ornaments";
 
 type EventSectionProps = {
   event: EventLocation;
@@ -28,6 +29,7 @@ export function EventSection({
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
   const hasMaps = Boolean(event.mapsUrl.trim());
   const hasEditorialDate = Boolean(event.date);
+  const isCeremony = sectionId === "ceremony";
   const ctaClassName =
     "group inline-flex min-h-11 min-w-[11rem] items-center justify-center px-2 py-3 font-sans text-[0.8125rem] font-medium tracking-[0.2em] text-ink uppercase focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe";
 
@@ -39,11 +41,19 @@ export function EventSection({
       data-testid={sectionId}
     >
       <Reveal className="mx-auto w-full max-w-[var(--content-max)] text-center">
-        <hr className="invite-rule mx-auto" aria-hidden="true" />
+        {isCeremony ? (
+          <LatinCross className="mx-auto h-6 w-4 text-taupe/65" />
+        ) : (
+          <hr className="invite-rule mx-auto" aria-hidden="true" />
+        )}
 
         <h2
           id={`${sectionId}-title`}
-          className="font-display mt-10 text-[clamp(2rem,8vw,2.75rem)] leading-tight font-medium tracking-[-0.01em] text-balance"
+          className={`font-display leading-tight font-medium tracking-[-0.01em] text-balance ${
+            isCeremony
+              ? "mt-7 text-[clamp(2rem,8vw,2.75rem)]"
+              : "mt-10 text-[clamp(2rem,8vw,2.75rem)]"
+          }`}
         >
           {event.title}
         </h2>

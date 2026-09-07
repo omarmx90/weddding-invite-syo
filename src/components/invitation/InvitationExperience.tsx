@@ -19,6 +19,7 @@ import { MomentsGallerySection } from "@/components/invitation/MomentsGallerySec
 import { DressGuidanceSection } from "@/components/invitation/DressGuidanceSection";
 import { RsvpSection } from "@/components/invitation/RsvpSection";
 import { CinematicMoment } from "@/components/invitation/CinematicMoment";
+import { EditorialClosing } from "@/components/invitation/EditorialClosing";
 
 type RsvpContext = {
   accessToken?: string;
@@ -151,6 +152,10 @@ export function InvitationExperience({
               tone={guest ? "surface" : "canvas"}
             />
             {cineClosing ? <CinematicMoment moment={cineClosing} /> : null}
+            <EditorialClosing
+              content={content}
+              tone={guest ? "surface" : "canvas"}
+            />
             {guest && rsvpContext ? (
               <RsvpSection
                 slug={guest.slug}

@@ -404,8 +404,59 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(
       faith.getByRole("heading", { name: "Con la bendición de Dios" }),
     ).toBeVisible();
+    await expect(faith.getByText(/Todo lo disculpa/i)).toBeVisible();
+    await expect(faith.getByText("1 Corintios 13, 7–8")).toBeVisible();
     await expect(faith.getByText("Nuestra Señora de Guadalupe")).toBeVisible();
     await expect(faith.getByText("San Judas Tadeo")).toBeVisible();
+    await expect(
+      faith.getByText(/intercesión acompañe nuestro matrimonio/i),
+    ).toBeVisible();
+  });
+
+  test("capturas de fe, ceremonia y cierre editorial", async ({ page }) => {
+    test.setTimeout(120_000);
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+    const viewports = [
+      { name: "390x844", width: 390, height: 844 },
+      { name: "430x932", width: 430, height: 932 },
+      { name: "1440x900", width: 1440, height: 900 },
+    ] as const;
+
+    for (const viewport of viewports) {
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
+      });
+      await openInvitation(page);
+
+      const ceremony = page.getByTestId("ceremony");
+      await ceremony.scrollIntoViewIfNeeded();
+      await ceremony.screenshot({
+        path: path.join(OUTPUT_DIR, `catholic-ceremony-${viewport.name}.png`),
+      });
+
+      const faith = page.getByTestId("faith-section");
+      await faith.scrollIntoViewIfNeeded();
+      await faith.screenshot({
+        path: path.join(OUTPUT_DIR, `catholic-faith-${viewport.name}.png`),
+      });
+
+      const cine = page.getByTestId("cinematic-cine-couple");
+      await cine.scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path: path.join(
+          OUTPUT_DIR,
+          `catholic-faith-to-cine-${viewport.name}.png`,
+        ),
+      });
+
+      const closing = page.getByTestId("editorial-closing");
+      await closing.scrollIntoViewIfNeeded();
+      await closing.screenshot({
+        path: path.join(OUTPUT_DIR, `catholic-closing-${viewport.name}.png`),
+      });
+    }
   });
 
   test("la sugerencia de vestimenta es editorial y sin dress code rígido", async ({
