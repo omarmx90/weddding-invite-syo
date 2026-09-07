@@ -26,17 +26,24 @@ export type EventLocation = {
   date?: EditorialDate;
   timeLabel: string;
   time: string;
+  /** Valor datetime para <time>, p. ej. "17:00" o "18:30/21:30" */
+  timeDateTime?: string;
   venueLabel: string;
   venue: string;
   addressLabel: string;
   address: string;
+  /** Párrafo breve bajo el título (opcional) */
+  body?: string;
   ctaLabel: string;
-  /** Si está vacío, el CTA se muestra pero no navega (pendiente) */
+  /**
+   * URL de Maps. Vacío = no inventar link;
+   * la UI no renderiza CTA de ubicación.
+   */
   mapsUrl: string;
 };
 
 /**
- * Ítems futuros del itinerario del día.
+ * Ítems del itinerario del día.
  * Solo incluir entradas con información confirmada.
  */
 export type ScheduleItemId =
@@ -45,6 +52,7 @@ export type ScheduleItemId =
   | "transfer"
   | "reception"
   | "dinner"
+  | "closing"
   | "special"
   | (string & {});
 
@@ -53,12 +61,17 @@ export type ScheduleItem = {
   title: string;
   /** Hora en español de México cuando esté confirmada */
   time?: string;
+  /** Valor datetime para <time> */
+  timeDateTime?: string;
+  /** Ubicación breve (parroquia, hacienda, etc.) */
+  location?: string;
   description?: string;
   eventKey?: "ceremony" | "reception";
 };
 
 export type DaySchedule = {
   title: string;
+  eyebrow?: string;
   items: ScheduleItem[];
 };
 
@@ -126,6 +139,8 @@ export type WeddingCopy = {
   introBody: string;
   /** Firma familiar bajo el mensaje de bienvenida */
   familySignature: string;
+  /** Puente editorial entre ceremonia y celebración */
+  celebrationTransition: string;
 };
 
 export type WeddingContent = {

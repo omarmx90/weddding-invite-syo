@@ -7,6 +7,8 @@ import { isGallerySectionVisible } from "@/content/wedding";
 import { HeroOpening } from "@/components/invitation/HeroOpening";
 import { IntroSection } from "@/components/invitation/IntroSection";
 import { EventSection } from "@/components/invitation/EventSection";
+import { NarrativeBridge } from "@/components/invitation/NarrativeBridge";
+import { DayScheduleSection } from "@/components/invitation/DayScheduleSection";
 import { OurTeamSection } from "@/components/invitation/OurTeamSection";
 import { MomentsGallerySection } from "@/components/invitation/MomentsGallerySection";
 
@@ -63,11 +65,16 @@ export function InvitationExperience({ content }: InvitationExperienceProps) {
               event={content.event.ceremony}
               tone="surface"
             />
+            <NarrativeBridge
+              text={content.copy.celebrationTransition}
+              tone="canvas"
+            />
             <EventSection
               sectionId="reception"
               event={content.event.reception}
-              tone="canvas"
+              tone="surface"
             />
+            <DayScheduleSection schedule={content.schedule} tone="canvas" />
             <OurTeamSection content={content.familyTeam} tone="surface" />
             {showGallery ? (
               <MomentsGallerySection content={content.gallery} tone="canvas" />

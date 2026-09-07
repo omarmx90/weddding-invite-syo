@@ -13,7 +13,9 @@ function DetailRow({ label, value }: { label: string; value: string }) {
       <dt className="font-sans text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-ink-subtle">
         {label}
       </dt>
-      <dd className="font-sans text-[1.0625rem] leading-relaxed text-ink">{value}</dd>
+      <dd className="font-sans text-[1.0625rem] leading-relaxed text-ink text-pretty">
+        {value}
+      </dd>
     </div>
   );
 }
@@ -46,6 +48,12 @@ export function EventSection({
           {event.title}
         </h2>
 
+        {event.body ? (
+          <p className="mx-auto mt-6 max-w-[22rem] font-sans text-[1.0625rem] leading-[1.7] text-ink-muted text-pretty">
+            {event.body}
+          </p>
+        ) : null}
+
         {hasEditorialDate && event.date ? (
           <div className="mt-10 flex flex-col items-center gap-3">
             <p className="font-sans text-[0.75rem] font-medium uppercase tracking-[0.34em] text-ink-subtle">
@@ -55,18 +63,24 @@ export function EventSection({
               {event.date.dayMonthYear}
             </p>
             <p
-              className="mt-4 font-display text-[clamp(2.15rem,9vw,2.85rem)] leading-none tracking-[-0.02em] text-ink"
+              className="mt-4 font-display text-[clamp(1.85rem,8vw,2.65rem)] leading-none tracking-[-0.02em] text-ink"
               data-testid={`${sectionId}-time`}
             >
-              <time dateTime={sectionId === "ceremony" ? "17:00" : undefined}>
-                {event.time}
-              </time>
+              <time dateTime={event.timeDateTime}>{event.time}</time>
             </p>
           </div>
         ) : (
-          <dl className="mt-12 flex flex-col gap-9 text-center">
-            <DetailRow label={event.timeLabel} value={event.time} />
-          </dl>
+          <div className="mt-10 flex flex-col items-center gap-2">
+            <p className="font-sans text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-ink-subtle">
+              {event.timeLabel}
+            </p>
+            <p
+              className="font-display text-[clamp(1.85rem,8vw,2.65rem)] leading-none tracking-[-0.02em] text-ink"
+              data-testid={`${sectionId}-time`}
+            >
+              <time dateTime={event.timeDateTime}>{event.time}</time>
+            </p>
+          </div>
         )}
 
         <dl className="mt-12 flex flex-col gap-9 text-center">
@@ -74,8 +88,8 @@ export function EventSection({
           <DetailRow label={event.addressLabel} value={event.address} />
         </dl>
 
-        <div className="mt-12">
-          {hasMaps ? (
+        {hasMaps ? (
+          <div className="mt-12">
             <a
               href={event.mapsUrl}
               target="_blank"
@@ -88,19 +102,8 @@ export function EventSection({
                 {event.ctaLabel}
               </span>
             </a>
-          ) : (
-            <button
-              type="button"
-              className={ctaClassName}
-              aria-disabled="true"
-              data-testid={`${sectionId}-maps-cta`}
-            >
-              <span className="border-b border-taupe/50 pb-1 opacity-90">
-                {event.ctaLabel}
-              </span>
-            </button>
-          )}
-        </div>
+          </div>
+        ) : null}
       </Reveal>
     </section>
   );

@@ -33,6 +33,8 @@ export const wedding: WeddingContent = {
     introBody:
       "Cada persona que recibe esta invitación es especial para nosotros. Gracias por acompañar a nuestra familia — Silvia, Omar y Mauro — en un momento que queremos compartir de cerca.",
     familySignature: "Silvia, Omar y Mauro",
+    celebrationTransition:
+      "Después de este paso tan importante, queremos seguir celebrando con quienes forman parte de nuestra historia.",
   },
   meta: {
     title: "Silvia & Omar | Nos casamos",
@@ -57,33 +59,56 @@ export const wedding: WeddingContent = {
       date: ceremonyDate,
       timeLabel: "Hora",
       time: "5:00 p. m.",
+      timeDateTime: "17:00",
       venueLabel: "Parroquia",
       venue: "Parroquia de Nuestra Señora de la Luz",
       addressLabel: "Dirección",
-      address: "Por confirmar",
+      address:
+        "Av. de la Luz S/N, Santa Ana, 76116 Santiago de Querétaro, Qro.",
       ctaLabel: "Cómo llegar",
       mapsUrl: "https://share.google/cyuLdnExWdwHQkBQg",
     },
     reception: {
-      title: "Recepción",
-      timeLabel: "Hora",
-      time: "Por confirmar",
+      title: "Celebración íntima",
+      timeLabel: "Horario",
+      time: "6:30 p. m. – 9:30 p. m.",
+      timeDateTime: "18:30/21:30",
       venueLabel: "Lugar",
-      venue: "Por confirmar",
+      venue: "Hacienda Los Laureles Restaurante Y Banquetes",
       addressLabel: "Dirección",
-      address: "Por confirmar",
-      ctaLabel: "Ver ubicación",
+      address:
+        "Carretera México–San Luis Potosí, Km. 8.5, Jurica, 76100 Santiago de Querétaro, Qro.",
+      body: "Después de la ceremonia queremos compartir una comida especial con ustedes.",
+      ctaLabel: "Cómo llegar",
+      // Sin URL confirmada: no inventar Maps; la UI no muestra CTA.
       mapsUrl: "",
     },
   },
   schedule: {
     title: "Itinerario del día",
+    eyebrow: "El recorrido",
     items: [
       {
         id: "ceremony",
         title: "Ceremonia católica",
         time: "5:00 p. m.",
+        timeDateTime: "17:00",
+        location: "Parroquia de Nuestra Señora de la Luz",
         eventKey: "ceremony",
+      },
+      {
+        id: "reception",
+        title: "Celebración íntima",
+        time: "6:30 p. m.",
+        timeDateTime: "18:30",
+        location: "Hacienda Los Laureles",
+        eventKey: "reception",
+      },
+      {
+        id: "closing",
+        title: "Cierre de la celebración",
+        time: "9:30 p. m.",
+        timeDateTime: "21:30",
       },
     ],
   },

@@ -66,7 +66,7 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(page.getByTestId("hero-opening")).toHaveCount(0);
   });
 
-  test("la ceremonia muestra parroquia, fecha, hora y cómo llegar", async ({
+  test("la ceremonia muestra parroquia, dirección, fecha, hora y cómo llegar", async ({
     page,
   }) => {
     await openInvitation(page);
@@ -78,6 +78,11 @@ test.describe("Invitación de boda — Chromium", () => {
     ).toBeVisible();
     await expect(
       ceremony.getByText("Parroquia de Nuestra Señora de la Luz"),
+    ).toBeVisible();
+    await expect(
+      ceremony.getByText(
+        "Av. de la Luz S/N, Santa Ana, 76116 Santiago de Querétaro, Qro.",
+      ),
     ).toBeVisible();
     await expect(ceremony.getByText("Viernes", { exact: true })).toBeVisible();
     await expect(ceremony.getByText("16 de octubre de 2026")).toBeVisible();
@@ -101,11 +106,61 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(intro.getByText("Silvia, Omar y Mauro", { exact: true })).toBeVisible();
   });
 
-  test("la sección de recepción es visible", async ({ page }) => {
+  test("la celebración íntima muestra lugar, horario y sin link falso", async ({
+    page,
+  }) => {
     await openInvitation(page);
     const reception = page.getByTestId("reception");
     await reception.scrollIntoViewIfNeeded();
-    await expect(reception.getByRole("heading", { name: "Recepción" })).toBeVisible();
+
+    await expect(
+      reception.getByRole("heading", { name: "Celebración íntima" }),
+    ).toBeVisible();
+    await expect(
+      reception.getByText("Hacienda Los Laureles Restaurante Y Banquetes"),
+    ).toBeVisible();
+    await expect(reception.getByTestId("reception-time")).toHaveText(
+      "6:30 p. m. – 9:30 p. m.",
+    );
+    await expect(
+      reception.getByText(
+        "Carretera México–San Luis Potosí, Km. 8.5, Jurica, 76100 Santiago de Querétaro, Qro.",
+      ),
+    ).toBeVisible();
+    await expect(page.getByTestId("reception-maps-cta")).toHaveCount(0);
+  });
+
+  test("la transición hacia la celebración es visible", async ({ page }) => {
+    await openInvitation(page);
+    const bridge = page.getByTestId("celebration-transition");
+    await bridge.scrollIntoViewIfNeeded();
+    await expect(bridge.getByText(/seguir celebrando/i)).toBeVisible();
+  });
+
+  test("el itinerario del día muestra horarios claros", async ({ page }) => {
+    await openInvitation(page);
+    const schedule = page.getByTestId("day-schedule");
+    await schedule.scrollIntoViewIfNeeded();
+
+    await expect(
+      schedule.getByRole("heading", { name: "Itinerario del día" }),
+    ).toBeVisible();
+
+    const ceremonyItem = schedule.getByTestId("schedule-item-ceremony");
+    await expect(ceremonyItem.getByText("5:00 p. m.")).toBeVisible();
+    await expect(ceremonyItem.getByText("Ceremonia católica")).toBeVisible();
+    await expect(
+      ceremonyItem.getByText("Parroquia de Nuestra Señora de la Luz"),
+    ).toBeVisible();
+
+    const receptionItem = schedule.getByTestId("schedule-item-reception");
+    await expect(receptionItem.getByText("6:30 p. m.")).toBeVisible();
+    await expect(receptionItem.getByText("Celebración íntima")).toBeVisible();
+    await expect(receptionItem.getByText("Hacienda Los Laureles")).toBeVisible();
+
+    const closingItem = schedule.getByTestId("schedule-item-closing");
+    await expect(closingItem.getByText("9:30 p. m.")).toBeVisible();
+    await expect(closingItem.getByText("Cierre de la celebración")).toBeVisible();
   });
 
   test("Nuestro equipo muestra familia, equipos y fotografía", async ({
@@ -255,7 +310,9 @@ test.describe("Invitación de boda — Chromium", () => {
     await openInvitation(page);
     await expect(page.getByTestId("intro-section")).toBeVisible();
     await expect(page.getByTestId("ceremony")).toBeVisible();
+    await expect(page.getByTestId("celebration-transition")).toBeVisible();
     await expect(page.getByTestId("reception")).toBeVisible();
+    await expect(page.getByTestId("day-schedule")).toBeVisible();
     await expect(page.getByTestId("nuestro-equipo")).toBeVisible();
     await expect(page.getByTestId("nuestros-momentos")).toBeVisible();
   });
