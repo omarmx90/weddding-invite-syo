@@ -137,8 +137,7 @@ export const wedding: WeddingContent = {
       address:
         "Carretera México–San Luis Potosí, Km. 8.5, Jurica, 76100 Santiago de Querétaro, Qro.",
       ctaLabel: "Cómo llegar",
-      // Sin URL confirmada: no inventar Maps; la UI no muestra CTA.
-      mapsUrl: "",
+      mapsUrl: "https://share.google/TdXu1g2QrDQgwxbqt",
     },
   },
   receptionHospitality: {

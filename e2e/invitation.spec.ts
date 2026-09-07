@@ -5,6 +5,7 @@ import { wedding } from "../src/content/wedding";
 
 const OUTPUT_DIR = path.join(process.cwd(), "e2e", "output");
 const CEREMONY_MAPS_URL = wedding.event.ceremony.mapsUrl;
+const RECEPTION_MAPS_URL = wedding.event.reception.mapsUrl;
 
 async function openInvitation(page: Page) {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -115,7 +116,7 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(intro.getByText("Silvia, Omar y Mauro", { exact: true })).toBeVisible();
   });
 
-  test("la celebración íntima muestra lugar, horario y sin link falso", async ({
+  test("la celebración íntima muestra lugar, horario y cómo llegar", async ({
     page,
   }) => {
     await openInvitation(page);
@@ -136,7 +137,13 @@ test.describe("Invitación de boda — Chromium", () => {
         "Carretera México–San Luis Potosí, Km. 8.5, Jurica, 76100 Santiago de Querétaro, Qro.",
       ),
     ).toBeVisible();
-    await expect(page.getByTestId("reception-maps-cta")).toHaveCount(0);
+
+    const mapsCta = reception.getByTestId("reception-maps-cta");
+    await expect(mapsCta).toHaveText(/Cómo llegar/i);
+    await expect(mapsCta).toHaveAttribute("href", RECEPTION_MAPS_URL);
+    await expect(mapsCta).toHaveAttribute("target", "_blank");
+    await expect(mapsCta).toHaveAttribute("rel", /noopener/);
+
     await expect(page.getByTestId("reception-hospitality")).toBeVisible();
     await expect(page.getByTestId("reception-hospitality-lead")).toContainText(
       /momento sencillo y muy nuestro/i,
