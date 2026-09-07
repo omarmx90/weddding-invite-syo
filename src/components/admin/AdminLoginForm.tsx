@@ -1,8 +1,42 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createSupabaseAuthBrowserClient } from "@/lib/supabase/auth-browser";
+
+/**
+ * Si el magic link trae tokens en el hash (#access_token=…), el route
+ * server de /admin/auth/callback no puede leerlos. Recuperamos sesión
+ * en cliente y entramos a /admin.
+ */
+async function recoverAdminSessionFromUrlHash(): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  const hash = window.location.hash;
+  if (!hash || !hash.includes("access_token")) return false;
+
+  const params = new URLSearchParams(hash.replace(/^#/, ""));
+  const accessToken = params.get("access_token");
+  const refreshToken = params.get("refresh_token");
+  if (!accessToken || !refreshToken) return false;
+
+  const supabase = createSupabaseAuthBrowserClient();
+  const { error } = await supabase.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
+  if (error) return false;
+
+  const { data } = await supabase.auth.getUser();
+  if (!data.user?.email) return false;
+
+  window.history.replaceState(
+    {},
+    "",
+    `${window.location.pathname}${window.location.search}`,
+  );
+  window.location.replace("/admin");
+  return true;
+}
 
 export function AdminLoginForm({
   authConfigured,
@@ -21,8 +55,31 @@ export function AdminLoginForm({
     "idle",
   );
   const [message, setMessage] = useState<string | null>(null);
+  const [hashRecovery, setHashRecovery] = useState<
+    "idle" | "pending" | "failed"
+  >("idle");
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      if (!window.location.hash.includes("access_token")) return;
+      setHashRecovery("pending");
+      try {
+        const recovered = await recoverAdminSessionFromUrlHash();
+        if (!cancelled && !recovered) setHashRecovery("failed");
+      } catch {
+        if (!cancelled) setHashRecovery("failed");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const recovering = hashRecovery === "pending";
 
   const errorText = useMemo(() => {
+    if (recovering) return null;
     if (errorCode === "unauthorized") {
       return "Este correo no está autorizado para administrar la boda.";
     }
@@ -33,7 +90,7 @@ export function AdminLoginForm({
       return "El enlace expiró o ya fue usado. Solicita uno nuevo.";
     }
     return null;
-  }, [errorCode]);
+  }, [errorCode, recovering]);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -102,30 +159,39 @@ export function AdminLoginForm({
         contraseñas.
       </p>
 
-      <form onSubmit={onSubmit} className="mt-8 text-left">
-        <label className="block">
-          <span className="font-sans text-[0.625rem] font-medium uppercase tracking-[0.28em] text-ink-subtle">
-            Correo
-          </span>
-          <input
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            data-testid="admin-login-email"
-            className="mt-2 w-full border border-taupe/50 bg-warm-white px-4 py-3 font-sans text-[1rem] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-taupe"
-          />
-        </label>
-        <button
-          type="submit"
-          disabled={status === "sending"}
-          data-testid="admin-login-submit"
-          className="mt-6 inline-flex min-h-12 w-full items-center justify-center border border-ink/80 bg-ink px-6 py-3 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-warm-white disabled:opacity-50"
+      {recovering ? (
+        <p
+          className="mt-8 font-sans text-[0.9375rem] text-ink-muted"
+          data-testid="admin-login-recovering"
         >
-          {status === "sending" ? "Enviando…" : "Enviar enlace"}
-        </button>
-      </form>
+          Completando acceso…
+        </p>
+      ) : (
+        <form onSubmit={onSubmit} className="mt-8 text-left">
+          <label className="block">
+            <span className="font-sans text-[0.625rem] font-medium uppercase tracking-[0.28em] text-ink-subtle">
+              Correo
+            </span>
+            <input
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              data-testid="admin-login-email"
+              className="mt-2 w-full border border-taupe/50 bg-warm-white px-4 py-3 font-sans text-[1rem] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-taupe"
+            />
+          </label>
+          <button
+            type="submit"
+            disabled={status === "sending"}
+            data-testid="admin-login-submit"
+            className="mt-6 inline-flex min-h-12 w-full items-center justify-center border border-ink/80 bg-ink px-6 py-3 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-warm-white disabled:opacity-50"
+          >
+            {status === "sending" ? "Enviando…" : "Enviar enlace"}
+          </button>
+        </form>
+      )}
 
       <p className="sr-only" data-testid="admin-email-redirect-to">
         {emailRedirectTo}

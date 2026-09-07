@@ -44,7 +44,10 @@ export async function GET(request: Request) {
         new URL("/admin/login?error=unauthorized", origin),
       );
     }
+    return NextResponse.redirect(new URL("/admin/login?error=auth", origin));
   }
 
-  return NextResponse.redirect(new URL("/admin/login?error=auth", origin));
+  // Sin ?code=: puede ser flujo con tokens en #hash (el servidor no los ve).
+  // Mandamos a login sin error para que el cliente recupere la sesión del hash.
+  return NextResponse.redirect(new URL("/admin/login", origin));
 }
