@@ -129,6 +129,50 @@ export type GalleryContent = {
   items: GalleryItem[];
 };
 
+export type CountdownContent = {
+  /** Fecha calendario del evento (YYYY-MM-DD) */
+  targetIsoDate: string;
+  /** Hora local 24h HH:mm en la zona del producto */
+  targetTime: string;
+  timezone: string;
+  preface: string;
+  suffix: string;
+  arrivedMessage: string;
+  labels: {
+    days: string;
+    hours: string;
+    minutes: string;
+  };
+};
+
+export type FaithContent = {
+  title: string;
+  body: string;
+  patrons: string[];
+};
+
+export type DressGuidanceContent = {
+  eyebrow: string;
+  title: string;
+  body: string;
+  suggestionLabel: string;
+  suggestion: string;
+};
+
+/**
+ * RSVP — modelo preparado; UI activa solo cuando enabled === true
+ * y exista implementación real (sin CTAs falsos).
+ */
+export type RsvpContent = {
+  enabled: boolean;
+  /** Fecha límite YYYY-MM-DD */
+  deadlineIso: string;
+  timezone: string;
+  /** Etiqueta futura, p. ej. "Confirmar asistencia" */
+  ctaLabel: string;
+  note: string;
+};
+
 export type WeddingCopy = {
   tagline: string;
   heroCta: string;
@@ -178,6 +222,11 @@ export type WeddingContent = {
   };
   /** Estructura lista para el itinerario completo (sin inventar eventos). */
   schedule: DaySchedule;
+  countdown: CountdownContent;
+  faith: FaithContent;
+  dress: DressGuidanceContent;
+  /** Confirmación futura — no renderizar CTA mientras enabled sea false */
+  rsvp: RsvpContent;
   familyTeam: FamilyTeamContent;
   /**
    * Galería editorial ("Nuestros momentos").

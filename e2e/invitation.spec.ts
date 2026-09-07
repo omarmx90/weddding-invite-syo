@@ -308,13 +308,89 @@ test.describe("Invitación de boda — Chromium", () => {
 
   test("el flujo completo de secciones está presente", async ({ page }) => {
     await openInvitation(page);
+    await expect(page.getByTestId("countdown-section")).toBeVisible();
     await expect(page.getByTestId("intro-section")).toBeVisible();
     await expect(page.getByTestId("ceremony")).toBeVisible();
     await expect(page.getByTestId("celebration-transition")).toBeVisible();
     await expect(page.getByTestId("reception")).toBeVisible();
     await expect(page.getByTestId("day-schedule")).toBeVisible();
+    await expect(page.getByTestId("faith-section")).toBeVisible();
     await expect(page.getByTestId("nuestro-equipo")).toBeVisible();
     await expect(page.getByTestId("nuestros-momentos")).toBeVisible();
+    await expect(page.getByTestId("dress-section")).toBeVisible();
+  });
+
+  test("la cuenta regresiva muestra días, horas y minutos sin segundos", async ({
+    page,
+  }) => {
+    await openInvitation(page);
+    const countdown = page.getByTestId("countdown-section");
+    await countdown.scrollIntoViewIfNeeded();
+
+    await expect(countdown).toHaveAttribute("data-target-date", "2026-10-16");
+    await expect(countdown).toHaveAttribute("data-target-time", "17:00");
+    await expect(countdown).toHaveAttribute(
+      "data-timezone",
+      "America/Mexico_City",
+    );
+
+    await expect(page.getByTestId("countdown-active")).toBeVisible();
+    await expect(countdown.getByText("Días", { exact: true })).toBeVisible();
+    await expect(countdown.getByText("Horas", { exact: true })).toBeVisible();
+    await expect(countdown.getByText("Minutos", { exact: true })).toBeVisible();
+    await expect(countdown.getByText(/segundos/i)).toHaveCount(0);
+
+    const daysText = await page.getByTestId("countdown-days").innerText();
+    const hoursText = await page.getByTestId("countdown-hours").innerText();
+    const minutesText = await page.getByTestId("countdown-minutes").innerText();
+
+    const days = Number(daysText);
+    const hours = Number(hoursText);
+    const minutes = Number(minutesText);
+
+    expect(Number.isFinite(days)).toBe(true);
+    expect(days).toBeGreaterThanOrEqual(0);
+    expect(hours).toBeGreaterThanOrEqual(0);
+    expect(hours).toBeLessThan(24);
+    expect(minutes).toBeGreaterThanOrEqual(0);
+    expect(minutes).toBeLessThan(60);
+  });
+
+  test("la sección de fe es visible y respetuosa", async ({ page }) => {
+    await openInvitation(page);
+    const faith = page.getByTestId("faith-section");
+    await faith.scrollIntoViewIfNeeded();
+
+    await expect(
+      faith.getByRole("heading", { name: "Con la bendición de Dios" }),
+    ).toBeVisible();
+    await expect(faith.getByText("Nuestra Señora de Guadalupe")).toBeVisible();
+    await expect(faith.getByText("San Judas Tadeo")).toBeVisible();
+  });
+
+  test("la sugerencia de vestimenta es editorial y sin dress code rígido", async ({
+    page,
+  }) => {
+    await openInvitation(page);
+    const dress = page.getByTestId("dress-section");
+    await dress.scrollIntoViewIfNeeded();
+
+    await expect(
+      dress.getByRole("heading", { name: "Un toque especial" }),
+    ).toBeVisible();
+    await expect(dress.getByText("Elegante y cómodo", { exact: true })).toBeVisible();
+    await expect(page.getByText(/Formal casual/i)).toHaveCount(0);
+    await expect(page.getByText(/Dress code/i)).toHaveCount(0);
+  });
+
+  test("RSVP queda preparado sin CTA falso", async ({ page }) => {
+    expect(wedding.rsvp.enabled).toBe(false);
+    expect(wedding.rsvp.deadlineIso).toBe("2026-10-10");
+    expect(wedding.rsvp.timezone).toBe("America/Mexico_City");
+
+    await openInvitation(page);
+    await expect(page.getByRole("button", { name: /Confirmar asistencia/i })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /Confirmar asistencia/i })).toHaveCount(0);
   });
 
   test("no hay overflow horizontal a 360px", async ({ page }) => {
@@ -322,6 +398,8 @@ test.describe("Invitación de boda — Chromium", () => {
     await openInvitation(page);
     await page.getByTestId("nuestro-equipo").scrollIntoViewIfNeeded();
     await page.getByTestId("nuestros-momentos").scrollIntoViewIfNeeded();
+    await page.getByTestId("dress-section").scrollIntoViewIfNeeded();
+    await page.getByTestId("countdown-section").scrollIntoViewIfNeeded();
 
     const rail = page.getByTestId("gallery-rail");
     await expect(rail).toBeVisible();

@@ -67,6 +67,15 @@ Horas, sedes, direcciones y URLs de mapa de ceremonia/recepción se editan solo 
 3. Decláralos en `wedding.gallery.items` con `featured: true` y `objectPosition`.
 4. Ver mapping y curaduría en `public/images/gallery/README.md`.
 
+### RSVP (fase futura)
+
+En `wedding.rsvp`:
+
+- `deadlineIso: "2026-10-10"` (America/Mexico_City)
+- `enabled: false` — **no** renderizar CTAs hasta implementar persistencia real
+
+Cuando se active: formulario real + backend; nunca un botón decorativo que no haga nada.
+
 ## Locale es-MX
 
 - Idioma oficial del producto: **español de México**

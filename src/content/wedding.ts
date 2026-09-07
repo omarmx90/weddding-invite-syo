@@ -112,6 +112,42 @@ export const wedding: WeddingContent = {
       },
     ],
   },
+  countdown: {
+    targetIsoDate: "2026-10-16",
+    targetTime: "17:00",
+    timezone: PRODUCT_TIMEZONE,
+    preface: "Faltan",
+    suffix: "para nuestro gran día",
+    arrivedMessage: "Nuestro gran día llegó",
+    labels: {
+      days: "Días",
+      hours: "Horas",
+      minutes: "Minutos",
+    },
+  },
+  faith: {
+    title: "Con la bendición de Dios",
+    body: "Ponemos este nuevo capítulo de nuestra familia en manos de Dios, acompañados por nuestra fe y por quienes más queremos.",
+    patrons: ["Nuestra Señora de Guadalupe", "San Judas Tadeo"],
+  },
+  dress: {
+    eyebrow: "Para celebrar juntos",
+    title: "Un toque especial",
+    body: "Nos encantará verlos con un estilo elegante y cómodo, ideal para disfrutar esta tarde juntos.",
+    suggestionLabel: "Sugerencia de vestimenta",
+    suggestion: "Elegante y cómodo",
+  },
+  /**
+   * Confirmación de asistencia — fase futura.
+   * enabled: false evita CTAs falsos. Deadline real: 10 de octubre de 2026.
+   */
+  rsvp: {
+    enabled: false,
+    deadlineIso: "2026-10-10",
+    timezone: PRODUCT_TIMEZONE,
+    ctaLabel: "Confirmar asistencia",
+    note: "La confirmación de asistencia se implementará en una fase posterior (sin CTAs hasta entonces).",
+  },
   familyTeam: {
     title: "Nuestro equipo",
     eyebrow: "Familia",
