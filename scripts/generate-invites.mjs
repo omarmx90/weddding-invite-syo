@@ -38,7 +38,7 @@ const PILOT_FAMILIES = [
     maxSeats: 3,
     enabled: true,
   },
-] as const;
+];
 
 function generateToken() {
   return randomBytes(TOKEN_BYTES).toString("base64url");
@@ -95,13 +95,17 @@ for (const item of links) {
 const sqlPath = join(privateDir, "seed-token-hashes.sql");
 writeFileSync(sqlPath, `${sqlLines.join("\n")}\n`, "utf8");
 
-process.stdout.write("\nInvitaciones privadas generadas (no se guardan en git):\n\n");
+process.stdout.write("\nInvitaciones privadas generadas (secretos solo en .private/):\n\n");
 for (const item of links) {
-  process.stdout.write(`${item.displayName}\n`);
-  process.stdout.write(`${item.url}\n`);
-  process.stdout.write(`lugares: ${item.maxSeats}\n\n`);
+  const tokenOk = typeof item.token === "string" && item.token.length >= 40;
+  const hashOk =
+    typeof item.accessTokenHash === "string" &&
+    /^[a-f0-9]{64}$/.test(item.accessTokenHash);
+  process.stdout.write(
+    `${item.displayName} → ${item.maxSeats} lugares → token ${tokenOk ? "ok" : "FAIL"} → hash ${hashOk ? "ok" : "FAIL"}\n`,
+  );
 }
-process.stdout.write(`Archivos:\n- ${inviteLinksPath}\n- ${sqlPath}\n`);
+process.stdout.write(`\nArchivos:\n- ${inviteLinksPath}\n- ${sqlPath}\n`);
 process.stdout.write(
   "\nSiguiente paso: ejecutar .private/seed-token-hashes.sql en Supabase.\n",
 );

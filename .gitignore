@@ -54,3 +54,6 @@ next-env.d.ts
 
 # secretos de distribución RSVP (tokens, ligas, SQL de hashes)
 .private/
+
+# artefactos locales de Supabase CLI
+supabase/.temp/
