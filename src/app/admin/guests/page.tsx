@@ -5,7 +5,7 @@ import { getAuthorizedAdminSession } from "@/lib/admin/session";
 import { getAdminGuestStore, isAdminPersistenceReady } from "@/lib/admin/repository";
 import { guestMatchesAdminQuery } from "@/lib/admin/search";
 import type { GuestRsvpStatus } from "@/lib/admin/types";
-import { formatAdminDateTime } from "@/lib/admin/format";
+import { formatAdminPartyLine } from "@/lib/admin/format";
 
 type SearchParams = Promise<{
   q?: string;
@@ -14,7 +14,7 @@ type SearchParams = Promise<{
 
 function statusLabel(status: GuestRsvpStatus): string {
   if (status === "confirmed") return "Confirmado";
-  if (status === "declined") return "No asistirá";
+  if (status === "declined") return "No asistirán";
   return "Pendiente";
 }
 
@@ -57,7 +57,7 @@ export default async function AdminGuestsPage({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="font-sans text-[0.6875rem] font-medium uppercase tracking-[0.32em] text-ink-subtle">
-            Invitados
+            Invitaciones
           </p>
           <h1 className="font-display mt-3 text-[clamp(1.8rem,5vw,2.4rem)] leading-snug">
             Familias
@@ -65,7 +65,7 @@ export default async function AdminGuestsPage({
         </div>
         <Link
           href="/admin/guests/new"
-          className="inline-flex min-h-11 items-center justify-center border border-ink/80 bg-ink px-5 py-2.5 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.24em] text-warm-white"
+          className="inline-flex min-h-12 items-center justify-center border border-ink/80 bg-ink px-5 py-2.5 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.24em] text-warm-white"
           data-testid="admin-create-guest"
         >
           Nueva invitación
@@ -74,46 +74,51 @@ export default async function AdminGuestsPage({
 
       <AdminGuestFilters query={query} status={status} />
 
-      <ul className="mt-8 divide-y divide-taupe/25" data-testid="admin-guest-list">
-        {guests.map((guest) => (
-          <li key={guest.id} className="py-5">
-            <Link
-              href={`/admin/guests/${guest.id}`}
-              className="block focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
-              data-testid={`admin-guest-${guest.slug}`}
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-display text-[1.2rem] leading-snug">
-                    {guest.displayName}
-                  </p>
-                  <p className="mt-1 font-sans text-[0.875rem] text-ink-muted">
-                    {guest.maxSeats}{" "}
-                    {guest.maxSeats === 1 ? "lugar" : "lugares"}
-                    {!guest.enabled ? " · Desactivada" : ""}
+      <ul className="mt-6 divide-y divide-taupe/25" data-testid="admin-guest-list">
+        {guests.map((guest) => {
+          const party = formatAdminPartyLine(guest.adultCount, guest.childCount);
+          return (
+            <li key={guest.id} className="py-5">
+              <Link
+                href={`/admin/guests/${guest.id}`}
+                className="block min-h-11 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
+                data-testid={`admin-guest-${guest.slug}`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="font-display text-[1.2rem] leading-snug">
+                      {guest.displayName}
+                    </p>
+                    <p className="mt-1 font-sans text-[0.875rem] text-ink-muted">
+                      {guest.maxSeats}{" "}
+                      {guest.maxSeats === 1 ? "lugar" : "lugares"}
+                      {!guest.enabled ? " · Inactiva" : ""}
+                    </p>
+                  </div>
+                  <p className="shrink-0 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.16em] text-ink-subtle">
+                    {statusLabel(guest.status)}
                   </p>
                 </div>
-                <p className="font-sans text-[0.75rem] font-medium uppercase tracking-[0.16em] text-ink-subtle">
-                  {statusLabel(guest.status)}
-                </p>
-              </div>
-              <p className="mt-2 font-sans text-[0.875rem] text-ink-muted">
-                {guest.status === "confirmed"
-                  ? `${guest.confirmedSeats} de ${guest.maxSeats} confirmados · ${guest.adultCount} ${guest.adultCount === 1 ? "adulto" : "adultos"} · ${guest.childCount} ${guest.childCount === 1 ? "niño" : "niños"}`
-                  : guest.status === "declined"
-                    ? "No asistirán"
-                    : "Sin respuesta"}
-                {guest.updatedAt
-                  ? ` · ${formatAdminDateTime(guest.updatedAt)}`
-                  : ""}
-              </p>
-            </Link>
-          </li>
-        ))}
+                {guest.status === "confirmed" ? (
+                  <p className="mt-2 font-sans text-[0.875rem] text-ink-muted">
+                    {party || `${guest.confirmedSeats} confirmados`}
+                  </p>
+                ) : guest.status === "pending" ? (
+                  <p className="mt-2 font-sans text-[0.875rem] text-ink-subtle">
+                    Esta familia aún no ha respondido.
+                  </p>
+                ) : null}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
 
       {guests.length === 0 ? (
-        <p className="mt-8 font-sans text-ink-muted" data-testid="admin-guests-empty">
+        <p
+          className="mt-8 font-sans text-ink-muted"
+          data-testid="admin-guests-empty"
+        >
           No encontramos familias con ese filtro.
         </p>
       ) : null}

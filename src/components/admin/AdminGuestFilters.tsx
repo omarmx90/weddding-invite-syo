@@ -31,7 +31,8 @@ export function AdminGuestFilters({
         <input
           type="search"
           value={value}
-          placeholder="Buscar familia o slug"
+          placeholder="Buscar familia"
+          enterKeyHint="search"
           data-testid="admin-guest-search"
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={(event) => {
@@ -39,10 +40,14 @@ export function AdminGuestFilters({
               push(value, status);
             }
           }}
-          className="w-full border border-taupe/50 bg-warm-white px-4 py-3 font-sans text-[1rem] text-ink placeholder:text-ink-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-taupe"
+          className="w-full border border-taupe/50 bg-warm-white px-4 py-3.5 font-sans text-[1rem] text-ink placeholder:text-ink-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-taupe"
         />
       </label>
-      <div className="flex flex-wrap gap-2">
+      <div
+        className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        role="toolbar"
+        aria-label="Filtros de estado"
+      >
         {(
           [
             ["all", "Todos"],
@@ -59,7 +64,7 @@ export function AdminGuestFilters({
             aria-pressed={status === key}
             disabled={isPending}
             onClick={() => push(value, key)}
-            className={`min-h-11 px-3 py-2 font-sans text-[0.7rem] font-medium uppercase tracking-[0.16em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe ${
+            className={`min-h-11 shrink-0 px-4 py-2.5 font-sans text-[0.7rem] font-medium uppercase tracking-[0.16em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe ${
               status === key
                 ? "border border-ink bg-ink text-warm-white"
                 : "border border-taupe/50 text-ink-muted hover:border-taupe hover:text-ink"

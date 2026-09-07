@@ -167,6 +167,7 @@ test.describe("Admin guest manager — Chromium", () => {
 
     await page.goto("/admin/guests");
     await page.getByTestId("admin-guest-montero-aguilar").click();
+    await page.getByTestId("admin-more-actions").click();
     await page.getByTestId("admin-edit-toggle").click();
     await page.getByTestId("admin-edit-seats").fill("1");
     await page.getByTestId("admin-edit-save").click();
@@ -178,6 +179,7 @@ test.describe("Admin guest manager — Chromium", () => {
     await expect(page.getByTestId("admin-edit-form")).toHaveCount(0);
 
     page.once("dialog", (dialog) => dialog.accept());
+    await page.getByTestId("admin-more-actions").click();
     await page.getByTestId("admin-disable").click();
     await expect(page.getByTestId("admin-detail-enabled")).toHaveText("No");
 
@@ -209,6 +211,7 @@ test.describe("Admin guest manager — Chromium", () => {
     await page.goto("/admin/guests");
     await page.getByTestId("admin-guest-nava-munoz").click();
     page.once("dialog", (dialog) => dialog.accept());
+    await page.getByTestId("admin-more-actions").click();
     await page.getByTestId("admin-rotate-link").click();
     await expect(page.getByTestId("admin-revealed-url")).toBeVisible();
     const newUrl = await page
@@ -247,6 +250,7 @@ test.describe("Admin guest manager — Chromium", () => {
     expect(message).toContain("Familia Granados Montero");
     expect(message).toContain("/i/granados-montero?t=");
 
+    await page.getByTestId("admin-more-actions").click();
     await page.getByTestId("admin-show-qr").click();
     await expect(page.getByTestId("admin-qr")).toBeVisible();
     await expect(page.getByTestId("admin-qr-download")).toBeVisible();
@@ -275,6 +279,70 @@ test.describe("Admin guest manager — Chromium", () => {
       return doc.scrollWidth - doc.clientWidth;
     });
     expect(overflow).toBeLessThanOrEqual(1);
+  });
+
+  test("mobile action sheet: open Escape focus return y overflow", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await adminLogin(page);
+    await page.goto("/admin/guests");
+    await page.getByTestId("admin-guest-granados-montero").click();
+
+    const more = page.getByTestId("admin-more-actions");
+    await more.focus();
+    await more.click();
+    await expect(page.getByTestId("admin-action-sheet")).toBeVisible();
+    await expect(page.getByTestId("admin-show-qr")).toBeVisible();
+    await expect(page.getByTestId("admin-rotate-link")).toBeVisible();
+    await expect(page.getByTestId("admin-disable")).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("admin-action-sheet")).toHaveCount(0);
+    await expect(more).toBeFocused();
+
+    await more.click();
+    page.once("dialog", (dialog) => dialog.dismiss());
+    await page.getByTestId("admin-rotate-link").click();
+    await expect(page.getByTestId("admin-revealed-url")).toHaveCount(0);
+
+    await page.goto("/admin");
+    const overflowDash = await page.evaluate(() => {
+      const doc = document.documentElement;
+      return doc.scrollWidth - doc.clientWidth;
+    });
+    expect(overflowDash).toBeLessThanOrEqual(1);
+
+    await page.setViewportSize({ width: 430, height: 932 });
+    await page.goto("/admin/guests");
+    await expect(page.getByTestId("admin-guest-filters")).toBeVisible();
+    await expect(page.getByTestId("admin-guest-search")).toHaveAttribute(
+      "placeholder",
+      "Buscar familia",
+    );
+    const overflowList = await page.evaluate(() => {
+      const doc = document.documentElement;
+      return doc.scrollWidth - doc.clientWidth;
+    });
+    expect(overflowList).toBeLessThanOrEqual(1);
+
+    await page.getByTestId("admin-filter-pending").click();
+    await expect(page).toHaveURL(/status=pending/);
+  });
+
+  test("copiar invitación no deja URL permanente en pantalla", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await adminLogin(page);
+    await page.goto("/admin/guests");
+    await page.getByTestId("admin-guest-granados-montero").click();
+    await page.getByTestId("admin-copy-invite").click();
+    await expect(page.getByTestId("admin-copy-invite")).toContainText(
+      /enlace copiado/i,
+    );
+    await expect(page.getByTestId("admin-revealed-url")).toHaveCount(0);
   });
 });
 

@@ -27,12 +27,12 @@ export default async function AdminLayout({
   return (
     <div className="min-h-full bg-canvas text-ink" data-testid="admin-shell">
       <header className="border-b border-taupe/30 bg-warm-white/80">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
-          <div>
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-5 py-3.5 sm:px-8 sm:py-4">
+          <div className="min-w-0">
             <p className="font-sans text-[0.625rem] font-medium uppercase tracking-[0.28em] text-ink-subtle">
               Privado
             </p>
-            <p className="font-display text-[1.35rem] tracking-[-0.01em]">
+            <p className="font-display text-[1.2rem] tracking-[-0.01em] sm:text-[1.35rem]">
               Silvia & Omar
             </p>
           </div>
@@ -53,19 +53,19 @@ async function AdminNav() {
   }
 
   return (
-    <nav className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 font-sans text-[0.75rem] font-medium uppercase tracking-[0.18em] text-ink-muted">
+    <nav className="flex shrink-0 items-center gap-x-3 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-ink-muted sm:gap-x-4 sm:text-[0.75rem] sm:tracking-[0.18em]">
       <Link
         href="/admin"
-        className="hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
+        className="inline-flex min-h-11 items-center hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
       >
         Resumen
       </Link>
       <Link
         href="/admin/guests"
-        className="hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
+        className="inline-flex min-h-11 items-center hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
         data-testid="admin-nav-guests"
       >
-        Invitados
+        Invitaciones
       </Link>
       <form
         action={async () => {
@@ -93,7 +93,7 @@ async function AdminNav() {
       >
         <button
           type="submit"
-          className="hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
+          className="inline-flex min-h-11 items-center hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe"
           data-testid="admin-logout"
         >
           Salir
