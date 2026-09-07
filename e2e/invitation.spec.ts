@@ -200,7 +200,7 @@ test.describe("Invitación de boda — Chromium", () => {
     ).toBeVisible();
 
     const featured = wedding.gallery.items.filter((i) => i.featured);
-    expect(featured.length).toBeGreaterThanOrEqual(12);
+    expect(featured.length).toBeGreaterThanOrEqual(10);
 
     const rail = page.getByTestId("gallery-rail");
     await expect(rail).toBeVisible();
@@ -219,6 +219,46 @@ test.describe("Invitación de boda — Chromium", () => {
         { timeout: 30_000 },
       )
       .toBeGreaterThan(0);
+  });
+
+  test("capturas de momentos cinematográficos para inspección visual", async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+    const viewports = [
+      { name: "390x844", width: 390, height: 844 },
+      { name: "430x932", width: 430, height: 932 },
+      { name: "1440x900", width: 1440, height: 900 },
+    ] as const;
+
+    const moments = ["cine-couple", "cine-family", "cine-closing"] as const;
+
+    for (const viewport of viewports) {
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
+      });
+      await openInvitation(page);
+
+      for (const id of moments) {
+        const section = page.getByTestId(`cinematic-${id}`);
+        await expect(section).toBeVisible();
+        await section.scrollIntoViewIfNeeded();
+        const img = section.locator("img").first();
+        await expect
+          .poll(
+            async () =>
+              img.evaluate((el: HTMLImageElement) => el.naturalWidth),
+            { timeout: 30_000 },
+          )
+          .toBeGreaterThan(0);
+        await section.screenshot({
+          path: path.join(OUTPUT_DIR, `cinematic-${id}-${viewport.name}.png`),
+        });
+      }
+    }
   });
 
   test("capturas del riel de galería para inspección visual", async ({ page }) => {

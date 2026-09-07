@@ -136,10 +136,20 @@ body {
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--warm-white) 18%, transparent) 0%,
-      transparent 28%,
-      color-mix(in srgb, var(--ink) 42%, transparent) 100%
+      color-mix(in srgb, var(--warm-white) 12%, transparent) 0%,
+      transparent 32%,
+      color-mix(in srgb, var(--ink) 28%, transparent) 100%
     );
+}
+
+.cinematic-photo {
+  object-position: var(--cine-object-pos-mobile, 50% 40%);
+}
+
+@media (min-width: 768px) {
+  .cinematic-photo {
+    object-position: var(--cine-object-pos-desktop, 50% 40%);
+  }
 }
 
 .hero-overlay {

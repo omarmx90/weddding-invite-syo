@@ -47,7 +47,15 @@ export function InvitationExperience({
   const reduceMotion = useReducedMotion();
   const showGallery = isGallerySectionVisible(content.gallery);
   const isPersonalized = Boolean(guest);
-  const [cineCouple, cineFamily] = content.editorial.cinematic;
+  const cineCouple = content.editorial.cinematic.find(
+    (m) => m.id === "cine-couple",
+  );
+  const cineFamily = content.editorial.cinematic.find(
+    (m) => m.id === "cine-family",
+  );
+  const cineClosing = content.editorial.cinematic.find(
+    (m) => m.id === "cine-closing",
+  );
 
   const countdownAccessibleSummary = `Cuenta regresiva para la ceremonia del ${formatLongDateEsMx(content.countdown.targetIsoDate)} a las ${content.event.ceremony.time}, hora de la Ciudad de México.`;
 
@@ -142,6 +150,7 @@ export function InvitationExperience({
               chapter={content.editorial.chapters.celebrate}
               tone={guest ? "surface" : "canvas"}
             />
+            {cineClosing ? <CinematicMoment moment={cineClosing} /> : null}
             {guest && rsvpContext ? (
               <RsvpSection
                 slug={guest.slug}
