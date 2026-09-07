@@ -2,6 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 import { setPartyCounts } from "./rsvp-helpers";
 import { createHash } from "node:crypto";
 import { execSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { slugifyFamilyName } from "../src/lib/admin/slug";
 import { buildWhatsAppMessage } from "../src/lib/admin/messages";
 import {
@@ -13,6 +15,16 @@ import {
   resolveAdminAuthEmailRedirectTo,
 } from "../src/lib/admin/auth-redirect";
 import { isAdminE2EAuthEnabled } from "../src/lib/admin/e2e-auth-shared";
+import {
+  isEmailAllowlisted,
+  normalizeAdminEmail,
+} from "../src/lib/admin/allowlist";
+import {
+  ADMIN_LOGIN_NEUTRAL_MESSAGE,
+  isSignupNotAllowedOtpError,
+  requestAdminMagicLink,
+  type SendAdminOtpFn,
+} from "../src/lib/admin/request-magic-link";
 import { generateInviteToken, hashInviteToken } from "../src/lib/rsvp/token";
 
 async function resetStores(page: Page) {
@@ -53,6 +65,38 @@ test.describe("Admin guest manager — Chromium", () => {
     await page.goto("/admin");
     await expect(page).toHaveURL(/\/admin\/login/);
     await expect(page.getByTestId("admin-login")).toBeVisible();
+  });
+
+  test("login form: unauthorized recibe ack neutral sin exponer allowlist", async ({
+    page,
+  }) => {
+    await page.goto("/admin/login");
+    await expect(page.getByTestId("admin-login")).toBeVisible();
+    const html = await page.content();
+    expect(html).not.toMatch(/ADMIN_EMAILS/i);
+    expect(html).not.toMatch(/admin@syo\.test/i);
+
+    const configured = await page.getByTestId("admin-login-email").count();
+    expect(configured).toBe(1);
+
+    // Si Auth no está configurado en el webServer, el submit muestra error de config.
+    await page.getByTestId("admin-login-email").fill("intruso@example.com");
+    await page.getByTestId("admin-login-submit").click();
+    const message = page.getByTestId("admin-login-message");
+    await expect(message).toBeVisible();
+    const text = await message.innerText();
+    expect(text).not.toMatch(/no es administrador|no está autorizado/i);
+    expect(text.length).toBeGreaterThan(10);
+  });
+
+  test("logout limpia sesión e2e y vuelve a login", async ({ page }) => {
+    await adminLogin(page);
+    await page.goto("/admin");
+    await expect(page.getByTestId("admin-dashboard")).toBeVisible();
+    await page.getByTestId("admin-logout").click();
+    await expect(page).toHaveURL(/\/admin\/login/);
+    await page.goto("/admin");
+    await expect(page).toHaveURL(/\/admin\/login/);
   });
 
   test("usuario no allowlisted es rechazado en login e2e", async ({ page }) => {
@@ -438,5 +482,148 @@ test.describe("Admin unit helpers — Chromium", () => {
       output = "";
     }
     expect(output.trim()).toBe("");
+  });
+
+  test("invite-only magic link: allowlist pre-check y shouldCreateUser false", async () => {
+    const previousEmails = process.env.ADMIN_EMAILS;
+    const previousVercel = process.env.VERCEL_ENV;
+    try {
+      process.env.ADMIN_EMAILS = "Admin@Syo.Test , pair@syo.test";
+      delete process.env.VERCEL_ENV;
+
+      const calls: Array<{ email: string; shouldCreateUser: boolean }> = [];
+      const sendOtp: SendAdminOtpFn = async ({ email, shouldCreateUser }) => {
+        calls.push({ email, shouldCreateUser });
+        return { error: null };
+      };
+
+      const unauthorized = await requestAdminMagicLink({
+        email: "  Intruso@Example.COM ",
+        emailRedirectTo: "http://127.0.0.1:3000/admin/auth/callback",
+        sendOtp,
+      });
+      expect(unauthorized.ok).toBe(true);
+      expect(unauthorized.outcome).toBe("neutral_ack");
+      expect(unauthorized.message).toBe(ADMIN_LOGIN_NEUTRAL_MESSAGE);
+      expect(calls).toHaveLength(0);
+
+      const authorized = await requestAdminMagicLink({
+        email: "  ADMIN@syo.test ",
+        emailRedirectTo: "http://127.0.0.1:3000/admin/auth/callback",
+        sendOtp,
+      });
+      expect(authorized.ok).toBe(true);
+      expect(authorized.outcome).toBe("otp_sent");
+      expect(authorized.shouldCreateUser).toBe(false);
+      expect(authorized.message).toBe(ADMIN_LOGIN_NEUTRAL_MESSAGE);
+      expect(calls).toEqual([
+        { email: "admin@syo.test", shouldCreateUser: false },
+      ]);
+
+      expect(normalizeAdminEmail("  A@B.COM ")).toBe("a@b.com");
+      expect(isEmailAllowlisted("PAIR@syo.test")).toBe(true);
+      expect(isEmailAllowlisted("nope@syo.test")).toBe(false);
+    } finally {
+      if (previousEmails === undefined) delete process.env.ADMIN_EMAILS;
+      else process.env.ADMIN_EMAILS = previousEmails;
+      if (previousVercel === undefined) delete process.env.VERCEL_ENV;
+      else process.env.VERCEL_ENV = previousVercel;
+    }
+  });
+
+  test("invite-only: allowlist vacía / ausente fail-closed", async () => {
+    const previousEmails = process.env.ADMIN_EMAILS;
+    try {
+      delete process.env.ADMIN_EMAILS;
+      const missing = await requestAdminMagicLink({
+        email: "admin@syo.test",
+        emailRedirectTo: "http://127.0.0.1:3000/admin/auth/callback",
+        sendOtp: async () => ({ error: null }),
+      });
+      expect(missing.ok).toBe(false);
+      expect(missing.outcome).toBe("not_configured");
+
+      process.env.ADMIN_EMAILS = "   ";
+      const empty = await requestAdminMagicLink({
+        email: "admin@syo.test",
+        emailRedirectTo: "http://127.0.0.1:3000/admin/auth/callback",
+        sendOtp: async () => ({ error: null }),
+      });
+      expect(empty.ok).toBe(false);
+      expect(empty.outcome).toBe("not_configured");
+    } finally {
+      if (previousEmails === undefined) delete process.env.ADMIN_EMAILS;
+      else process.env.ADMIN_EMAILS = previousEmails;
+    }
+  });
+
+  test("invite-only: fallback create solo si signup bloqueado y allowlisted", async () => {
+    const previousEmails = process.env.ADMIN_EMAILS;
+    try {
+      process.env.ADMIN_EMAILS = "newbie@syo.test";
+      const calls: boolean[] = [];
+      const result = await requestAdminMagicLink({
+        email: "newbie@syo.test",
+        emailRedirectTo: "http://127.0.0.1:3000/admin/auth/callback",
+        sendOtp: async ({ shouldCreateUser }) => {
+          calls.push(shouldCreateUser);
+          if (!shouldCreateUser) {
+            return {
+              error: {
+                message: "Signups not allowed for otp",
+                status: 422,
+              },
+            };
+          }
+          return { error: null };
+        },
+      });
+      expect(result.ok).toBe(true);
+      expect(result.outcome).toBe("otp_sent");
+      expect(result.shouldCreateUser).toBe(true);
+      expect(calls).toEqual([false, true]);
+      expect(isSignupNotAllowedOtpError({ message: "Signups not allowed for otp" })).toBe(
+        true,
+      );
+    } finally {
+      if (previousEmails === undefined) delete process.env.ADMIN_EMAILS;
+      else process.env.ADMIN_EMAILS = previousEmails;
+    }
+  });
+
+  test("callback route preserva ?code= y hash recovery path", () => {
+    const source = readFileSync(
+      path.join(process.cwd(), "src/app/admin/auth/callback/route.ts"),
+      "utf8",
+    );
+    expect(source).toContain("exchangeCodeForSession");
+    expect(source).toContain("isEmailAllowlisted");
+    expect(source).toMatch(/searchParams\.get\([\"']code[\"']\)/);
+    expect(source).toContain("Sin ?code=");
+    expect(source).toContain("/admin/login");
+
+    const loginForm = readFileSync(
+      path.join(process.cwd(), "src/components/admin/AdminLoginForm.tsx"),
+      "utf8",
+    );
+    expect(loginForm).toContain("access_token");
+    expect(loginForm).toContain("setSession");
+    expect(loginForm).toContain("requestAdminMagicLinkAction");
+    expect(loginForm).not.toContain("shouldCreateUser: true");
+    expect(loginForm).not.toContain("signInWithOtp");
+  });
+
+  test("ADMIN_EMAILS no se expone al client bundle admin login", () => {
+    const loginForm = readFileSync(
+      path.join(process.cwd(), "src/components/admin/AdminLoginForm.tsx"),
+      "utf8",
+    );
+    const loginPage = readFileSync(
+      path.join(process.cwd(), "src/app/admin/login/page.tsx"),
+      "utf8",
+    );
+    expect(loginForm).not.toMatch(/ADMIN_EMAILS/);
+    expect(loginPage).not.toMatch(/ADMIN_EMAILS/);
+    expect(loginForm).not.toMatch(/getAdminAllowlist/);
   });
 });

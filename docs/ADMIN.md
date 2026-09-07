@@ -8,13 +8,27 @@ a mano. Herramienta privada, editorial y fail-closed.
 ## Auth
 
 1. **Producción:** Supabase Auth magic link (OTP email).
-2. Allowlist server-side: `ADMIN_EMAILS=a@x.com,b@y.com`
-3. Callback: `/admin/auth/callback`
-4. Middleware protege `/admin/*` excepto login/callback.
-5. Email fuera de allowlist → rechazo + sign-out.
+2. Allowlist server-side: `ADMIN_EMAILS=a@x.com,b@y.com` (nunca `NEXT_PUBLIC_`).
+3. **Pre-auth:** el login valida allowlist en servidor **antes** de `signInWithOtp`.
+   Correos no autorizados reciben ack neutral y **no** disparan OTP ni crean usuario.
+4. **OTP:** `shouldCreateUser: false` por defecto (invite-only).
+   Si un email allowlisted aún no tiene identity en Auth, hay un fallback
+   controlado con `shouldCreateUser: true` solo para esa cuenta (migración).
+5. Callback: `/admin/auth/callback` (`?code=` + recuperación client `#access_token`).
+6. Middleware + sesión + acciones: allowlist post-auth (defense in depth).
+7. Email fuera de allowlist con sesión → rechazo + sign-out.
+
+**Alta de un admin nuevo**
+
+1. Añadir el correo a `ADMIN_EMAILS` en Vercel (y redesplegar / sync env).
+2. Preferible: crear/invitar el usuario en Supabase Auth → Users antes del primer login.
+3. Si no existe, el primer magic link allowlisted puede crearlo vía fallback controlado.
 
 **E2E / local memory:** `ADMIN_AUTH_MODE=test` + `ADMIN_E2E_SECRET`  
 Solo si `RSVP_STORE=memory` y **nunca** en Vercel Production.
+
+**Rate limit:** no hay limiter custom; se confía en límites de Supabase Auth/email.
+El pre-check reduce OTP spam de correos no allowlisted.
 
 ## Tokens (estrategia A)
 

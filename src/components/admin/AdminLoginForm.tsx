@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { requestAdminMagicLinkAction } from "@/lib/admin/auth-actions";
 import { createSupabaseAuthBrowserClient } from "@/lib/supabase/auth-browser";
 
 /**
@@ -81,7 +82,7 @@ export function AdminLoginForm({
   const errorText = useMemo(() => {
     if (recovering) return null;
     if (errorCode === "unauthorized") {
-      return "Este correo no está autorizado para administrar la boda.";
+      return "No se pudo completar el acceso. Solicita un enlace nuevo si lo necesitas.";
     }
     if (errorCode === "auth") {
       return "No se pudo completar el acceso. Intenta de nuevo.";
@@ -89,8 +90,11 @@ export function AdminLoginForm({
     if (errorCode === "access_denied" || errorCode === "otp_expired") {
       return "El enlace expiró o ya fue usado. Solicita uno nuevo.";
     }
+    if (hashRecovery === "failed") {
+      return "No se pudo completar el acceso. Solicita un enlace nuevo.";
+    }
     return null;
-  }, [errorCode, recovering]);
+  }, [errorCode, recovering, hashRecovery]);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -107,7 +111,6 @@ export function AdminLoginForm({
     }
 
     if (/localhost|127\.0\.0\.1/i.test(emailRedirectTo) && !e2eHint) {
-      // Defensa: en builds de Production el servidor no debe haber enviado localhost.
       const host = typeof window !== "undefined" ? window.location.hostname : "";
       if (host === "silvia-y-omar.com" || host.endsWith(".vercel.app")) {
         setStatus("error");
@@ -120,25 +123,14 @@ export function AdminLoginForm({
 
     setStatus("sending");
     try {
-      const supabase = createSupabaseAuthBrowserClient();
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
-        options: {
-          emailRedirectTo,
-          shouldCreateUser: true,
-        },
-      });
-      if (error) {
+      const result = await requestAdminMagicLinkAction(email);
+      if (!result.ok) {
         setStatus("error");
-        setMessage(
-          "No pudimos enviar el enlace. Revisa el correo e intenta otra vez.",
-        );
+        setMessage(result.message);
         return;
       }
       setStatus("sent");
-      setMessage(
-        "Te enviamos un enlace de acceso. Ábrelo desde este dispositivo.",
-      );
+      setMessage(result.message);
     } catch {
       setStatus("error");
       setMessage("No pudimos iniciar el acceso en este momento.");
@@ -155,8 +147,8 @@ export function AdminLoginForm({
         Administración
       </h1>
       <p className="mt-4 font-sans text-[1rem] leading-relaxed text-ink-muted text-pretty">
-        Solo correos autorizados. Te enviaremos un enlace mágico; no usamos
-        contraseñas.
+        Acceso solo con cuenta autorizada. Te enviaremos un enlace mágico; no
+        usamos contraseñas.
       </p>
 
       {recovering ? (
@@ -185,6 +177,7 @@ export function AdminLoginForm({
           <button
             type="submit"
             disabled={status === "sending"}
+            aria-busy={status === "sending"}
             data-testid="admin-login-submit"
             className="mt-6 inline-flex min-h-12 w-full items-center justify-center border border-ink/80 bg-ink px-6 py-3 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-warm-white disabled:opacity-50"
           >
