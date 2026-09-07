@@ -1,62 +1,59 @@
 # Galería — Nuestros momentos
 
-Coloca aquí las fotografías familiares/de pareja (derivados web, no originales crudos de 10+ MB).
+## Archivos en producción (repo)
 
-## Convención de archivos
+Derivados web curados (lado largo ≈ 1600 px):
 
-```
-public/images/gallery/
-  01-nombre-corto.jpg
-  02-nombre-corto.jpg
-  …
-```
+`momento-01.jpg` … `momento-16.jpg`
 
-Recomendado por foto destacada:
+Se declaran en `src/content/wedding.ts` → `gallery.items`.
 
-- Lado largo ≈ 1600–2000 px
-- JPEG quality ~80–88 o WebP
-- Dimensiones conocidas en el content
+## Originales (local)
 
-## Content config
+Las fotografías de alta resolución viven en:
 
-En `src/content/wedding.ts` → `gallery`:
+`public/images/gallery/originals/`
 
-```ts
-gallery: {
-  enabled: true, // solo cuando haya assets reales
-  title: "Nuestros momentos",
-  eyebrow: "Álbum",
-  hint: "Desliza para ver más",
-  items: [
-    {
-      id: "01",
-      src: "/images/gallery/01-ejemplo.jpg",
-      alt: "Descripción en español de México",
-      width: 1600,
-      height: 2000,
-      objectPosition: "50% 40%",
-      featured: true, // aparece en el riel inicial
-    },
-  ],
-}
-```
+Esa carpeta está en `.gitignore` (archivos de 10–22 MB). No se modifican destructivamente.
 
-## Estrategia para ~100 fotos
+## Mapping curado (original → momento)
 
-| Capa | Qué carga | Cuándo |
+| Original | Nuevo | Rol narrativo |
 | --- | --- | --- |
-| Featured (12–20) | Riel horizontal actual | Al entrar a la sección (lazy salvo la 1ª) |
-| Archivo completo | Futuro “Ver más” / página álbum | Bajo demanda |
-| Originales | Fuera del repo o no servidos | Nunca en el cliente |
+| Previas -80.jpg | momento-01.jpg | Apertura — pareja |
+| Previas -35.jpg | momento-02.jpg | Pareja frente a la entrada |
+| Previas -74.jpg | momento-03.jpg | Retrato vertical pareja |
+| Previas -40.jpg | momento-04.jpg | Mirada íntima |
+| Previas -58.jpg | momento-05.jpg | Detalle — manos / anillo |
+| Previas -43.jpg | momento-06.jpg | Momento espontáneo |
+| Previas -4.jpg | momento-07.jpg | Familia — terraza / acueducto |
+| Previas -24.jpg | momento-08.jpg | Familia — jardín |
+| Previas -32.jpg | momento-09.jpg | Familia — patio |
+| Previas -107.jpg | momento-10.jpg | Guiño futbolero — juntos |
+| Previas -91.jpg | momento-11.jpg | Familia caminando (playeras) |
+| Previas -95.jpg | momento-12.jpg | Rivalidad — retrato vertical |
+| Previas -116.jpg | momento-13.jpg | Mauro |
+| Previas -114.jpg | momento-14.jpg | Silvia |
+| Previas -119.jpg | momento-15.jpg | Omar |
+| Previas -29.jpg | momento-16.jpg | Cierre — caminando juntos |
 
-Reglas:
+## Descartadas del riel (permanecen en `originals/`)
 
-1. `enabled: false` mientras no haya fotos → la sección no se renderiza.
-2. Solo `featured: true` entra al riel (máx. ~20).
-3. Hero sigue siendo el único `priority`; la galería no.
-4. Next/Image entrega AVIF/WebP automáticamente.
-5. Un “Ver más” futuro puede paginar o abrir un álbum sin cargar las 100 de golpe.
+| Archivo | Motivo |
+| --- | --- |
+| nuestro-equipo.jpg | Ya se usa en “Nuestro equipo” |
+| Previas -15.jpg | Muy similar a momento-07 (terraza) |
+| Previas -68.jpg | Redundante con 01/02 (pareja en arco) |
+| Previas -85.jpg | Variante futbolera sentada; 10–12 cubren el tema |
+| Previas -89.jpg | Casi idéntica a momento-11 |
+| Previas -97.jpg | Casi idéntica a momento-12 |
+| Previas -99.jpg | Variante de 12 |
+| Previas -103.jpg | Variante de grupo con playeras |
 
-## Placeholders
+## Activar / ampliar
 
-No uses bloques vacíos en producción. Si faltan assets, deja `enabled: false` e `items: []`.
+1. Agregar o regenerar `momento-XX.jpg` (derivado web).
+2. Declarar el ítem en `wedding.gallery.items` con `featured: true`.
+3. Mantener `gallery.enabled: true`.
+
+Futuro: “Ver más” puede cargar ítems no featured bajo demanda. Lightbox ampliado queda para una iteración posterior (sin librería pesada).

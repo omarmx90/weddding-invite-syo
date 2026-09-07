@@ -22,7 +22,7 @@
   --hero-veil: rgba(75, 68, 61, 0.38);
   --hero-veil-deep: rgba(75, 68, 61, 0.55);
 
-  --section-y: clamp(4.5rem, 12vw, 7.5rem);
+  --section-y: clamp(4.75rem, 12.5vw, 7.75rem);
   --content-max: 28rem;
 }
 
@@ -49,12 +49,16 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 body {
   background: var(--canvas);
   color: var(--ink);
   font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 .font-display {
@@ -183,6 +187,10 @@ body {
   padding-block: var(--section-y);
 }
 
+.section-pad-y {
+  padding-block: var(--section-y);
+}
+
 .invite-rule {
   width: 2.5rem;
   height: 1px;
@@ -191,7 +199,14 @@ body {
 }
 
 /* Riel editorial — scroll-snap nativo, sin JS de carousel */
+#nuestros-momentos {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 .gallery-rail {
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
@@ -199,6 +214,9 @@ body {
   scroll-snap-type: x mandatory;
   scroll-padding-inline: max(1.25rem, env(safe-area-inset-left));
   outline: none;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--sand) 80%, transparent) transparent;
+  contain: inline-size;
 }
 
 .gallery-rail:focus-visible {
@@ -208,26 +226,81 @@ body {
 
 .gallery-rail-track {
   display: flex;
-  gap: 0.85rem;
+  align-items: flex-end;
+  gap: 0.95rem;
   width: max-content;
   padding-inline: max(1.25rem, env(safe-area-inset-left))
-    max(1.25rem, env(safe-area-inset-right));
-  padding-block: 0.15rem 0.5rem;
+    max(2.5rem, env(safe-area-inset-right));
+  padding-block: 0.25rem 0.35rem;
   list-style: none;
   margin: 0;
 }
 
 .gallery-rail-slide {
   flex: 0 0 auto;
-  width: min(78vw, 22rem);
-  aspect-ratio: 4 / 5;
   scroll-snap-align: start;
 }
 
+.gallery-slide-figure {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  margin: 0;
+}
+
+.gallery-rail-slide--featured {
+  width: min(86vw, 26rem);
+}
+
+.gallery-rail-slide--featured .gallery-slide-figure > div {
+  aspect-ratio: 5 / 4;
+}
+
+.gallery-rail-slide--landscape {
+  width: min(78vw, 22rem);
+}
+
+.gallery-rail-slide--landscape .gallery-slide-figure > div {
+  aspect-ratio: 4 / 3;
+}
+
+.gallery-rail-slide--portrait {
+  width: min(68vw, 18rem);
+}
+
+.gallery-rail-slide--portrait .gallery-slide-figure > div {
+  aspect-ratio: 3 / 4;
+}
+
+.gallery-rail-slide--square {
+  width: min(62vw, 16rem);
+}
+
+.gallery-rail-slide--square .gallery-slide-figure > div {
+  aspect-ratio: 1 / 1;
+}
+
 @media (min-width: 768px) {
-  .gallery-rail-slide {
-    width: min(42vw, 26rem);
-    aspect-ratio: 3 / 4;
+  .gallery-rail-track {
+    gap: 1.15rem;
+    padding-inline: max(2rem, calc((100vw - 52rem) / 2 + 1.25rem))
+      max(2.5rem, calc((100vw - 52rem) / 2 + 1.5rem));
+  }
+
+  .gallery-rail-slide--featured {
+    width: min(42vw, 28rem);
+  }
+
+  .gallery-rail-slide--landscape {
+    width: min(36vw, 24rem);
+  }
+
+  .gallery-rail-slide--portrait {
+    width: min(28vw, 20rem);
+  }
+
+  .gallery-rail-slide--square {
+    width: min(24vw, 17rem);
   }
 }
 

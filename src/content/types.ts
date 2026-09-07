@@ -88,10 +88,19 @@ export type FamilyTeamContent = {
   photoPlaceholderLabel: string;
 };
 
+export type GalleryOrientation = "portrait" | "landscape";
+
+export type GalleryFrame = "featured" | "portrait" | "landscape" | "square";
+
 export type GalleryItem = WeddingMediaAsset & {
   id: string;
   /** Solo las marcadas aparecen en el riel inicial */
   featured: boolean;
+  orientation: GalleryOrientation;
+  /** Ritmo editorial del slide en el riel */
+  frame?: GalleryFrame;
+  /** Pie opcional, breve */
+  caption?: string;
 };
 
 export type GalleryContent = {

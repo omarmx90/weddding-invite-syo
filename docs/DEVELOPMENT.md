@@ -62,11 +62,10 @@ Horas, sedes, direcciones y URLs de mapa de ceremonia/recepción se editan solo 
 
 ### Galería (“Nuestros momentos”)
 
-1. Agrega derivados web en `public/images/gallery/` (ver README de esa carpeta).
-2. Declara cada foto en `wedding.gallery.items` con `featured: true` para el riel.
-3. Pon `gallery.enabled: true` solo cuando haya al menos una foto real.
-
-La sección no se muestra si está deshabilitada o sin destacadas — evita placeholders vacíos en producción.
+1. Conserva originales en `public/images/gallery/originals/` (gitignored).
+2. Genera derivados web `momento-XX.jpg` (~1600 px) en `public/images/gallery/`.
+3. Decláralos en `wedding.gallery.items` con `featured: true` y `objectPosition`.
+4. Ver mapping y curaduría en `public/images/gallery/README.md`.
 
 ## Locale es-MX
 

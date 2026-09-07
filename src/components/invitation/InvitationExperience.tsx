@@ -49,6 +49,7 @@ export function InvitationExperience({ content }: InvitationExperienceProps) {
             key="invitation"
             id="invitation"
             data-testid="invitation-content"
+            className="overflow-x-clip"
             initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{

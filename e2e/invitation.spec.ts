@@ -133,19 +133,82 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(photo).toHaveAttribute("alt", /Silvia, Omar y Mauro/);
   });
 
-  test("la galería solo aparece cuando está habilitada con contenido", async ({
+  test("la galería Nuestros momentos está activa con fotografías reales", async ({
     page,
   }) => {
     await openInvitation(page);
-    if (wedding.gallery.enabled && wedding.gallery.items.some((i) => i.featured)) {
+    const gallery = page.getByTestId("nuestros-momentos");
+    await gallery.scrollIntoViewIfNeeded();
+
+    await expect(
+      gallery.getByRole("heading", { name: "Nuestros momentos" }),
+    ).toBeVisible();
+
+    const featured = wedding.gallery.items.filter((i) => i.featured);
+    expect(featured.length).toBeGreaterThanOrEqual(12);
+
+    const rail = page.getByTestId("gallery-rail");
+    await expect(rail).toBeVisible();
+    await expect(rail).toHaveAttribute("tabindex", "0");
+
+    for (const item of featured) {
+      const photo = page.getByTestId(`gallery-photo-${item.id}`);
+      await expect(photo).toHaveAttribute("alt", item.alt);
+      await expect(photo).toHaveAttribute("src", new RegExp(item.id));
+    }
+
+    const first = page.getByTestId(`gallery-photo-${featured[0].id}`);
+    await expect
+      .poll(
+        async () => first.evaluate((img: HTMLImageElement) => img.naturalWidth),
+        { timeout: 30_000 },
+      )
+      .toBeGreaterThan(0);
+  });
+
+  test("capturas del riel de galería para inspección visual", async ({ page }) => {
+    test.setTimeout(120_000);
+    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+    const viewports = [
+      { name: "360x800", width: 360, height: 800 },
+      { name: "390x844", width: 390, height: 844 },
+      { name: "430x932", width: 430, height: 932 },
+      { name: "768x1024", width: 768, height: 1024 },
+      { name: "1440x900", width: 1440, height: 900 },
+    ] as const;
+
+    for (const viewport of viewports) {
+      await page.setViewportSize({
+        width: viewport.width,
+        height: viewport.height,
+      });
+      await openInvitation(page);
+
       const gallery = page.getByTestId("nuestros-momentos");
-      await expect(gallery).toBeVisible();
+      await gallery.scrollIntoViewIfNeeded();
       const rail = page.getByTestId("gallery-rail");
       await expect(rail).toBeVisible();
-      await expect(rail).toHaveAttribute("tabindex", "0");
-    } else {
-      await expect(page.getByTestId("nuestros-momentos")).toHaveCount(0);
-      await expect(page.getByTestId("gallery-rail")).toHaveCount(0);
+
+      await gallery.screenshot({
+        path: path.join(OUTPUT_DIR, `gallery-start-${viewport.name}.png`),
+      });
+
+      await rail.evaluate((el) => {
+        el.scrollLeft = el.scrollWidth * 0.45;
+      });
+      await page.waitForTimeout(200);
+      await gallery.screenshot({
+        path: path.join(OUTPUT_DIR, `gallery-mid-${viewport.name}.png`),
+      });
+
+      await rail.evaluate((el) => {
+        el.scrollLeft = el.scrollWidth;
+      });
+      await page.waitForTimeout(200);
+      await gallery.screenshot({
+        path: path.join(OUTPUT_DIR, `gallery-end-${viewport.name}.png`),
+      });
     }
   });
 
@@ -194,19 +257,38 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(page.getByTestId("ceremony")).toBeVisible();
     await expect(page.getByTestId("reception")).toBeVisible();
     await expect(page.getByTestId("nuestro-equipo")).toBeVisible();
+    await expect(page.getByTestId("nuestros-momentos")).toBeVisible();
   });
 
   test("no hay overflow horizontal a 360px", async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await openInvitation(page);
     await page.getByTestId("nuestro-equipo").scrollIntoViewIfNeeded();
+    await page.getByTestId("nuestros-momentos").scrollIntoViewIfNeeded();
 
-    const hasOverflow = await page.evaluate(() => {
+    const rail = page.getByTestId("gallery-rail");
+    await expect(rail).toBeVisible();
+
+    const result = await page.evaluate(() => {
       const doc = document.documentElement;
-      return doc.scrollWidth > doc.clientWidth + 1;
+      const railEl = document.querySelector("[data-testid='gallery-rail']");
+      const before = window.scrollX;
+      window.scrollBy(240, 0);
+      const afterWindow = window.scrollX;
+      window.scrollTo(0, window.scrollY);
+
+      return {
+        docOk: doc.scrollWidth <= doc.clientWidth + 1,
+        windowScrollDelta: afterWindow - before,
+        railCanScroll: railEl
+          ? railEl.scrollWidth > railEl.clientWidth + 8
+          : false,
+      };
     });
 
-    expect(hasOverflow).toBe(false);
+    expect(result.docOk).toBe(true);
+    expect(result.windowScrollDelta).toBe(0);
+    expect(result.railCanScroll).toBe(true);
   });
 
   test("capturas del hero editorial para inspección visual", async ({ page }) => {
