@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { setPartyCounts } from "./rsvp-helpers";
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -68,10 +69,15 @@ test.describe("RSVP piloto — Chromium", () => {
       );
       await expect(page.getByTestId("rsvp-form")).toBeVisible();
       await page.getByTestId("rsvp-attend-yes").click();
-      await expect(page.getByTestId(`rsvp-seat-${item.seats}`)).toBeVisible();
-      await expect(
-        page.getByTestId(`rsvp-seat-${item.seats + 1}`),
-      ).toHaveCount(0);
+      await expect(page.getByTestId("rsvp-seats")).toBeVisible();
+      await expect(page.getByTestId("rsvp-adults")).toBeVisible();
+      await expect(page.getByTestId("rsvp-children")).toBeVisible();
+      await setPartyCounts(page, item.seats, 0);
+      await expect(page.getByTestId("rsvp-adults-inc")).toBeDisabled();
+      await expect(page.getByTestId("rsvp-children-inc")).toBeDisabled();
+      await expect(page.getByTestId("rsvp-capacity-summary")).toHaveText(
+        `${item.seats} de ${item.seats} lugares confirmados`,
+      );
     }
   });
 
@@ -79,15 +85,36 @@ test.describe("RSVP piloto — Chromium", () => {
     const token = await fetchMemoryToken(page, "montero-aguilar");
     await openPersonalizedWithToken(page, "montero-aguilar", token);
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-2").click();
+    await setPartyCounts(page, 2, 0);
     await page.getByTestId("rsvp-submit").click();
 
     await expect(page.getByTestId("rsvp-confirmed")).toBeVisible();
     await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
       "2 de 3 lugares",
     );
+    await expect(page.getByTestId("rsvp-party-breakdown")).toHaveText(
+      "2 adultos",
+    );
     await expect(page.getByTestId("rsvp-success-message")).toContainText(
       "Gracias por confirmar",
+    );
+  });
+
+  test("adultos y niños respetan el cupo y el desglose", async ({ page }) => {
+    const token = await fetchMemoryToken(page, "montero-aguilar");
+    await openPersonalizedWithToken(page, "montero-aguilar", token);
+    await page.getByTestId("rsvp-attend-yes").click();
+    await setPartyCounts(page, 2, 1);
+    await expect(page.getByTestId("rsvp-capacity-summary")).toHaveText(
+      "3 de 3 lugares confirmados",
+    );
+    await expect(page.getByTestId("rsvp-adults-inc")).toBeDisabled();
+    await page.getByTestId("rsvp-submit").click();
+    await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
+      "3 de 3 lugares",
+    );
+    await expect(page.getByTestId("rsvp-party-breakdown")).toHaveText(
+      "2 adultos · 1 niño",
     );
   });
 
@@ -109,7 +136,7 @@ test.describe("RSVP piloto — Chromium", () => {
     const token = await fetchMemoryToken(page, "nava-munoz");
     await openPersonalizedWithToken(page, "nava-munoz", token);
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-1").click();
+    await setPartyCounts(page, 1, 0);
     await page.getByTestId("rsvp-submit").click();
     await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
       "1 de 3 lugares",
@@ -118,11 +145,14 @@ test.describe("RSVP piloto — Chromium", () => {
     await page.getByTestId("rsvp-edit").click();
     await expect(page.getByTestId("rsvp-form")).toBeVisible();
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-3").click();
+    await setPartyCounts(page, 2, 1);
     await page.getByTestId("rsvp-submit").click();
 
     await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
       "3 de 3 lugares",
+    );
+    await expect(page.getByTestId("rsvp-party-breakdown")).toHaveText(
+      "2 adultos · 1 niño",
     );
 
     await page.reload();
@@ -130,6 +160,9 @@ test.describe("RSVP piloto — Chromium", () => {
     await expect(page.getByTestId("rsvp-confirmed")).toBeVisible();
     await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
       "3 de 3 lugares",
+    );
+    await expect(page.getByTestId("rsvp-party-breakdown")).toHaveText(
+      "2 adultos · 1 niño",
     );
   });
 
@@ -177,7 +210,7 @@ test.describe("RSVP piloto — Chromium", () => {
     const token = await fetchMemoryToken(page, "granados-montero");
     await openPersonalizedWithToken(page, "granados-montero", token);
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-1").click();
+    await setPartyCounts(page, 1, 0);
     await page.getByTestId("rsvp-submit").click();
     await expect(page.getByTestId("rsvp-error")).toContainText(
       "No pudimos guardar tu confirmación",
@@ -200,11 +233,25 @@ test.describe("RSVP piloto — Chromium", () => {
     await openPersonalizedWithToken(page, "montero-aguilar", token);
     await page.getByTestId("rsvp-attend-yes").click();
 
-    for (const testId of ["rsvp-attend-yes", "rsvp-seat-2", "rsvp-submit"]) {
+    for (const testId of [
+      "rsvp-attend-yes",
+      "rsvp-adults-inc",
+      "rsvp-adults-dec",
+      "rsvp-children-inc",
+      "rsvp-submit",
+    ]) {
       const box = await page.getByTestId(testId).boundingBox();
       expect(box).toBeTruthy();
       expect(box!.height).toBeGreaterThanOrEqual(44);
     }
+    await expect(page.getByTestId("rsvp-adults-inc")).toHaveAttribute(
+      "aria-label",
+      "Agregar adulto",
+    );
+    await expect(page.getByTestId("rsvp-children-inc")).toHaveAttribute(
+      "aria-label",
+      "Agregar niño",
+    );
   });
 
   test("mensaje opcional no es requerido para confirmar", async ({ page }) => {
@@ -216,7 +263,7 @@ test.describe("RSVP piloto — Chromium", () => {
       /nota breve/i,
     );
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-2").click();
+    await setPartyCounts(page, 2, 0);
     await page.getByTestId("rsvp-submit").click();
     await expect(page.getByTestId("rsvp-confirmed")).toBeVisible();
     await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
@@ -230,7 +277,7 @@ test.describe("RSVP piloto — Chromium", () => {
     const token = await fetchMemoryToken(page, "montero-aguilar");
     await openPersonalizedWithToken(page, "montero-aguilar", token);
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-1").click();
+    await setPartyCounts(page, 1, 0);
 
     const submit = page.getByTestId("rsvp-submit");
     await submit.dblclick();
@@ -242,6 +289,9 @@ test.describe("RSVP piloto — Chromium", () => {
     );
     await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
       "1 de 3 lugares",
+    );
+    await expect(page.getByTestId("rsvp-party-breakdown")).toHaveText(
+      "1 adulto",
     );
     await expect(page.getByTestId("rsvp-see-you")).toHaveText(
       "Nos vemos el 16 de octubre",

@@ -62,6 +62,16 @@ export default async function AdminDashboardPage() {
           label="Lugares confirmados"
           value={String(stats.confirmedSeats)}
         />
+        <Row
+          testId="stat-confirmed-adults"
+          label="Adultos"
+          value={String(stats.confirmedAdults)}
+        />
+        <Row
+          testId="stat-confirmed-children"
+          label="Niños"
+          value={String(stats.confirmedChildren)}
+        />
       </dl>
 
       <div className="mt-12 flex flex-col gap-3 sm:flex-row">

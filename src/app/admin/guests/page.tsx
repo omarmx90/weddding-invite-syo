@@ -96,7 +96,7 @@ export default async function AdminGuestsPage({
               </div>
               <p className="mt-2 font-sans text-[0.875rem] text-ink-muted">
                 {guest.status === "confirmed"
-                  ? `${guest.confirmedSeats} de ${guest.maxSeats} confirmados`
+                  ? `${guest.confirmedSeats} de ${guest.maxSeats} confirmados · ${guest.adultCount} ${guest.adultCount === 1 ? "adulto" : "adultos"} · ${guest.childCount} ${guest.childCount === 1 ? "niño" : "niños"}`
                   : guest.status === "declined"
                     ? "No asistirán"
                     : "Sin respuesta"}

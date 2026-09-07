@@ -41,18 +41,27 @@ export type AdminGuestStore = {
 
 export function computeStats(guests: GuestListItem[]): DashboardStats {
   const enabled = guests.filter((guest) => guest.enabled);
+  const confirmed = enabled.filter((guest) => guest.status === "confirmed");
   return {
     totalFamilies: enabled.length,
     totalReservedSeats: enabled.reduce((sum, guest) => sum + guest.maxSeats, 0),
-    confirmedFamilies: enabled.filter((guest) => guest.status === "confirmed")
-      .length,
+    confirmedFamilies: confirmed.length,
     declinedFamilies: enabled.filter((guest) => guest.status === "declined")
       .length,
     pendingFamilies: enabled.filter((guest) => guest.status === "pending")
       .length,
-    confirmedSeats: enabled
-      .filter((guest) => guest.status === "confirmed")
-      .reduce((sum, guest) => sum + guest.confirmedSeats, 0),
+    confirmedSeats: confirmed.reduce(
+      (sum, guest) => sum + guest.confirmedSeats,
+      0,
+    ),
+    confirmedAdults: confirmed.reduce(
+      (sum, guest) => sum + guest.adultCount,
+      0,
+    ),
+    confirmedChildren: confirmed.reduce(
+      (sum, guest) => sum + guest.childCount,
+      0,
+    ),
   };
 }
 

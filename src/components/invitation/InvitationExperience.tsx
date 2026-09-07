@@ -27,6 +27,8 @@ type RsvpContext = {
   existingRsvp?: {
     attending: boolean;
     confirmedSeats: number;
+    adultCount?: number | null;
+    childCount?: number | null;
   } | null;
   persistenceReady: boolean;
   deadlinePassed: boolean;
@@ -129,6 +131,7 @@ export function InvitationExperience({
               event={content.event.reception}
               tone={guest ? "canvas" : "surface"}
               detail={content.media.receptionDetail}
+              hospitality={content.receptionHospitality}
             />
             <DayScheduleSection
               schedule={content.schedule}

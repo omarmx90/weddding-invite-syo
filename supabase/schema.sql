@@ -26,12 +26,20 @@ create table if not exists public.rsvps (
   invitation_id uuid not null unique references public.invitations (id) on delete cascade,
   attending boolean not null,
   confirmed_seats integer not null check (confirmed_seats >= 0),
+  -- Desglose opcional (nullable = RSVP legado / sin breakdown)
+  adult_count integer check (adult_count is null or adult_count >= 0),
+  child_count integer check (child_count is null or child_count >= 0),
   message text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint rsvps_attending_seats_chk check (
     (attending = false and confirmed_seats = 0)
     or (attending = true and confirmed_seats >= 1)
+  ),
+  constraint rsvps_seat_breakdown_chk check (
+    adult_count is null
+    or child_count is null
+    or confirmed_seats = adult_count + child_count
   )
 );
 

@@ -44,6 +44,15 @@ export type EventLocation = {
   mapsUrl: string;
 };
 
+/** Notas cálidas de la celebración íntima (comida, niños, bebidas). */
+export type ReceptionHospitalityContent = {
+  lead: string;
+  food: string;
+  childrenTitle: string;
+  childrenBody: string;
+  drinksNote: string;
+};
+
 /**
  * Ítems del itinerario del día.
  * Solo incluir entradas con información confirmada.
@@ -271,6 +280,8 @@ export type WeddingContent = {
     ceremony: EventLocation;
     reception: EventLocation;
   };
+  /** Composición editorial bajo Celebración íntima */
+  receptionHospitality: ReceptionHospitalityContent;
   /** Estructura lista para el itinerario completo (sin inventar eventos). */
   schedule: DaySchedule;
   countdown: CountdownContent;

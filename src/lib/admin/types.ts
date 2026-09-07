@@ -8,6 +8,8 @@ export type GuestListItem = {
   enabled: boolean;
   status: GuestRsvpStatus;
   confirmedSeats: number;
+  adultCount: number;
+  childCount: number;
   updatedAt: string | null;
 };
 
@@ -23,6 +25,8 @@ export type DashboardStats = {
   declinedFamilies: number;
   pendingFamilies: number;
   confirmedSeats: number;
+  confirmedAdults: number;
+  confirmedChildren: number;
 };
 
 export type AdminAuditAction =

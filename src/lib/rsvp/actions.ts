@@ -67,8 +67,10 @@ export async function submitRsvp(
 
     const validation = validateRsvpInput({
       attending: Boolean(payload.attending),
-      confirmedSeats: payload.confirmedSeats,
       maxSeats: invitation.maxSeats,
+      adultCount: payload.adultCount,
+      childCount: payload.childCount,
+      confirmedSeats: payload.confirmedSeats,
     });
 
     if (!validation.ok) {
@@ -88,6 +90,8 @@ export async function submitRsvp(
       invitationId: invitation.id,
       attending: Boolean(payload.attending),
       confirmedSeats: validation.confirmedSeats,
+      adultCount: validation.adultCount,
+      childCount: validation.childCount,
       message,
     });
 
@@ -96,6 +100,8 @@ export async function submitRsvp(
       rsvp: {
         attending: rsvp.attending,
         confirmedSeats: rsvp.confirmedSeats,
+        adultCount: rsvp.adultCount ?? validation.adultCount,
+        childCount: rsvp.childCount ?? validation.childCount,
         updatedAt: rsvp.updatedAt,
       },
     };

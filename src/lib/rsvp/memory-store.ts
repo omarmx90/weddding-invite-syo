@@ -137,6 +137,9 @@ function toListItem(
   invitation: InvitationRecord,
   rsvp: RsvpRecord | undefined,
 ): GuestListItem {
+  const attending = Boolean(rsvp?.attending);
+  const adultCount = attending ? (rsvp?.adultCount ?? rsvp?.confirmedSeats ?? 0) : 0;
+  const childCount = attending ? (rsvp?.childCount ?? 0) : 0;
   return {
     id: invitation.id,
     slug: invitation.slug,
@@ -144,7 +147,9 @@ function toListItem(
     maxSeats: invitation.maxSeats,
     enabled: invitation.enabled,
     status: statusFromRsvp(rsvp ?? null),
-    confirmedSeats: rsvp?.attending ? rsvp.confirmedSeats : 0,
+    confirmedSeats: attending ? (rsvp?.confirmedSeats ?? 0) : 0,
+    adultCount: attending ? adultCount : 0,
+    childCount: attending ? childCount : 0,
     updatedAt: rsvp?.updatedAt ?? null,
   };
 }
@@ -193,6 +198,8 @@ export function createMemoryRsvpStore(): RsvpStore {
         invitationId: input.invitationId,
         attending: input.attending,
         confirmedSeats: input.confirmedSeats,
+        adultCount: input.adultCount,
+        childCount: input.childCount,
         message: input.message ?? null,
         createdAt: existing?.createdAt ?? now,
         updatedAt: now,

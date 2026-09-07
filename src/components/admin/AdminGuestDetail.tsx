@@ -65,12 +65,23 @@ export function AdminGuestDetail({ guest }: { guest: GuestDetail }) {
           <dd data-testid="admin-detail-status">{statusLabel(current.status)}</dd>
         </div>
         {current.status === "confirmed" ? (
-          <div className="flex justify-between gap-4">
-            <dt className="text-ink-muted">Confirmados</dt>
-            <dd data-testid="admin-detail-seats">
-              {current.confirmedSeats} de {current.maxSeats}
-            </dd>
-          </div>
+          <>
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-muted">Confirmados</dt>
+              <dd data-testid="admin-detail-seats">
+                {current.confirmedSeats} de {current.maxSeats}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-muted">Desglose</dt>
+              <dd data-testid="admin-detail-breakdown">
+                {current.adultCount}{" "}
+                {current.adultCount === 1 ? "adulto" : "adultos"} ·{" "}
+                {current.childCount}{" "}
+                {current.childCount === 1 ? "niño" : "niños"}
+              </dd>
+            </div>
+          </>
         ) : null}
         {current.message ? (
           <div>

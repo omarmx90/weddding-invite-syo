@@ -1,9 +1,14 @@
 import Image from "next/image";
-import type { EventLocation, WeddingMediaAsset } from "@/content/types";
+import type {
+  EventLocation,
+  ReceptionHospitalityContent,
+  WeddingMediaAsset,
+} from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
 import {
   BotanicalSprig,
   LatinCross,
+  OrnamentalDivider,
 } from "@/components/invitation/ornaments";
 
 type EventSectionProps = {
@@ -12,6 +17,8 @@ type EventSectionProps = {
   tone?: "canvas" | "surface";
   /** Foto editorial debajo del CTA Cómo llegar */
   detail?: WeddingMediaAsset;
+  /** Notas editoriales de la celebración (solo recepción) */
+  hospitality?: ReceptionHospitalityContent;
 };
 
 function DetailRow({ label, value }: { label: string; value: string }) {
@@ -27,11 +34,73 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+function ReceptionHospitality({
+  hospitality,
+}: {
+  hospitality: ReceptionHospitalityContent;
+}) {
+  return (
+    <div
+      className="mx-auto mt-12 w-full max-w-[22rem] text-center md:mt-14"
+      data-testid="reception-hospitality"
+    >
+      <OrnamentalDivider className="text-taupe/65" motif="sprig" />
+
+      <p
+        className="mt-9 font-sans text-[1.0625rem] leading-[1.75] text-ink-muted text-pretty"
+        data-testid="reception-hospitality-lead"
+      >
+        {hospitality.lead}
+      </p>
+
+      <p
+        className="mt-5 font-sans text-[1.0625rem] leading-[1.75] text-ink-muted text-pretty"
+        data-testid="reception-hospitality-food"
+      >
+        {hospitality.food}
+      </p>
+
+      <div
+        className="mx-auto mt-10 flex w-full max-w-[12rem] items-center gap-3"
+        aria-hidden="true"
+      >
+        <span className="h-px flex-1 bg-sand" />
+        <span className="size-1 rounded-full bg-taupe/65" />
+        <span className="h-px flex-1 bg-sand" />
+      </div>
+
+      <BotanicalSprig className="mx-auto mt-10 h-4 w-14 text-taupe/50" />
+
+      <p
+        className="mt-6 font-sans text-[0.6875rem] font-medium uppercase tracking-[0.3em] text-ink-subtle"
+        data-testid="reception-children-title"
+      >
+        {hospitality.childrenTitle}
+      </p>
+
+      <p
+        className="mt-4 font-sans text-[1.0625rem] leading-[1.75] text-ink-muted text-pretty"
+        data-testid="reception-children-body"
+      >
+        {hospitality.childrenBody}
+      </p>
+
+      <p
+        className="mt-10 font-sans text-[0.9375rem] leading-[1.7] text-ink-subtle text-pretty"
+        data-testid="reception-drinks-note"
+      >
+        {hospitality.drinksNote}
+      </p>
+    </div>
+  );
+}
+
 export function EventSection({
   event,
   sectionId,
   tone = "canvas",
   detail,
+  hospitality,
 }: EventSectionProps) {
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
   const hasMaps = Boolean(event.mapsUrl.trim());
@@ -68,7 +137,7 @@ export function EventSection({
           {event.title}
         </h2>
 
-        {event.body ? (
+        {event.body && !hospitality ? (
           <p className="mx-auto mt-6 max-w-[22rem] font-sans text-[1.0625rem] leading-[1.7] text-ink-muted text-pretty">
             {event.body}
           </p>
@@ -89,7 +158,9 @@ export function EventSection({
               <time dateTime={event.timeDateTime}>{event.time}</time>
             </p>
           </div>
-        ) : (
+        ) : null}
+
+        {!hasEditorialDate ? (
           <div className="mt-10 flex flex-col items-center gap-2">
             <p className="font-sans text-[0.6875rem] font-medium uppercase tracking-[0.28em] text-ink-subtle">
               {event.timeLabel}
@@ -101,7 +172,7 @@ export function EventSection({
               <time dateTime={event.timeDateTime}>{event.time}</time>
             </p>
           </div>
-        )}
+        ) : null}
 
         <dl className="mt-12 flex flex-col gap-9 text-center">
           <DetailRow label={event.venueLabel} value={event.venue} />
@@ -124,6 +195,8 @@ export function EventSection({
             </a>
           </div>
         ) : null}
+
+        {hospitality ? <ReceptionHospitality hospitality={hospitality} /> : null}
       </Reveal>
 
       {detail ? (

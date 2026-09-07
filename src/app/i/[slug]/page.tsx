@@ -97,6 +97,8 @@ export default async function PersonalizedInvitationPage({
           ? {
               attending: rsvp.attending,
               confirmedSeats: rsvp.confirmedSeats,
+              adultCount: rsvp.adultCount,
+              childCount: rsvp.childCount,
             }
           : null,
         persistenceReady: isRsvpPersistenceReady(),

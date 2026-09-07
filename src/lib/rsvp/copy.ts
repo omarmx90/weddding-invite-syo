@@ -7,14 +7,21 @@ export const rsvpCopy = {
   question: "¿Nos acompañan?",
   yes: "Sí, ahí estaremos",
   no: "No podremos acompañarlos",
-  // Más natural y breve en mobile que "¿Cuántos nos acompañarán?"
-  seatsQuestion: "¿Cuántos asistirán?",
+  seatsQuestion: "¿Quiénes nos acompañarán?",
+  adultsLabel: "Adultos",
+  childrenLabel: "Niños",
+  addAdult: "Agregar adulto",
+  removeAdult: "Quitar adulto",
+  addChild: "Agregar niño",
+  removeChild: "Quitar niño",
   submit: "Enviar confirmación",
   update: "Actualizar confirmación",
   confirmedTitle: "Asistencia confirmada",
   declinedTitle: "Confirmación registrada",
   seatsSummary: (confirmed: number, max: number) =>
     `${confirmed} de ${max} ${max === 1 ? "lugar" : "lugares"}`,
+  seatsSummaryLive: (confirmed: number, max: number) =>
+    `${confirmed} de ${max} ${max === 1 ? "lugar confirmado" : "lugares confirmados"}`,
   successYes:
     "Gracias por confirmar. Nos dará mucha alegría compartir este día con ustedes.",
   successNo:

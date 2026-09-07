@@ -12,7 +12,11 @@ export type RsvpRecord = {
   id: string;
   invitationId: string;
   attending: boolean;
+  /** Total de asistentes — fuente canónica de capacidad */
   confirmedSeats: number;
+  /** Desglose; null = RSVP legado sin breakdown */
+  adultCount: number | null;
+  childCount: number | null;
   message: string | null;
   createdAt: string;
   updatedAt: string;
@@ -22,6 +26,8 @@ export type UpsertRsvpInput = {
   invitationId: string;
   attending: boolean;
   confirmedSeats: number;
+  adultCount: number;
+  childCount: number;
   message?: string | null;
 };
 
@@ -37,7 +43,13 @@ export type RsvpSubmitPayload = {
   slug: string;
   accessToken: string;
   attending: boolean;
-  confirmedSeats: number;
+  adultCount?: number;
+  childCount?: number;
+  /**
+   * Compatibilidad: si no vienen adult/child, el total se interpreta
+   * como adultos (RSVP legado / clientes antiguos).
+   */
+  confirmedSeats?: number;
   message?: string;
 };
 
@@ -55,6 +67,8 @@ export type RsvpActionResult =
       rsvp: {
         attending: boolean;
         confirmedSeats: number;
+        adultCount: number;
+        childCount: number;
         updatedAt: string;
       };
     }

@@ -15,6 +15,7 @@ import type {
   GuestListItem,
   UpdateInvitationInput,
 } from "@/lib/admin/types";
+import { resolveSeatBreakdown } from "@/lib/rsvp/seats";
 import { generateInviteToken, hashInviteToken } from "@/lib/rsvp/token";
 import { createServiceSupabaseClient } from "@/lib/supabase/server";
 
@@ -31,6 +32,8 @@ type RsvpRow = {
   invitation_id: string;
   attending: boolean;
   confirmed_seats: number;
+  adult_count: number | null;
+  child_count: number | null;
   message: string | null;
   created_at: string;
   updated_at: string;
@@ -42,6 +45,15 @@ function toListItem(invitation: InvitationRow, rsvp?: RsvpRow | null): GuestList
       ? { attending: rsvp.attending, confirmedSeats: rsvp.confirmed_seats }
       : null,
   );
+  const breakdown = rsvp
+    ? resolveSeatBreakdown({
+        attending: rsvp.attending,
+        confirmedSeats: rsvp.confirmed_seats,
+        adultCount: rsvp.adult_count,
+        childCount: rsvp.child_count,
+      })
+    : { adultCount: 0, childCount: 0, confirmedSeats: 0 };
+
   return {
     id: invitation.id,
     slug: invitation.slug,
@@ -50,6 +62,8 @@ function toListItem(invitation: InvitationRow, rsvp?: RsvpRow | null): GuestList
     enabled: invitation.enabled,
     status,
     confirmedSeats: rsvp?.attending ? rsvp.confirmed_seats : 0,
+    adultCount: rsvp?.attending ? breakdown.adultCount : 0,
+    childCount: rsvp?.attending ? breakdown.childCount : 0,
     updatedAt: rsvp?.updated_at ?? null,
   };
 }
@@ -69,7 +83,7 @@ export function createSupabaseAdminGuestStore(): AdminGuestStore {
     const { data, error } = await supabase
       .from("rsvps")
       .select(
-        "invitation_id, attending, confirmed_seats, message, created_at, updated_at",
+        "invitation_id, attending, confirmed_seats, adult_count, child_count, message, created_at, updated_at",
       );
     if (error) {
       throw new Error("No se pudieron leer las confirmaciones.");
@@ -109,7 +123,7 @@ export function createSupabaseAdminGuestStore(): AdminGuestStore {
       const { data: rsvp } = await supabase
         .from("rsvps")
         .select(
-          "invitation_id, attending, confirmed_seats, message, created_at, updated_at",
+          "invitation_id, attending, confirmed_seats, adult_count, child_count, message, created_at, updated_at",
         )
         .eq("invitation_id", invitationId)
         .maybeSingle();

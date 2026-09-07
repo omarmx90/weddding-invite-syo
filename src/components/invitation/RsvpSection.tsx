@@ -5,11 +5,14 @@ import { motion, useReducedMotion } from "motion/react";
 import { wedding } from "@/content/wedding";
 import { submitRsvp } from "@/lib/rsvp/actions";
 import { formatRsvpDeadlineCopy, rsvpCopy } from "@/lib/rsvp/copy";
+import { formatPartyBreakdown, resolveSeatBreakdown } from "@/lib/rsvp/seats";
 import { Reveal } from "@/components/invitation/Reveal";
 
 type ExistingRsvp = {
   attending: boolean;
   confirmedSeats: number;
+  adultCount?: number | null;
+  childCount?: number | null;
 };
 
 type RsvpSectionProps = {
@@ -24,6 +27,22 @@ type RsvpSectionProps = {
 };
 
 type AttendChoice = "yes" | "no" | null;
+
+function initialBreakdown(existing: ExistingRsvp | null | undefined, maxSeats: number) {
+  if (existing?.attending) {
+    return resolveSeatBreakdown({
+      attending: true,
+      confirmedSeats: existing.confirmedSeats,
+      adultCount: existing.adultCount,
+      childCount: existing.childCount,
+    });
+  }
+  return {
+    adultCount: Math.min(maxSeats, 1),
+    childCount: 0,
+    confirmedSeats: Math.min(maxSeats, 1),
+  };
+}
 
 /**
  * Confirmación de asistencia — editorial, mobile-first, sin look SaaS.
@@ -45,26 +64,35 @@ export function RsvpSection({
   const [attend, setAttend] = useState<AttendChoice>(
     existingRsvp ? (existingRsvp.attending ? "yes" : "no") : null,
   );
-  const [seats, setSeats] = useState<number>(
-    existingRsvp?.attending
-      ? existingRsvp.confirmedSeats
-      : Math.min(maxSeats, Math.max(1, existingRsvp?.confirmedSeats ?? 1)),
-  );
+  const initial = initialBreakdown(existingRsvp, maxSeats);
+  const [adultCount, setAdultCount] = useState(initial.adultCount);
+  const [childCount, setChildCount] = useState(initial.childCount);
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState<ExistingRsvp | null>(existingRsvp);
   const [successFlash, setSuccessFlash] = useState<string | null>(null);
 
-  const seatOptions = useMemo(
-    () => Array.from({ length: maxSeats }, (_, index) => index + 1),
-    [maxSeats],
-  );
+  const totalSelected = adultCount + childCount;
+  const remaining = maxSeats - totalSelected;
 
   const ceremonyMapsUrl = wedding.event.ceremony.mapsUrl.trim();
   const celebrationMapsUrl = wedding.event.reception.mapsUrl.trim();
 
   const showForm =
     Boolean(accessToken) && persistenceReady && !deadlinePassed && editing;
+
+  const savedBreakdown = useMemo(
+    () =>
+      saved
+        ? resolveSeatBreakdown({
+            attending: saved.attending,
+            confirmedSeats: saved.confirmedSeats,
+            adultCount: saved.adultCount,
+            childCount: saved.childCount,
+          })
+        : null,
+    [saved],
+  );
 
   function onSubmit() {
     if (isPending) return;
@@ -86,7 +114,8 @@ export function RsvpSection({
         slug,
         accessToken,
         attending: attend === "yes",
-        confirmedSeats: attend === "yes" ? seats : 0,
+        adultCount: attend === "yes" ? adultCount : 0,
+        childCount: attend === "yes" ? childCount : 0,
         message: message.trim() || undefined,
       });
 
@@ -98,6 +127,8 @@ export function RsvpSection({
       setSaved({
         attending: result.rsvp.attending,
         confirmedSeats: result.rsvp.confirmedSeats,
+        adultCount: result.rsvp.adultCount,
+        childCount: result.rsvp.childCount,
       });
       setSuccessFlash(
         result.rsvp.attending ? rsvpCopy.successYes : rsvpCopy.successNo,
@@ -184,21 +215,20 @@ export function RsvpSection({
         !editing ? (
           <ConfirmedState
             saved={saved}
+            breakdown={savedBreakdown}
             maxSeats={maxSeats}
             successFlash={successFlash}
             ceremonyMapsUrl={ceremonyMapsUrl}
             celebrationMapsUrl={celebrationMapsUrl}
             reduceMotion={Boolean(reduceMotion)}
             onEdit={() => {
+              const next = initialBreakdown(saved, maxSeats);
               setEditing(true);
               setSuccessFlash(null);
               setError(null);
               setAttend(saved.attending ? "yes" : "no");
-              setSeats(
-                saved.attending
-                  ? saved.confirmedSeats
-                  : Math.min(maxSeats, 1),
-              );
+              setAdultCount(next.adultCount);
+              setChildCount(next.childCount);
             }}
           />
         ) : null}
@@ -244,36 +274,51 @@ export function RsvpSection({
                 <p className="font-display text-[clamp(1.05rem,4vw,1.22rem)] leading-snug text-ink text-balance">
                   {rsvpCopy.seatsQuestion}
                 </p>
-                <div
-                  className={`mt-3.5 gap-2.5 ${
-                    maxSeats <= 2 ? "grid grid-cols-2" : "grid grid-cols-3"
-                  }`}
-                  role="group"
-                  aria-label={rsvpCopy.seatsQuestion}
-                >
-                  {seatOptions.map((value) => {
-                    const selected = seats === value;
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        data-testid={`rsvp-seat-${value}`}
-                        aria-pressed={selected}
-                        onClick={() => {
-                          setSeats(value);
-                          setError(null);
-                        }}
-                        className={`inline-flex min-h-11 items-center justify-center border font-display text-[1.28rem] tracking-[-0.02em] transition-[border-color,background-color,color,transform] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe active:scale-[0.98] ${
-                          selected
-                            ? "border-ink/85 bg-beige/70 text-ink"
-                            : "border-taupe/50 bg-transparent text-ink-muted hover:border-taupe hover:bg-beige/40 hover:text-ink"
-                        }`}
-                      >
-                        {value}
-                      </button>
-                    );
-                  })}
+
+                <div className="mt-5 flex flex-col gap-4">
+                  <SeatStepper
+                    label={rsvpCopy.adultsLabel}
+                    value={adultCount}
+                    testIdPrefix="rsvp-adults"
+                    addLabel={rsvpCopy.addAdult}
+                    removeLabel={rsvpCopy.removeAdult}
+                    canIncrement={remaining > 0}
+                    canDecrement={adultCount > 0}
+                    onIncrement={() => {
+                      setAdultCount((value) => value + 1);
+                      setError(null);
+                    }}
+                    onDecrement={() => {
+                      setAdultCount((value) => Math.max(0, value - 1));
+                      setError(null);
+                    }}
+                  />
+                  <SeatStepper
+                    label={rsvpCopy.childrenLabel}
+                    value={childCount}
+                    testIdPrefix="rsvp-children"
+                    addLabel={rsvpCopy.addChild}
+                    removeLabel={rsvpCopy.removeChild}
+                    canIncrement={remaining > 0}
+                    canDecrement={childCount > 0}
+                    onIncrement={() => {
+                      setChildCount((value) => value + 1);
+                      setError(null);
+                    }}
+                    onDecrement={() => {
+                      setChildCount((value) => Math.max(0, value - 1));
+                      setError(null);
+                    }}
+                  />
                 </div>
+
+                <p
+                  className="mt-5 font-sans text-[0.8125rem] font-medium tracking-[0.06em] text-ink-subtle"
+                  data-testid="rsvp-capacity-summary"
+                  aria-live="polite"
+                >
+                  {rsvpCopy.seatsSummaryLive(totalSelected, maxSeats)}
+                </p>
               </div>
             ) : null}
 
@@ -321,8 +366,75 @@ export function RsvpSection({
   );
 }
 
+function SeatStepper({
+  label,
+  value,
+  testIdPrefix,
+  addLabel,
+  removeLabel,
+  canIncrement,
+  canDecrement,
+  onIncrement,
+  onDecrement,
+}: {
+  label: string;
+  value: number;
+  testIdPrefix: string;
+  addLabel: string;
+  removeLabel: string;
+  canIncrement: boolean;
+  canDecrement: boolean;
+  onIncrement: () => void;
+  onDecrement: () => void;
+}) {
+  return (
+    <div
+      className="grid grid-cols-[1fr_auto] items-center gap-3"
+      data-testid={testIdPrefix}
+    >
+      <p className="text-left font-sans text-[0.8125rem] font-medium uppercase tracking-[0.22em] text-ink">
+        {label}
+      </p>
+      <div
+        className="inline-flex items-center gap-1"
+        role="group"
+        aria-label={label}
+      >
+        <button
+          type="button"
+          data-testid={`${testIdPrefix}-dec`}
+          aria-label={removeLabel}
+          disabled={!canDecrement}
+          onClick={onDecrement}
+          className="inline-flex size-11 items-center justify-center border border-taupe/55 bg-transparent font-display text-[1.25rem] leading-none text-ink transition-[border-color,background-color,opacity] hover:border-taupe hover:bg-beige/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe disabled:cursor-not-allowed disabled:opacity-35"
+        >
+          −
+        </button>
+        <span
+          className="inline-flex min-w-10 items-center justify-center font-display text-[1.35rem] tracking-[-0.02em] text-ink"
+          data-testid={`${testIdPrefix}-value`}
+          aria-live="polite"
+        >
+          {value}
+        </span>
+        <button
+          type="button"
+          data-testid={`${testIdPrefix}-inc`}
+          aria-label={addLabel}
+          disabled={!canIncrement}
+          onClick={onIncrement}
+          className="inline-flex size-11 items-center justify-center border border-taupe/55 bg-transparent font-display text-[1.25rem] leading-none text-ink transition-[border-color,background-color,opacity] hover:border-taupe hover:bg-beige/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-taupe disabled:cursor-not-allowed disabled:opacity-35"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ConfirmedState({
   saved,
+  breakdown,
   maxSeats,
   successFlash,
   ceremonyMapsUrl,
@@ -331,6 +443,7 @@ function ConfirmedState({
   onEdit,
 }: {
   saved: ExistingRsvp;
+  breakdown: { adultCount: number; childCount: number } | null;
   maxSeats: number;
   successFlash: string | null;
   ceremonyMapsUrl: string;
@@ -338,6 +451,11 @@ function ConfirmedState({
   reduceMotion: boolean;
   onEdit: () => void;
 }) {
+  const partyLine =
+    saved.attending && breakdown
+      ? formatPartyBreakdown(breakdown.adultCount, breakdown.childCount)
+      : null;
+
   return (
     <motion.div
       className="mx-auto mt-6 max-w-[22rem]"
@@ -368,12 +486,22 @@ function ConfirmedState({
         </p>
 
         {saved.attending ? (
-          <p
-            className="mt-3 font-display text-[clamp(1.45rem,5.8vw,1.8rem)] tracking-[-0.02em] text-ink"
-            data-testid="rsvp-seats-summary"
-          >
-            {rsvpCopy.seatsSummary(saved.confirmedSeats, maxSeats)}
-          </p>
+          <>
+            <p
+              className="mt-3 font-display text-[clamp(1.45rem,5.8vw,1.8rem)] tracking-[-0.02em] text-ink"
+              data-testid="rsvp-seats-summary"
+            >
+              {rsvpCopy.seatsSummary(saved.confirmedSeats, maxSeats)}
+            </p>
+            {partyLine ? (
+              <p
+                className="mt-2 font-sans text-[0.875rem] tracking-[0.04em] text-ink-subtle"
+                data-testid="rsvp-party-breakdown"
+              >
+                {partyLine}
+              </p>
+            ) : null}
+          </>
         ) : (
           <p className="mt-3 font-sans text-[1.0625rem] leading-relaxed text-ink-muted">
             {rsvpCopy.declinedSummary}

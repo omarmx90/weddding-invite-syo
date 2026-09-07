@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { setPartyCounts } from "./rsvp-helpers";
 import { createHash } from "node:crypto";
 import { execSync } from "node:child_process";
 import { slugifyFamilyName } from "../src/lib/admin/slug";
@@ -119,7 +120,7 @@ test.describe("Admin guest manager — Chromium", () => {
     );
     await page.getByTestId("hero-cta").click();
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-2").click();
+    await setPartyCounts(page, 2, 0);
     await page.getByTestId("rsvp-submit").click();
     await expect(page.getByTestId("rsvp-confirmed")).toBeVisible();
 
@@ -128,6 +129,10 @@ test.describe("Admin guest manager — Chromium", () => {
       "1",
     );
     await expect(page.getByTestId("stat-confirmed-seats")).toContainText("2");
+    await expect(page.getByTestId("stat-confirmed-adults")).toContainText("2");
+    await expect(page.getByTestId("stat-confirmed-children")).toContainText(
+      "0",
+    );
     await expect(page.getByTestId("stat-pending-families")).toContainText("2");
 
     await page.goto("/admin/guests?status=confirmed");
@@ -152,7 +157,7 @@ test.describe("Admin guest manager — Chromium", () => {
     );
     await page.getByTestId("hero-cta").click();
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-3").click();
+    await setPartyCounts(page, 3, 0);
     await page.getByTestId("rsvp-submit").click();
     await expect(page.getByTestId("rsvp-confirmed")).toBeVisible();
 
@@ -185,10 +190,13 @@ test.describe("Admin guest manager — Chromium", () => {
     await page.goto(`/i/nava-munoz?t=${encodeURIComponent(oldToken)}`);
     await page.getByTestId("hero-cta").click();
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-2").click();
+    await setPartyCounts(page, 1, 1);
     await page.getByTestId("rsvp-submit").click();
     await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
       "2 de 3 lugares",
+    );
+    await expect(page.getByTestId("rsvp-party-breakdown")).toHaveText(
+      "1 adulto · 1 niño",
     );
 
     await page.goto("/admin/guests");
@@ -211,6 +219,9 @@ test.describe("Admin guest manager — Chromium", () => {
     await expect(page.getByTestId("rsvp-confirmed")).toBeVisible();
     await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
       "2 de 3 lugares",
+    );
+    await expect(page.getByTestId("rsvp-party-breakdown")).toHaveText(
+      "1 adulto · 1 niño",
     );
   });
 

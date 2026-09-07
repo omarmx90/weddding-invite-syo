@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test:unit": "node --experimental-strip-types --test src/lib/rsvp/validation.node-test.ts",
     "test:e2e": "playwright test --project=chromium",
     "test:e2e:ui": "playwright test --ui --project=chromium",
     "invites:generate": "node scripts/generate-invites.mjs",

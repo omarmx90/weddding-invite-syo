@@ -1,4 +1,5 @@
 import { createServiceSupabaseClient } from "@/lib/supabase/server";
+import { resolveSeatBreakdown } from "@/lib/rsvp/seats";
 import type {
   InvitationRecord,
   RsvpRecord,
@@ -20,6 +21,8 @@ type RsvpRow = {
   invitation_id: string;
   attending: boolean;
   confirmed_seats: number;
+  adult_count: number | null;
+  child_count: number | null;
   message: string | null;
   created_at: string;
   updated_at: string;
@@ -37,11 +40,20 @@ function mapInvitation(row: InvitationRow): InvitationRecord {
 }
 
 function mapRsvp(row: RsvpRow): RsvpRecord {
+  const breakdown = resolveSeatBreakdown({
+    attending: row.attending,
+    confirmedSeats: row.confirmed_seats,
+    adultCount: row.adult_count,
+    childCount: row.child_count,
+  });
+
   return {
     id: row.id,
     invitationId: row.invitation_id,
     attending: row.attending,
     confirmedSeats: row.confirmed_seats,
+    adultCount: row.attending ? breakdown.adultCount : 0,
+    childCount: row.attending ? breakdown.childCount : 0,
     message: row.message,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -50,6 +62,9 @@ function mapRsvp(row: RsvpRow): RsvpRecord {
 
 const INVITATION_COLUMNS =
   "id, slug, display_name, max_seats, access_token_hash, enabled";
+
+const RSVP_COLUMNS =
+  "id, invitation_id, attending, confirmed_seats, adult_count, child_count, message, created_at, updated_at";
 
 export function createSupabaseRsvpStore(): RsvpStore {
   const supabase = createServiceSupabaseClient();
@@ -89,9 +104,7 @@ export function createSupabaseRsvpStore(): RsvpStore {
     async getRsvpByInvitationId(invitationId: string) {
       const { data, error } = await supabase
         .from("rsvps")
-        .select(
-          "id, invitation_id, attending, confirmed_seats, message, created_at, updated_at",
-        )
+        .select(RSVP_COLUMNS)
         .eq("invitation_id", invitationId)
         .maybeSingle();
 
@@ -110,14 +123,14 @@ export function createSupabaseRsvpStore(): RsvpStore {
             invitation_id: input.invitationId,
             attending: input.attending,
             confirmed_seats: input.confirmedSeats,
+            adult_count: input.adultCount,
+            child_count: input.childCount,
             message: input.message ?? null,
             updated_at: new Date().toISOString(),
           },
           { onConflict: "invitation_id" },
         )
-        .select(
-          "id, invitation_id, attending, confirmed_seats, message, created_at, updated_at",
-        )
+        .select(RSVP_COLUMNS)
         .single();
 
       if (error || !data) {

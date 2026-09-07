@@ -136,11 +136,19 @@ export const wedding: WeddingContent = {
       addressLabel: "Dirección",
       address:
         "Carretera México–San Luis Potosí, Km. 8.5, Jurica, 76100 Santiago de Querétaro, Qro.",
-      body: "Después de la ceremonia queremos compartir una comida especial con ustedes.",
       ctaLabel: "Cómo llegar",
       // Sin URL confirmada: no inventar Maps; la UI no muestra CTA.
       mapsUrl: "",
     },
+  },
+  receptionHospitality: {
+    lead: "Después de la ceremonia queremos compartir con ustedes un momento sencillo y muy nuestro: convivir, platicar y celebrar alrededor de la mesa.",
+    food: "Tendremos antojitos mexicanos y platillos para compartir, acompañados de bebidas sin alcohol.",
+    childrenTitle: "Los pequeños también son bienvenidos",
+    childrenBody:
+      "Esta es una celebración para compartir en familia, así que los niños son más que bienvenidos. También tendremos opciones especialmente pensadas para ellos.",
+    drinksNote:
+      "Durante nuestra celebración ofreceremos bebidas sin alcohol. Si deseas alguna bebida alcohólica, podrás solicitarla directamente al restaurante.",
   },
   schedule: {
     title: "Itinerario del día",

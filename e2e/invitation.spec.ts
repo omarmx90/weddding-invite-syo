@@ -128,6 +128,22 @@ test.describe("Invitación de boda — Chromium", () => {
       ),
     ).toBeVisible();
     await expect(page.getByTestId("reception-maps-cta")).toHaveCount(0);
+    await expect(page.getByTestId("reception-hospitality")).toBeVisible();
+    await expect(page.getByTestId("reception-hospitality-lead")).toContainText(
+      /momento sencillo y muy nuestro/i,
+    );
+    await expect(page.getByTestId("reception-hospitality-food")).toContainText(
+      /antojitos mexicanos/i,
+    );
+    await expect(page.getByTestId("reception-children-title")).toHaveText(
+      /Los pequeños también son bienvenidos/i,
+    );
+    await expect(page.getByTestId("reception-children-body")).toContainText(
+      /más que bienvenidos/i,
+    );
+    await expect(page.getByTestId("reception-drinks-note")).toContainText(
+      /bebidas sin alcohol/i,
+    );
   });
 
   test("la transición hacia la celebración es visible", async ({ page }) => {

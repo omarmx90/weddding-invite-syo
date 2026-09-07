@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { setPartyCounts } from "./rsvp-helpers";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -60,9 +61,9 @@ test.describe("RSVP visual polish 390×844", () => {
     // A) form initial
     await shot(page, "A-form-initial");
 
-    // B) Sí + 2 personas
+    // B) Sí + 1 adulto + 1 niño
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-2").click();
+    await setPartyCounts(page, 1, 1);
     await shot(page, "B-yes-two-seats");
 
     // C) No seleccionado
@@ -71,7 +72,7 @@ test.describe("RSVP visual polish 390×844", () => {
 
     // D) success 2/2
     await page.getByTestId("rsvp-attend-yes").click();
-    await page.getByTestId("rsvp-seat-2").click();
+    await setPartyCounts(page, 2, 0);
     await page.getByTestId("rsvp-submit").click();
     await expect(page.getByTestId("rsvp-confirmed")).toBeVisible();
     await expect(page.getByTestId("rsvp-seats-summary")).toHaveText(
