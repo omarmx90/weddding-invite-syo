@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import type { CinematicMomentContent } from "@/content/editorial-types";
 import { Reveal } from "@/components/invitation/Reveal";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type CinematicMomentProps = {
   moment: CinematicMomentContent;
@@ -67,6 +68,10 @@ export function CinematicMoment({ moment }: CinematicMomentProps) {
             </p>
           </Reveal>
         ) : null}
+      </div>
+
+      <div className="bg-canvas px-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))] pb-2">
+        <SectionEndMark className="mt-10 md:mt-12" />
       </div>
     </section>
   );

@@ -10,6 +10,7 @@ import {
   LatinCross,
   OrnamentalDivider,
 } from "@/components/invitation/ornaments";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type EventSectionProps = {
   event: EventLocation;
@@ -229,6 +230,8 @@ export function EventSection({
           </div>
         </figure>
       ) : null}
+
+      <SectionEndMark />
     </section>
   );
 }

@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import type { WeddingContent } from "@/content/types";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type IntroSectionProps = {
   content: WeddingContent;
@@ -42,6 +43,8 @@ export function IntroSection({ content }: IntroSectionProps) {
           <time dateTime={content.date.iso}>{content.date.display}</time>
         </p>
       </motion.div>
+
+      <SectionEndMark />
     </section>
   );
 }

@@ -4,6 +4,7 @@ import type { EditorialChapter } from "@/content/editorial-types";
 import { getFeaturedGalleryItems } from "@/content/wedding";
 import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type MomentsGallerySectionProps = {
   content: GalleryContent;
@@ -113,6 +114,8 @@ export function MomentsGallerySection({
           })}
         </ul>
       </div>
+
+      <SectionEndMark />
     </section>
   );
 }

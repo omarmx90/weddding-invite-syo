@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { WeddingMediaAsset } from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
 import { OrnamentalDivider } from "@/components/invitation/ornaments";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type NarrativeBridgeProps = {
   text: string;
@@ -56,6 +57,8 @@ export function NarrativeBridge({
           </div>
         </figure>
       ) : null}
+
+      <SectionEndMark />
     </section>
   );
 }

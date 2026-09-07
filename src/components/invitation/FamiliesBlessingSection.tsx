@@ -1,6 +1,7 @@
 import type { FamiliesBlessingContent } from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
 import { OrnamentalDivider } from "@/components/invitation/ornaments";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type FamiliesBlessingSectionProps = {
   content: FamiliesBlessingContent;
@@ -59,6 +60,8 @@ export function FamiliesBlessingSection({
           </div>
         </div>
       </Reveal>
+
+      <SectionEndMark />
     </section>
   );
 }

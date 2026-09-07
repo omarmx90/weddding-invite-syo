@@ -7,6 +7,7 @@ import {
   JudeMark,
   LatinCross,
 } from "@/components/invitation/ornaments";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type FaithSectionProps = {
   content: FaithContent;
@@ -122,6 +123,8 @@ export function FaithSection({
           ))}
         </div>
       ) : null}
+
+      <SectionEndMark />
     </section>
   );
 }

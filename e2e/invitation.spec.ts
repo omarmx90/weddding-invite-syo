@@ -66,6 +66,15 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(page.getByTestId("hero-opening")).toHaveCount(0);
   });
 
+  test("cada sección cierra con el separador S & O", async ({ page }) => {
+    await openInvitation(page);
+    const marks = page.getByTestId("section-end-mark");
+    // Ruta pública: countdown, intro, 3 cinematics, 2 eventos, puente,
+    // horario, fe, equipo, galería, vestimenta (sin familias ni RSVP).
+    await expect(marks).toHaveCount(13);
+    await expect(marks.first()).toContainText("S & O");
+  });
+
   test("la ceremonia muestra parroquia, dirección, fecha, hora y cómo llegar", async ({
     page,
   }) => {

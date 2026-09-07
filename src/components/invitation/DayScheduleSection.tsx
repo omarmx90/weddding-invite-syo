@@ -6,6 +6,7 @@ import type {
 } from "@/content/types";
 import { Reveal } from "@/components/invitation/Reveal";
 import { LatinCross } from "@/components/invitation/ornaments";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type DayScheduleSectionProps = {
   schedule: DaySchedule;
@@ -134,6 +135,8 @@ export function DayScheduleSection({
           </div>
         </figure>
       ) : null}
+
+      <SectionEndMark />
     </section>
   );
 }

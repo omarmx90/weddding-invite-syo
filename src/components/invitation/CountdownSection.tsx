@@ -12,6 +12,7 @@ import {
 import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
 import { SaveTheDate } from "@/components/invitation/SaveTheDate";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type CountdownSectionProps = {
   content: CountdownContent;
@@ -178,6 +179,8 @@ export function CountdownSection({
           </div>
         </figure>
       ) : null}
+
+      <SectionEndMark />
     </section>
   );
 }

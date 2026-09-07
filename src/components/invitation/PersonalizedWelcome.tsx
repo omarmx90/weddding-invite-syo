@@ -8,6 +8,7 @@ import {
   BotanicalSprig,
   OrnamentalDivider,
 } from "@/components/invitation/ornaments";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type PersonalizedWelcomeProps = {
   guest: GuestInvitation;
@@ -89,6 +90,8 @@ export function PersonalizedWelcome({
           {personalizationCopy.warmLine}
         </p>
       </Reveal>
+
+      <SectionEndMark />
     </section>
   );
 }

@@ -3,6 +3,7 @@ import type { EditorialChapter } from "@/content/editorial-types";
 import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
 import { BotanicalSprig } from "@/components/invitation/ornaments";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type DressGuidanceSectionProps = {
   content: DressGuidanceContent;
@@ -55,6 +56,8 @@ export function DressGuidanceSection({
           </p>
         </div>
       </Reveal>
+
+      <SectionEndMark />
     </section>
   );
 }

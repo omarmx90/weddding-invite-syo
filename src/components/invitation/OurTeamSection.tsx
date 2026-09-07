@@ -7,7 +7,7 @@ import type { EditorialChapter } from "@/content/editorial-types";
 import { Reveal } from "@/components/invitation/Reveal";
 import { ChapterMark } from "@/components/invitation/ChapterMark";
 import { FootballLightbox } from "@/components/invitation/FootballLightbox";
-import { OrnamentalDivider } from "@/components/invitation/ornaments";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type OurTeamSectionProps = {
   content: FamilyTeamContent;
@@ -168,8 +168,8 @@ export function OurTeamSection({
         </div>
       ) : null}
 
-      <div className="relative z-[1] mx-auto mt-16 max-w-[18rem] px-[max(1.25rem,env(safe-area-inset-left))]">
-        <OrnamentalDivider className="text-taupe/60" motif="monogram" />
+      <div className="relative z-[1]">
+        <SectionEndMark />
       </div>
 
       <FootballLightbox

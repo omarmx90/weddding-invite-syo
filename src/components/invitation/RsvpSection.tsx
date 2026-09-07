@@ -7,6 +7,7 @@ import { submitRsvp } from "@/lib/rsvp/actions";
 import { formatRsvpDeadlineCopy, rsvpCopy } from "@/lib/rsvp/copy";
 import { formatPartyBreakdown, resolveSeatBreakdown } from "@/lib/rsvp/seats";
 import { Reveal } from "@/components/invitation/Reveal";
+import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 
 type ExistingRsvp = {
   attending: boolean;
@@ -362,6 +363,8 @@ export function RsvpSection({
           </div>
         ) : null}
       </Reveal>
+
+      <SectionEndMark />
     </section>
   );
 }
