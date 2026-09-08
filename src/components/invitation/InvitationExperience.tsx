@@ -17,6 +17,7 @@ import { FaithSection } from "@/components/invitation/FaithSection";
 import { OurTeamSection } from "@/components/invitation/OurTeamSection";
 import { MomentsGallerySection } from "@/components/invitation/MomentsGallerySection";
 import { DressGuidanceSection } from "@/components/invitation/DressGuidanceSection";
+import { PresenceGiftSection } from "@/components/invitation/PresenceGiftSection";
 import { RsvpSection } from "@/components/invitation/RsvpSection";
 import { CinematicMoment } from "@/components/invitation/CinematicMoment";
 import { EditorialClosing } from "@/components/invitation/EditorialClosing";
@@ -166,6 +167,10 @@ export function InvitationExperience({
               tone={guest ? "surface" : "canvas"}
             />
             {cineClosing ? <CinematicMoment moment={cineClosing} /> : null}
+            <PresenceGiftSection
+              content={content.presenceGift}
+              tone={guest ? "canvas" : "surface"}
+            />
             {guest && rsvpContext ? (
               <RsvpSection
                 slug={guest.slug}

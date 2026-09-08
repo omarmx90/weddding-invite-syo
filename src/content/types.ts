@@ -207,6 +207,13 @@ export type DressGuidanceContent = {
   suggestion: string;
 };
 
+/** Mensaje editorial: presencia sobre regalos (sin mesa de regalos). */
+export type PresenceGiftContent = {
+  title: string;
+  /** Párrafos en orden editorial */
+  paragraphs: string[];
+};
+
 /**
  * RSVP — modelo preparado; UI activa solo cuando enabled === true
  * y exista implementación real (sin CTAs falsos).
@@ -292,6 +299,8 @@ export type WeddingContent = {
    */
   familiesBlessing: FamiliesBlessingContent;
   dress: DressGuidanceContent;
+  /** Presencia sobre regalos — pausa editorial antes del RSVP */
+  presenceGift: PresenceGiftContent;
   /** Confirmación futura — no renderizar CTA mientras enabled sea false */
   rsvp: RsvpContent;
   familyTeam: FamilyTeamContent;

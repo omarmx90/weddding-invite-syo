@@ -71,8 +71,8 @@ test.describe("Invitación de boda — Chromium", () => {
     await openInvitation(page);
     const marks = page.getByTestId("section-end-mark");
     // Ruta pública: countdown, intro, 3 cinematics, 2 eventos, puente,
-    // horario, fe, equipo, galería, vestimenta (sin familias ni RSVP).
-    await expect(marks).toHaveCount(13);
+    // horario, fe, equipo, galería, vestimenta, presencia (sin familias ni RSVP).
+    await expect(marks).toHaveCount(14);
     await expect(marks.first()).toContainText("S & O");
   });
 
@@ -339,7 +339,7 @@ test.describe("Invitación de boda — Chromium", () => {
       String(featured.length).padStart(2, "0"),
     );
 
-    const hint = page.getByTestId("gallery-rail-hint");
+    const hint = gallery.getByTestId("gallery-rail-hint");
     await expect(hint).toContainText(/Desliza para descubrir/i);
 
     // Next-photo peek: lead slide narrower than rail viewport
@@ -374,6 +374,7 @@ test.describe("Invitación de boda — Chromium", () => {
       .toBeGreaterThan(0);
 
     await rail.evaluate((el) => {
+      el.dispatchEvent(new Event("pointerdown", { bubbles: true }));
       el.scrollBy({ left: Math.min(280, el.clientWidth * 0.7) });
     });
     await expect
@@ -417,6 +418,7 @@ test.describe("Invitación de boda — Chromium", () => {
     );
 
     await rail.evaluate((el) => {
+      el.dispatchEvent(new Event("pointerdown", { bubbles: true }));
       el.scrollBy({ left: 240 });
     });
     await expect
@@ -668,6 +670,16 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(page.getByTestId("nuestro-equipo")).toBeVisible();
     await expect(page.getByTestId("nuestros-momentos")).toBeVisible();
     await expect(page.getByTestId("dress-section")).toBeVisible();
+    await expect(page.getByTestId("presence-gift-section")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Su presencia es nuestro regalo/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/No es necesario traer ningún regalo/i),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/Tenerlos con nosotros en este día/i),
+    ).toBeVisible();
   });
 
   test("la cuenta regresiva muestra días, horas y minutos sin segundos", async ({
@@ -811,7 +823,9 @@ test.describe("Invitación de boda — Chromium", () => {
     await page.getByTestId("nuestro-equipo").scrollIntoViewIfNeeded();
     await page.getByTestId("nuestros-momentos").scrollIntoViewIfNeeded();
     await page.getByTestId("dress-section").scrollIntoViewIfNeeded();
+    await page.getByTestId("presence-gift-section").scrollIntoViewIfNeeded();
     await page.getByTestId("countdown-section").scrollIntoViewIfNeeded();
+
 
     const rail = page.getByTestId("gallery-rail");
     const footballRail = page.getByTestId("football-gallery");

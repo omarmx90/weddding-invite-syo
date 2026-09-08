@@ -227,6 +227,13 @@ export const wedding: WeddingContent = {
     suggestionLabel: "Sugerencia de vestimenta",
     suggestion: "Elegante y cómodo",
   },
+  presenceGift: {
+    title: "Su presencia es nuestro regalo",
+    paragraphs: [
+      "Tenerlos con nosotros en este día significa mucho más de lo que podemos expresar.",
+      "No es necesario traer ningún regalo; nos hará muy felices simplemente celebrar juntos.",
+    ],
+  },
   /**
    * Confirmación de asistencia — fase futura.
    * enabled: false evita CTAs falsos. Deadline real: 10 de octubre de 2026.

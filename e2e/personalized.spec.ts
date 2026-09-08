@@ -59,7 +59,24 @@ test.describe("Invitaciones personalizadas — piloto", () => {
       "Familia Granados Montero",
     );
     await expect(page.getByTestId("personalized-seats")).toHaveText("2 lugares");
+    await expect(page.getByTestId("presence-gift-section")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Su presencia es nuestro regalo/i }),
+    ).toBeVisible();
     await expect(page.getByTestId("rsvp-section")).toBeVisible();
+
+    const order = await page.evaluate(() => {
+      const presence = document.querySelector(
+        "[data-testid='presence-gift-section']",
+      );
+      const rsvp = document.querySelector("[data-testid='rsvp-section']");
+      if (!presence || !rsvp) return null;
+      return Boolean(
+        presence.compareDocumentPosition(rsvp) & Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    });
+    expect(order).toBe(true);
+
     await expect(page.getByTestId("rsvp-deadline")).toContainText(
       "10 de octubre de 2026",
     );

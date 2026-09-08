@@ -42,6 +42,7 @@ export function GalleryRail({
   const [reducedMotion, setReducedMotion] = useState(false);
   const liveId = useId();
   const rafRef = useRef<number | null>(null);
+  const userEngagedRef = useRef(false);
 
   const atStart = activeIndex <= 0;
   const atEnd = activeIndex >= itemCount - 1;
@@ -88,24 +89,39 @@ export function GalleryRail({
     const rail = railRef.current;
     if (!rail) return;
 
+    const markEngaged = () => {
+      userEngagedRef.current = true;
+    };
+
     const onScroll = () => {
       if (rafRef.current != null) return;
       rafRef.current = window.requestAnimationFrame(() => {
         rafRef.current = null;
         resolveActiveIndex();
-        setInteracted(true);
+        if (userEngagedRef.current && rail.scrollLeft > 8) {
+          setInteracted(true);
+        }
       });
     };
 
+    rail.addEventListener("pointerdown", markEngaged, { passive: true });
+    rail.addEventListener("touchstart", markEngaged, { passive: true });
+    rail.addEventListener("wheel", markEngaged, { passive: true });
+    rail.addEventListener("keydown", markEngaged);
     rail.addEventListener("scroll", onScroll, { passive: true });
     resolveActiveIndex();
     return () => {
+      rail.removeEventListener("pointerdown", markEngaged);
+      rail.removeEventListener("touchstart", markEngaged);
+      rail.removeEventListener("wheel", markEngaged);
+      rail.removeEventListener("keydown", markEngaged);
       rail.removeEventListener("scroll", onScroll);
       if (rafRef.current != null) window.cancelAnimationFrame(rafRef.current);
     };
   }, [resolveActiveIndex]);
 
   const markInteracted = useCallback(() => {
+    userEngagedRef.current = true;
     setInteracted(true);
   }, []);
 
