@@ -112,7 +112,11 @@ export function InvitationExperience({
               wedding={content}
             />
             {guest ? (
-              <PersonalizedWelcome guest={guest} tone="surface" />
+              <PersonalizedWelcome
+                guest={guest}
+                tone="surface"
+                photo={content.media.personalizedWelcome}
+              />
             ) : null}
             <IntroSection content={content} />
             {cineFamily ? <CinematicMoment moment={cineFamily} /> : null}

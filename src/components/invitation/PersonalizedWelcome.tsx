@@ -1,4 +1,7 @@
+import Image from "next/image";
+import type { CSSProperties } from "react";
 import type { GuestInvitation } from "@/content/guest-types";
+import type { WeddingMediaAsset } from "@/content/types";
 import {
   formatReservedSeats,
   personalizationCopy,
@@ -13,6 +16,8 @@ import { SectionEndMark } from "@/components/invitation/SectionEndMark";
 type PersonalizedWelcomeProps = {
   guest: GuestInvitation;
   tone?: "canvas" | "surface";
+  /** Cierre editorial de la bienvenida (Previas -35). */
+  photo?: WeddingMediaAsset;
 };
 
 function splitFamilyName(displayName: string): { prefix: string; rest: string } {
@@ -25,12 +30,15 @@ function splitFamilyName(displayName: string): { prefix: string; rest: string } 
 
 /**
  * Pase personalizado — pieza tipográfica de papelería, no ticket.
+ * Copy → S&O → fotografía de cierre emocional.
  */
 export function PersonalizedWelcome({
   guest,
   tone = "surface",
+  photo,
 }: PersonalizedWelcomeProps) {
   const background = tone === "surface" ? "bg-surface" : "bg-canvas";
+  const fadeTone = tone === "surface" ? "var(--surface)" : "var(--canvas)";
   const seatsLabel = formatReservedSeats(guest.seats);
   const { prefix, rest } = splitFamilyName(guest.displayName);
 
@@ -91,7 +99,35 @@ export function PersonalizedWelcome({
         </p>
       </Reveal>
 
-      <SectionEndMark />
+      <SectionEndMark className="mt-12 md:mt-14" />
+
+      {photo ? (
+        <Reveal className="mx-auto mt-12 w-full max-w-[var(--content-max)] md:mt-14">
+          <figure
+            className="photo-edge-fade relative mx-auto w-full max-w-[min(100%,40rem)] overflow-hidden"
+            data-testid="personalized-welcome-photo"
+            style={
+              {
+                "--photo-fade-bg": fadeTone,
+              } as CSSProperties
+            }
+          >
+            <div className="relative aspect-[3/2] w-full">
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                fill
+                sizes="(max-width: 768px) 100vw, 640px"
+                className="object-cover"
+                style={{
+                  objectPosition: photo.objectPosition ?? "50% 42%",
+                }}
+                loading="lazy"
+              />
+            </div>
+          </figure>
+        </Reveal>
+      ) : null}
     </section>
   );
 }

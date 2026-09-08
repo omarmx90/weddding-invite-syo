@@ -574,3 +574,63 @@ body {
   opacity: 0.55;
 }
 
+/*
+ * Soft edge fade for editorial photos (center stays sharp).
+ * --photo-fade-bg must match the real section background token.
+ * Minimal local treatment until a shared EditorialPhotoFade lands.
+ */
+.photo-edge-fade::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(
+      to top,
+      var(--photo-fade-bg, var(--surface)) 0%,
+      transparent clamp(1.25rem, 11%, 2.75rem)
+    ),
+    linear-gradient(
+      to bottom,
+      var(--photo-fade-bg, var(--surface)) 0%,
+      transparent clamp(0.85rem, 7%, 1.75rem)
+    ),
+    linear-gradient(
+      to left,
+      var(--photo-fade-bg, var(--surface)) 0%,
+      transparent clamp(0.85rem, 8%, 2rem)
+    ),
+    linear-gradient(
+      to right,
+      var(--photo-fade-bg, var(--surface)) 0%,
+      transparent clamp(0.85rem, 8%, 2rem)
+    );
+}
+
+@media (min-width: 768px) {
+  .photo-edge-fade::after {
+    background:
+      linear-gradient(
+        to top,
+        var(--photo-fade-bg, var(--surface)) 0%,
+        transparent clamp(1.5rem, 12%, 3.25rem)
+      ),
+      linear-gradient(
+        to bottom,
+        var(--photo-fade-bg, var(--surface)) 0%,
+        transparent clamp(1rem, 8%, 2rem)
+      ),
+      linear-gradient(
+        to left,
+        var(--photo-fade-bg, var(--surface)) 0%,
+        transparent clamp(1rem, 9%, 2.25rem)
+      ),
+      linear-gradient(
+        to right,
+        var(--photo-fade-bg, var(--surface)) 0%,
+        transparent clamp(1rem, 9%, 2.25rem)
+      );
+  }
+}
+

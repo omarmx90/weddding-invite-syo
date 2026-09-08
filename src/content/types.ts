@@ -284,6 +284,8 @@ export type WeddingContent = {
     scheduleDetail?: WeddingMediaAsset;
     /** Par editorial en Con la bendición de Dios */
     faithDetails?: WeddingMediaAsset[];
+    /** Cierre fotográfico de la bienvenida personalizada (/i/[slug]) */
+    personalizedWelcome?: WeddingMediaAsset;
   };
   event: {
     ceremony: EventLocation;

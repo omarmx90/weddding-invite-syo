@@ -110,6 +110,14 @@ export const wedding: WeddingContent = {
         objectPosition: "58% 38%",
       },
     ],
+    personalizedWelcome: {
+      // Derivado de Previas -35.jpg; original intacto en gallery/originals.
+      src: "/images/gallery/features/feature-personalized-welcome.jpg",
+      alt: "Silvia y Omar de pie tomados de la mano, sonriéndose frente a un arco colonial",
+      width: 2000,
+      height: 1451,
+      objectPosition: "50% 42%",
+    },
   },
   event: {
     ceremony: {

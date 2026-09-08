@@ -59,6 +59,17 @@ test.describe("Invitaciones personalizadas — piloto", () => {
       "Familia Granados Montero",
     );
     await expect(page.getByTestId("personalized-seats")).toHaveText("2 lugares");
+    const welcomePhoto = page.getByTestId("personalized-welcome-photo");
+    await expect(welcomePhoto).toBeVisible();
+    await expect(welcomePhoto.locator("img")).toHaveAttribute(
+      "src",
+      /feature-personalized-welcome/,
+    );
+    await expect(welcomePhoto.locator("img")).toHaveAttribute(
+      "alt",
+      /Silvia y Omar/i,
+    );
+    await expect(welcomePhoto).toHaveClass(/photo-edge-fade/);
     await expect(page.getByTestId("presence-gift-section")).toBeVisible();
     await expect(
       page.getByRole("heading", { name: /Su presencia es nuestro regalo/i }),
@@ -146,6 +157,7 @@ test.describe("Invitaciones personalizadas — piloto", () => {
     await page.getByTestId("hero-cta").click();
     await expect(page.getByTestId("invitation-content")).toBeVisible();
     await expect(page.getByTestId("personalized-welcome")).toHaveCount(0);
+    await expect(page.getByTestId("personalized-welcome-photo")).toHaveCount(0);
     await expect(page.getByTestId("rsvp-section")).toHaveCount(0);
   });
 
