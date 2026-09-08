@@ -233,6 +233,14 @@ export const wedding: WeddingContent = {
       "Tenerlos con nosotros en este día significa mucho más de lo que podemos expresar.",
       "No es necesario traer ningún regalo; nos hará muy felices simplemente celebrar juntos.",
     ],
+    photo: {
+      // Derivado de Previas -33.jpg; original intacto en gallery/originals.
+      src: "/images/gallery/features/feature-presence-gift.jpg",
+      alt: "Silvia, Mauro y Omar de pie juntos en un patio soleado, con árboles altos al fondo",
+      width: 1333,
+      height: 2000,
+      objectPosition: "50% 42%",
+    },
   },
   /**
    * Confirmación de asistencia — fase futura.

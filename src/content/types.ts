@@ -212,6 +212,8 @@ export type PresenceGiftContent = {
   title: string;
   /** Párrafos en orden editorial */
   paragraphs: string[];
+  /** Foto editorial bajo el mensaje (derivado web; no servir originals/). */
+  photo: WeddingMediaAsset;
 };
 
 /**

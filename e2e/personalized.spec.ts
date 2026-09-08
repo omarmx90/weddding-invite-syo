@@ -63,19 +63,35 @@ test.describe("Invitaciones personalizadas — piloto", () => {
     await expect(
       page.getByRole("heading", { name: /Su presencia es nuestro regalo/i }),
     ).toBeVisible();
+    const presencePhoto = page.getByTestId("presence-gift-photo");
+    await expect(presencePhoto).toBeVisible();
+    await expect(presencePhoto.locator("img")).toHaveAttribute(
+      "src",
+      /feature-presence-gift/,
+    );
     await expect(page.getByTestId("rsvp-section")).toBeVisible();
 
     const order = await page.evaluate(() => {
       const presence = document.querySelector(
         "[data-testid='presence-gift-section']",
       );
-      const rsvp = document.querySelector("[data-testid='rsvp-section']");
-      if (!presence || !rsvp) return null;
-      return Boolean(
-        presence.compareDocumentPosition(rsvp) & Node.DOCUMENT_POSITION_FOLLOWING,
+      const photo = document.querySelector(
+        "[data-testid='presence-gift-photo']",
       );
+      const rsvp = document.querySelector("[data-testid='rsvp-section']");
+      if (!presence || !photo || !rsvp) return null;
+      return {
+        photoInsidePresence: presence.contains(photo),
+        presenceBeforeRsvp: Boolean(
+          presence.compareDocumentPosition(rsvp) &
+            Node.DOCUMENT_POSITION_FOLLOWING,
+        ),
+      };
     });
-    expect(order).toBe(true);
+    expect(order).toEqual({
+      photoInsidePresence: true,
+      presenceBeforeRsvp: true,
+    });
 
     await expect(page.getByTestId("rsvp-deadline")).toContainText(
       "10 de octubre de 2026",

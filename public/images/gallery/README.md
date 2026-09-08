@@ -18,6 +18,7 @@ Derivados web (~2000 px lado largo) en `features/`:
 | `feature-schedule-terrace.jpg` | Previas -16.jpg | Itinerario del día |
 | `feature-faith-silvia-gaze.jpg` | Previas -42.jpg | Fe — díptico (Silvia) |
 | `feature-faith-omar-gaze.jpg` | Previas -46.jpg | Fe — díptico (Omar) |
+| `feature-presence-gift.jpg` | Previas -33.jpg | Su presencia es nuestro regalo |
 
 ### Reel
 
@@ -58,6 +59,7 @@ Esa carpeta está en `.gitignore` (archivos de 10–24 MB). No se modifican dest
 | Previas -78 | Feature #1 |
 | Previas -25 | Feature #2 |
 | Previas -36 | Feature #3 |
+| Previas -33 | Su presencia es nuestro regalo |
 | nuestro-equipo.jpg | Sección Nuestro equipo |
 
 ## Activar / ampliar

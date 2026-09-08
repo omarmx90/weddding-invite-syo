@@ -680,6 +680,16 @@ test.describe("Invitación de boda — Chromium", () => {
     await expect(
       page.getByText(/Tenerlos con nosotros en este día/i),
     ).toBeVisible();
+    const presencePhoto = page.getByTestId("presence-gift-photo");
+    await expect(presencePhoto).toBeVisible();
+    await expect(presencePhoto.locator("img")).toHaveAttribute(
+      "src",
+      /feature-presence-gift/,
+    );
+    await expect(presencePhoto.locator("img")).toHaveAttribute(
+      "alt",
+      /Silvia, Mauro y Omar/i,
+    );
   });
 
   test("la cuenta regresiva muestra días, horas y minutos sin segundos", async ({
