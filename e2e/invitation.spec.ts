@@ -216,6 +216,7 @@ test.describe("Invitación de boda — Chromium", () => {
     const gallery = page.getByTestId("football-gallery");
     await expect(gallery).toBeVisible();
     await expect(gallery).toHaveAttribute("role", "region");
+    expect(wedding.familyTeam.footballGallery.items.length).toBe(14);
     expect(wedding.familyTeam.footballGallery.items.length).toBeGreaterThanOrEqual(
       10,
     );
@@ -326,7 +327,23 @@ test.describe("Invitación de boda — Chromium", () => {
     ).toBeVisible();
 
     const featured = wedding.gallery.items.filter((i) => i.featured);
-    expect(featured.length).toBeGreaterThanOrEqual(10);
+    expect(featured.length).toBe(7);
+    expect(featured.map((item) => item.id)).toEqual([
+      "momento-01",
+      "momento-02",
+      "momento-03",
+      "momento-04",
+      "momento-05",
+      "momento-06",
+      "momento-07",
+    ]);
+    expect(wedding.familyTeam.footballGallery.items.length).toBe(14);
+
+    await expect(gallery.getByTestId("gallery-photo-momento-08")).toHaveCount(0);
+    await expect(gallery.getByTestId("gallery-photo-momento-09")).toHaveCount(0);
+    await expect(gallery.getByTestId("gallery-photo-momento-10")).toHaveCount(0);
+    await expect(gallery.getByText("Tres equipos", { exact: true })).toHaveCount(0);
+    await expect(gallery.getByText("Siempre juntos", { exact: true })).toHaveCount(0);
 
     const rail = page.getByTestId("gallery-rail");
     await expect(rail).toBeVisible();

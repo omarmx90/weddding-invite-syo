@@ -434,8 +434,7 @@ export const wedding: WeddingContent = {
    *
    * Reel curado (orden narrativo):
    * pareja cámara → OTS Silvia → OTS Omar → detalle manos →
-   * familia terraza → jardín → santuario → playeras caminando →
-   * rivalidad → abrazo.
+   * familia terraza → jardín → santuario.
    * Features (-78, -25, -36) y hero no se duplican aquí.
    */
   gallery: {
@@ -523,41 +522,6 @@ export const wedding: WeddingContent = {
         orientation: "landscape",
         frame: "landscape",
         featured: true,
-      },
-      {
-        id: "momento-08",
-        src: "/images/gallery/momento-08.jpg",
-        alt: "Silvia, Mauro y Omar caminan de la mano con playeras de fútbol por una calle colonial",
-        width: 1600,
-        height: 1067,
-        objectPosition: "50% 35%",
-        orientation: "landscape",
-        frame: "landscape",
-        featured: true,
-      },
-      {
-        id: "momento-09",
-        src: "/images/gallery/momento-09.jpg",
-        alt: "Mauro serio al frente mientras Silvia y Omar ríen con playeras rivales",
-        width: 1111,
-        height: 1600,
-        objectPosition: "50% 32%",
-        orientation: "portrait",
-        frame: "portrait",
-        featured: true,
-        caption: "Tres equipos",
-      },
-      {
-        id: "momento-10",
-        src: "/images/gallery/momento-10.jpg",
-        alt: "Silvia, Mauro y Omar abrazados con playeras de Cruz Azul, América y Chivas",
-        width: 1600,
-        height: 1067,
-        objectPosition: "50% 32%",
-        orientation: "landscape",
-        frame: "featured",
-        featured: true,
-        caption: "Siempre juntos",
       },
     ],
   },
